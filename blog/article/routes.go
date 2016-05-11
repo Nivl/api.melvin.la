@@ -15,7 +15,7 @@ import (
 func SetRoutes(blog *gin.RouterGroup) {
 	articles := blog.Group("articles")
 	articles.GET("/:id", getArticle)
-	articles.GET("/", getArticles)
+	articles.GET("", getArticles)
 }
 
 func getArticles(gin *gin.Context) {
