@@ -11,9 +11,15 @@ func noRoute(gin *gin.Context) {
 	httpResponse.NotFound(gin)
 }
 
+func ensureIndexes() {
+	blog.EnsureIndexes()
+}
+
 func main() {
 	appContext := app.GetContext()
 	defer appContext.Destroy()
+
+	ensureIndexes()
 
 	api := gin.Default()
 	api.NoRoute(noRoute)
