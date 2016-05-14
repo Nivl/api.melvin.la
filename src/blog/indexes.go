@@ -1,6 +1,6 @@
 package blog
 
-import "github.com/Nivl/api.melvin.la/blog/article"
+import "github.com/Nivl/api.melvin.la/src/blog/article"
 
 // EnsureIndexes sets the indexes for all the documents in the blog
 func EnsureIndexes() {

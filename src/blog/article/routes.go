@@ -7,8 +7,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/Nivl/api.melvin.la/app"
-	"github.com/Nivl/api.melvin.la/http-response"
+	"github.com/Nivl/api.melvin.la/src/app"
+	"github.com/Nivl/api.melvin.la/src/http-response"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,7 @@
 package article
 
 import (
-	"github.com/Nivl/api.melvin.la/app"
+	"github.com/Nivl/api.melvin.la/src/app"
 	"gopkg.in/mgo.v2"
 )
 

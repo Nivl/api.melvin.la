@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Nivl/api.melvin.la/app"
-	"github.com/Nivl/api.melvin.la/blog"
-	"github.com/Nivl/api.melvin.la/http-response"
+	"github.com/Nivl/api.melvin.la/src/app"
+	"github.com/Nivl/api.melvin.la/src/blog"
+	"github.com/Nivl/api.melvin.la/src/http-response"
 	"github.com/gin-gonic/gin"
 )
 

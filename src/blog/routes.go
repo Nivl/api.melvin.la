@@ -1,7 +1,7 @@
 package blog
 
 import (
-	"github.com/Nivl/api.melvin.la/blog/article"
+	"github.com/Nivl/api.melvin.la/src/blog/article"
 	"github.com/gin-gonic/gin"
 )
 
