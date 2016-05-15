@@ -1,1 +1,1 @@
-web: bin/web start -p $PORT --database $MONGO_URI
+web: bin/api-melvin-la start -p $PORT --database $MONGO_URI
