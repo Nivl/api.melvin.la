@@ -15,14 +15,17 @@ func ensureIndexes() {
 	blog.EnsureIndexes()
 }
 
-func main() {
-	appContext := app.GetContext()
-	defer appContext.Destroy()
-
-	ensureIndexes()
-
+func start() {
 	api := gin.Default()
 	api.NoRoute(noRoute)
 	blog.SetRoutes(api)
-	api.Run(":" + appContext.Params.Port)
+	api.Run(":" + app.GetContext().Params.Port)
+}
+
+func main() {
+	app.InitContex()
+	defer app.GetContext().Destroy()
+
+	ensureIndexes()
+	start()
 }

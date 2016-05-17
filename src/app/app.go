@@ -22,14 +22,18 @@ type Context struct {
 
 var _context *Context
 
-// GetContext return the current app context.
-func GetContext() *Context {
+// InitContextWithParams initializes the app context using the provided params
+func InitContextWithParams(argv *Args) *Context {
 	if _context == nil {
 		_context = new(Context)
 
-		_, err := flags.Parse(&_context.Params)
-		if err != nil {
-			panic(err)
+		if argv == nil {
+			_, err := flags.Parse(&_context.Params)
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			_context.Params = *argv
 		}
 
 		session, err := mgo.Dial(_context.Params.MongoURI)
@@ -41,8 +45,20 @@ func GetContext() *Context {
 		_context.Session = session
 		_context.Session.SetMode(mgo.Monotonic, true)
 		_context.DB = session.DB("")
+	} else {
+		panic("Context already exists")
 	}
 
+	return _context
+}
+
+// InitContex initializes the app context using argv
+func InitContex() *Context {
+	return InitContextWithParams(nil)
+}
+
+// GetContext returns the current app context.
+func GetContext() *Context {
 	return _context
 }
 
