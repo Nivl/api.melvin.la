@@ -1,75 +1,132 @@
 package article
 
 import (
-	"log"
-	"time"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/Nivl/api.melvin.la/src/app"
-	"github.com/Nivl/api.melvin.la/src/http-response"
-	"github.com/gin-gonic/gin"
+	"github.com/Nivl/api.melvin.la/src/router"
+	"github.com/gorilla/mux"
 )
 
 // SetRoutes is used to set all the routes of the article
-func SetRoutes(blog *gin.RouterGroup) {
-	articles := blog.Group("articles")
-	articles.GET("/:id", getArticle)
-	articles.GET("", getArticles)
-	articles.POST("", addArticle)
+func SetRoutes(r *mux.Router) {
+	routes := &router.Endpoints{
+		{
+			Verb:    "GET",
+			Path:    "/",
+			Handler: getArticles,
+			Auth:    nil,
+		},
+		{
+			Verb:    "GET",
+			Path:    "/{id}",
+			Handler: getArticle,
+			Auth:    nil,
+		},
+		{
+			Verb:             "POST",
+			Path:             "/",
+			Handler:          addArticle,
+			Auth:             nil,
+			JSONBodyTemplate: Article{},
+		},
+		{
+			Verb:    "PATCH",
+			Path:    "/{id}",
+			Handler: updateArticle,
+			Auth:    nil,
+		},
+	}
+
+	routes.Activate(r)
 }
 
-func getArticles(gin *gin.Context) {
+func getArticles(req *router.Request) {
 	appCtx := app.GetContext()
 	doc := appCtx.DB.C("article")
 	articles := []Article{}
 
 	if err := doc.Find(nil).Sort("-createdAt").All(&articles); err != nil {
-		log.Println(err.Error())
-		httpResponse.ServerError(gin)
-	} else {
-		httpResponse.Ok(gin, httpResponse.Collection{ToCollection(articles)})
+		req.ServerError(err)
+		return
 	}
+
+	// httpResponse.Ok(gin, httpResponse.Collection{ToCollection(articles)})
+	req.NoContent()
 }
 
-func getArticle(gin *gin.Context) {
+func getArticle(req *router.Request) {
 	appCtx := app.GetContext()
 	doc := appCtx.DB.C("article")
 	article := Article{}
-	id := bson.ObjectIdHex(gin.Param("id"))
+	id := bson.ObjectIdHex(mux.Vars(req.Request)["id"])
 
 	if err := doc.Find(bson.M{"_id": id}).One(&article); err != nil {
 		if err == mgo.ErrNotFound {
-			httpResponse.NotFound(gin)
-		} else {
-			log.Println(err.Error())
-			httpResponse.ServerError(gin)
+			req.NotFound("Article %s not found", id)
+			return
 		}
-	} else {
-		httpResponse.Ok(gin, httpResponse.Resource{article})
+		req.ServerError(err)
+		return
 	}
+
+	//httpResponse.Ok(gin, httpResponse.Resource{article})
+	req.NoContent()
 }
 
 // TODO trim data before inserting
-func addArticle(gin *gin.Context) {
-	appCtx := app.GetContext()
-	doc := appCtx.DB.C("article")
-	article := Article{
-		ID:        bson.NewObjectId(),
-		CreatedAt: time.Now(),
-	}
+func addArticle(req *router.Request) {
+	//appCtx := app.GetContext()
+	//doc := appCtx.DB.C("article")
+	//article := Article{
+	//	ID:        bson.NewObjectId(),
+	//	CreatedAt: time.Now(),
+	//}
+	//
+	//if err := gin.Bind(&article); err != nil {
+	//	req.BadRequest(err)
+	//	return
+	//}
+	//
+	//if err := doc.Insert(article); err != nil {
+	//	if mgo.IsDup(err) {
+	//		req.Conflict("The slug %s already exists in the database", article.Slug)
+	//		return
+	//	}
+	//
+	//	req.ServerError(err)
+	//	return
+	//}
 
-	if err := gin.Bind(&article); err != nil {
-		httpResponse.BadRequest(gin, err.Error())
-	} else if err := doc.Insert(article); err != nil {
-		if mgo.IsDup(err) {
-			httpResponse.Conflict(gin, "This slug already exists in the database")
-		} else {
-			log.Println(err.Error())
-			httpResponse.ServerError(gin)
-		}
-	} else {
-		httpResponse.Ok(gin, httpResponse.Resource{article})
-	}
+	//httpResponse.Ok(gin, httpResponse.Resource{article})
+	req.NoContent()
+}
+
+// TODO trim data before updating
+func updateArticle(req *router.Request) {
+	//appCtx := app.GetContext()
+	//doc := appCtx.DB.C("article")
+	//article := Article{
+	//	ID:        bson.NewObjectId(),
+	//	CreatedAt: time.Now(),
+	//}
+	//
+	//if err := gin.Bind(&article); err != nil {
+	//	req.BadRequest(err)
+	//	return
+	//}
+	//
+	//if err := doc.Insert(article); err != nil {
+	//	if mgo.IsDup(err) {
+	//		req.Conflict("The slug %s already exists in the database", article.Slug)
+	//		return
+	//	}
+	//
+	//	req.ServerError(err)
+	//	return
+	//}
+
+	//httpResponse.Ok(gin, httpResponse.Resource{article})
+	req.NoContent()
 }

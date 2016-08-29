@@ -2,11 +2,10 @@ package blog
 
 import (
 	"github.com/Nivl/api.melvin.la/src/blog/article"
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 )
 
 // SetRoutes is used to set all the routes of the blog
-func SetRoutes(r *gin.Engine) {
-	blogRoutes := r.Group("blog")
-	article.SetRoutes(blogRoutes)
+func SetRoutes(r *mux.Router) {
+	article.SetRoutes(r.PathPrefix("/articles").Subrouter())
 }
