@@ -11,6 +11,7 @@ import (
 type Request struct {
 	Response http.ResponseWriter
 	Request  *http.Request
+	JSONBody interface{}
 }
 
 func (req *Request) String() string {

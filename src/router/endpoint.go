@@ -21,7 +21,7 @@ type Endpoint struct {
 
 // jsonBodyTemplateType returns the reflect.Type needed to create new
 // instances of the JSONBodyTemplate struct.
-func (e *Endpoint) jsonBodyTemplateType() (reflect.Type, error) {
+func (e *Endpoint) getJSONBodyTemplateType() (reflect.Type, error) {
 	// Reflect upon the type of e.JSONBodyTemplate and make sure
 	// that it's a pointer.
 	payloadPtrValue := reflect.ValueOf(e.JSONBodyTemplate)
