@@ -2,8 +2,8 @@ package article
 
 import "github.com/Nivl/api.melvin.la/src/app/helpers"
 
-// Payload represents an Article that can be sent to or returned by the API
-type Payload struct {
+// Exportable represents an Article that can be safely returned by the API
+type Exportable struct {
 	Title       string `json:"title"`
 	Content     string `json:"content"`
 	Slug        string `json:"slug"`
@@ -12,10 +12,10 @@ type Payload struct {
 	CreatedAt   string `json:"created_at"`
 }
 
-// NewPayloadFromModel turns an Article into a an object that is safe to be
+// NewPayloadFromModel turns an Article into an object that is safe to be
 // returned by the API
-func NewPayloadFromModel(a *Article) *Payload {
-	return &Payload{
+func NewPayloadFromModel(a *Article) *Exportable {
+	return &Exportable{
 		Title:       a.Title,
 		Content:     a.Content,
 		Slug:        a.Slug,
@@ -23,4 +23,14 @@ func NewPayloadFromModel(a *Article) *Payload {
 		Description: a.Description,
 		CreatedAt:   helpers.GetDateForJSON(a.CreatedAt),
 	}
+}
+
+// NewPayloadFromModels turns a []*Article into a list object that is safe to be
+// returned by the API
+func NewPayloadFromModels(list []*Article) []*Exportable {
+	pld := make([]*Exportable, len(list))
+	for i, a := range list {
+		pld[i] = NewPayloadFromModel(a)
+	}
+	return pld
 }

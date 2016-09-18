@@ -11,28 +11,26 @@ func SetRoutes(r *mux.Router) {
 		{
 			Verb:    "GET",
 			Path:    "/",
-			Handler: ArticleList,
+			Handler: List,
 			Auth:    nil,
 		},
 		{
 			Verb:    "GET",
 			Path:    "/{id}",
-			Handler: ArticleGet,
+			Handler: GetOne,
 			Auth:    nil,
 		},
 		{
-			Verb:             "POST",
-			Path:             "/",
-			Handler:          ArticleAdd,
-			Auth:             nil,
-			JSONBodyTemplate: &Article{},
+			Verb:    "POST",
+			Path:    "/",
+			Handler: Add,
+			Auth:    nil,
 		},
 		{
-			Verb:             "PATCH",
-			Path:             "/{id}",
-			Handler:          ArticleUpdate,
-			Auth:             nil,
-			JSONBodyTemplate: &Article{},
+			Verb:    "PATCH",
+			Path:    "/{id}",
+			Handler: Update,
+			Auth:    nil,
 		},
 	}
 
