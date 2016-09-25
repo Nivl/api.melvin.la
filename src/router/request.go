@@ -4,14 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Nivl/api.melvin.la/src/logger"
 )
 
+const ctFormData = "application/x-www-form-urlencoded"
+const ctMultipartFormData = "multipart/form-data"
+
 type Request struct {
-	Response http.ResponseWriter
-	Request  *http.Request
-	JSONBody interface{}
+	ID           string
+	Response     http.ResponseWriter
+	Request      *http.Request
+	Params       *Params
+	_contentType string
 }
 
 func (req *Request) String() string {
@@ -28,84 +34,37 @@ func (req *Request) String() string {
 	return string(dump)
 }
 
-func (req *Request) ServerError(err error) {
+func (req *Request) GetContentType() string {
 	if req == nil {
-		return
+		return ""
 	}
 
-	logger.Errorf("%s - %s", err.Error(), req)
-	http.Error(req.Response, "{\"error\":\"Something went wrong\"}", http.StatusInternalServerError)
-}
-
-func (req *Request) NotFound(msg string, args ...interface{}) {
-	if req == nil {
-		return
-	}
-
-	fullMsg := fmt.Sprintf(msg, args...)
-	http.Error(req.Response, fmt.Sprintf("{\"error\":\"%s\"}", fullMsg), http.StatusNotFound)
-}
-
-func (req *Request) Conflict(msg string, args ...interface{}) {
-	if req == nil {
-		return
-	}
-
-	fullMsg := fmt.Sprintf(msg, args...)
-	http.Error(req.Response, fmt.Sprintf("{\"error\":\"%s\"}", fullMsg), http.StatusConflict)
-}
-
-func (req *Request) BadRequest(msg string, args ...interface{}) {
-	if req == nil {
-		return
-	}
-
-	fullMsg := fmt.Sprintf(msg, args...)
-	http.Error(req.Response, fmt.Sprintf("{\"error\":\"%s\"}", fullMsg), http.StatusBadRequest)
-}
-
-func (req *Request) NoContent() {
-	if req == nil {
-		return
-	}
-
-	req.Response.WriteHeader(http.StatusNoContent)
-}
-
-func (req *Request) Created(obj interface{}) {
-	if req == nil {
-		return
-	}
-
-	req.RenderJSON(http.StatusCreated, obj)
-}
-
-func (req *Request) Ok(obj interface{}) {
-	if req == nil {
-		return
-	}
-
-	req.RenderJSON(http.StatusOK, obj)
-}
-
-func (req *Request) RenderJSON(code int, obj interface{}) {
-	var err error
-	var dump []byte
-
-	if obj != nil {
-		dump, err = json.Marshal(obj)
-		if err != nil {
-			req.ServerError(err)
-			return
+	if req._contentType == "" {
+		contentType := req.Request.Header.Get("Content-Type")
+		if contentType == "" {
+			req._contentType = "text/html"
+		} else {
+			req._contentType = strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
 		}
 	}
 
-	req.Response.WriteHeader(code)
+	return req._contentType
+}
 
-	if len(dump) == 0 {
-		if _, err = req.Response.Write(dump); err != nil {
-			req.Response.WriteHeader(http.StatusInternalServerError)
-			logger.Errorf("Could not write JSON response: %s", err.Error())
+func (req *Request) handlePanic() {
+	if rec := recover(); rec != nil {
+		req.Response.WriteHeader(http.StatusInternalServerError)
+		req.Response.Write([]byte(`{"error":"Something went wrong"}`))
+		// The recovered panic may not be an error
+		var err error
+		switch val := rec.(type) {
+		case error:
+			err = val
+		default:
+			err = fmt.Errorf("%v", val)
 		}
+		err = fmt.Errorf("panic: %v", err)
+		// TODO send an email
+		logger.Error(err.Error())
 	}
 }
