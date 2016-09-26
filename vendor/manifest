@@ -26,14 +26,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/jessevdk/go-flags",
-			"repository": "https://github.com/jessevdk/go-flags",
-			"vcs": "git",
-			"revision": "a8cab0163d48558ffd77076c9c99388529766f63",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/kelseyhightower/envconfig",
 			"repository": "https://github.com/kelseyhightower/envconfig",
 			"vcs": "git",

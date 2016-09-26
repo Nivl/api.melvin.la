@@ -2,17 +2,18 @@ package app
 
 import (
 	"fmt"
+
 	"github.com/bsphere/le_go"
-	"github.com/jessevdk/go-flags"
+	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/mgo.v2"
 )
 
 // Args represents the app args
 type Args struct {
-	Port            string `short:"p" long:"port" description:"Port to listen on" default:"8000"`
-	MongoURI        string `long:"database" description:"Connection URI of the mongo database" required:"true"`
-	LogEntriesToken string `long:"logentries" description:"Logenentries token to log errors"`
-	Debug           bool   `short:"d" long:"debug" description:"Debug mode"`
+	Port            string `default:"5000"`
+	MongoURI        string `required:"true" envconfig:"mongo_uri"`
+	LogEntriesToken string `envconfig:"mongo_uri" envconfig:"logentries_token"`
+	Debug           bool   `default:"false"`
 }
 
 // Context represent the global context of the app
@@ -25,22 +26,16 @@ type Context struct {
 
 var _context *Context
 
-// InitContextWithParams initializes the app context using the provided params
-func InitContextWithParams(argv *Args) *Context {
+// InitContex initializes the app context
+func InitContex() *Context {
 	if _context != nil {
 		panic("Context already exists")
 	}
 
 	_context = new(Context)
 
-	// Parse the cmd args
-	if argv == nil {
-		_, err := flags.Parse(&_context.Params)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		_context.Params = *argv
+	if err := envconfig.Process("api", &_context.Params); err != nil {
+		panic(err)
 	}
 
 	// Setup database
@@ -62,11 +57,6 @@ func InitContextWithParams(argv *Args) *Context {
 	}
 
 	return _context
-}
-
-// InitContex initializes the app context using argv
-func InitContex() *Context {
-	return InitContextWithParams(nil)
 }
 
 // GetContext returns the current app context.
