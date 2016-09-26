@@ -1,0 +1,15 @@
+api:
+  build: ./
+  ports:
+    - 5000:5000
+  volumes:
+    - ./:/go/src/github.com/Nivl/api.melvin.la
+  links:
+    - database
+  env_file:
+    - ./variables.env
+    - ./private.env
+
+database:
+  image: mongo:3.3
+  command: mongod --smallfiles --quiet --logpath=/dev/null

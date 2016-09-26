@@ -34,10 +34,26 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/kelseyhightower/envconfig",
+			"repository": "https://github.com/kelseyhightower/envconfig",
+			"vcs": "git",
+			"revision": "13674b2d056fb658a00ba3f36e78043ced07c924",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/satori/go.uuid",
 			"repository": "https://github.com/satori/go.uuid",
 			"vcs": "git",
 			"revision": "0aa62d5ddceb50dbcb909d790b5345affd3669b6",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "69483b4bd14f5845b5a1e55bca19e954e827f1d0",
 			"branch": "master",
 			"notests": true
 		},
