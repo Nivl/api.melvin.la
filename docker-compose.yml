@@ -12,4 +12,4 @@ api:
 
 database:
   image: mongo:3.3
-  command: mongod --smallfiles --logpath /var/log/mongodb.log
+  command: mongod
