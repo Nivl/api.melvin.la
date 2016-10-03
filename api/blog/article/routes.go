@@ -1,6 +1,7 @@
 package article
 
 import (
+	"github.com/Nivl/api.melvin.la/api/blog/article/articlehandlers"
 	"github.com/Nivl/api.melvin.la/api/router"
 	"github.com/gorilla/mux"
 )
@@ -11,25 +12,25 @@ func SetRoutes(r *mux.Router) {
 		{
 			Verb:    "GET",
 			Path:    "/",
-			Handler: List,
+			Handler: articlehandlers.List,
 			Auth:    nil,
 		},
 		{
 			Verb:    "GET",
 			Path:    "/{id}",
-			Handler: GetOne,
+			Handler: articlehandlers.GetOne,
 			Auth:    nil,
 		},
 		{
 			Verb:    "POST",
 			Path:    "/",
-			Handler: Add,
+			Handler: articlehandlers.Add,
 			Auth:    nil,
 		},
 		{
 			Verb:    "PATCH",
 			Path:    "/{id}",
-			Handler: Update,
+			Handler: articlehandlers.Update,
 			Auth:    nil,
 		},
 	}
