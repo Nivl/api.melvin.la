@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,12 +14,12 @@ func (endpoints Endpoints) Activate(router *mux.Router) {
 		router.
 			Methods(endpoint.Verb).
 			Path(endpoint.Path).
-			Handler(Handler(endpoint.Handler, endpoint.Auth))
+			Handler(Handler(endpoint))
 	}
 }
 
 // Handler makes it possible to use a RouteHandler where a http.Handler is required
-func Handler(handler RouteHandler, auth RouteAuth) http.Handler {
+func Handler(endpoint *Endpoint) http.Handler {
 	HTTPHandler := func(resWriter http.ResponseWriter, req *http.Request) {
 		request := &Request{
 			ID:       uuid.NewV4().String()[:8],
@@ -29,21 +28,17 @@ func Handler(handler RouteHandler, auth RouteAuth) http.Handler {
 		}
 
 		request.Response.Header().Set("X-Request-Id", request.ID)
-		// TODO: handle users
 
-		err := request.ParseParams()
-		defer removeParams(request)
-		// We must return a 400 and stop here if there was a problem parsing the request.
-		if err != nil {
-			http.Error(request.Response, fmt.Sprintf(`{"error":"%s"}`, "Bad params"), 400)
+		if err := endpoint.ParseParams(request); err != nil {
+			request.Error(err)
 			return
 		}
 
 		defer request.handlePanic()
 
-		accessGranted := auth == nil || auth(request)
+		accessGranted := endpoint.Auth == nil || endpoint.Auth(request)
 		if accessGranted {
-			handler(request)
+			endpoint.Handler(request)
 		}
 	}
 

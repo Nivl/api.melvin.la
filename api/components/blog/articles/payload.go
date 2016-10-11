@@ -1,4 +1,4 @@
-package article
+package articles
 
 import "github.com/Nivl/api.melvin.la/api/app/helpers"
 

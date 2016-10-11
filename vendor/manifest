@@ -26,6 +26,22 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/gosimple/slug",
+			"repository": "https://github.com/gosimple/slug",
+			"vcs": "git",
+			"revision": "501a9cc9964313c1711c9796f98ac0b340f68b81",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/imdario/mergo",
+			"repository": "https://github.com/imdario/mergo",
+			"vcs": "git",
+			"revision": "50d4dbd4eb0e84778abe37cefef140271d96fade",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/kelseyhightower/envconfig",
 			"repository": "https://github.com/kelseyhightower/envconfig",
 			"vcs": "git",
@@ -34,10 +50,26 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/rainycape/unidecode",
+			"repository": "https://github.com/rainycape/unidecode",
+			"vcs": "git",
+			"revision": "cb7f23ec59bec0d61b19c56cd88cee3d0cc1870c",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/satori/go.uuid",
 			"repository": "https://github.com/satori/go.uuid",
 			"vcs": "git",
 			"revision": "0aa62d5ddceb50dbcb909d790b5345affd3669b6",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/serenize/snaker",
+			"repository": "https://github.com/serenize/snaker",
+			"vcs": "git",
+			"revision": "8824b61eca66d308fcb2d515287d3d7a28dba8d6",
 			"branch": "master",
 			"notests": true
 		},

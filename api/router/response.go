@@ -5,43 +5,32 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/logger"
 )
 
-func (req *Request) ServerError(err error) {
+func (req *Request) Error(e error) {
 	if req == nil {
 		return
 	}
 
-	logger.Errorf("%s - %s", err.Error(), req)
-	http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
-}
-
-func (req *Request) NotFound(msg string, args ...interface{}) {
-	if req == nil {
-		return
+	// todo(melvin): can we just cast e into `apierror.Error` and check
+	// if err.Code == 0
+	var err apierror.Error
+	switch e.(type) {
+	case apierror.Error:
+		err = e.(apierror.Error)
+	default:
+		err = apierror.NewServerError(err.Error()).(apierror.Error)
 	}
 
-	fullMsg := fmt.Sprintf(msg, args...)
-	http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, fullMsg), http.StatusNotFound)
-}
-
-func (req *Request) Conflict(msg string, args ...interface{}) {
-	if req == nil {
-		return
+	switch err.Code {
+	case http.StatusInternalServerError:
+		logger.Errorf("%s - %s", err.Error(), req)
+		http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
+	default:
+		http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code)
 	}
-
-	fullMsg := fmt.Sprintf(msg, args...)
-	http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, fullMsg), http.StatusConflict)
-}
-
-func (req *Request) BadRequest(msg string, args ...interface{}) {
-	if req == nil {
-		return
-	}
-
-	fullMsg := fmt.Sprintf(msg, args...)
-	http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, fullMsg), http.StatusBadRequest)
 }
 
 func (req *Request) NoContent() {
@@ -75,7 +64,7 @@ func (req *Request) RenderJSON(code int, obj interface{}) {
 	if obj != nil {
 		dump, err = json.Marshal(obj)
 		if err != nil {
-			req.ServerError(err)
+			req.Error(err)
 			return
 		}
 	}

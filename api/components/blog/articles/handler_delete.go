@@ -1,8 +1,9 @@
-package articlehandlers
+package articles
 
 import "github.com/Nivl/api.melvin.la/api/router"
 
-func Add(req *router.Request) {
+// HandlerDelete represents a API handler to delete an article
+func HandlerDelete(req *router.Request) {
 	//appCtx := app.GetContext()
 	//doc := appCtx.DB.C("article")
 	//article := Article{

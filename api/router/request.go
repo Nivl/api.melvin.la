@@ -4,19 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/Nivl/api.melvin.la/api/logger"
 )
 
-const ctFormData = "application/x-www-form-urlencoded"
-const ctMultipartFormData = "multipart/form-data"
+const CTFormData = "application/x-www-form-urlencoded"
+const CTMultipartFormData = "multipart/form-data"
 
 type Request struct {
 	ID           string
 	Response     http.ResponseWriter
 	Request      *http.Request
-	Params       *Params
+	Params       url.Values
 	_contentType string
 }
 
