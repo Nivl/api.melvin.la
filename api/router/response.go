@@ -57,21 +57,10 @@ func (req *Request) Ok(obj interface{}) {
 }
 
 func (req *Request) RenderJSON(code int, obj interface{}) {
-	var err error
-	var dump []byte
-
-	if obj != nil {
-		dump, err = json.Marshal(obj)
-		if err != nil {
-			req.Error(err)
-			return
-		}
-	}
-
 	req.Response.WriteHeader(code)
 
-	if len(dump) == 0 {
-		if _, err = req.Response.Write(dump); err != nil {
+	if obj != nil {
+		if err := json.NewEncoder(req.Response).Encode(obj); err != nil {
 			req.Response.WriteHeader(http.StatusInternalServerError)
 			logger.Errorf("Could not write JSON response: %s", err.Error())
 		}
