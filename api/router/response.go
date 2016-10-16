@@ -17,7 +17,7 @@ func (req *Request) Error(e error) {
 
 	err, casted := e.(*apierror.ApiError)
 	if !casted {
-		err = apierror.NewServerError(err.Error()).(*apierror.ApiError)
+		err = apierror.NewServerError(e.Error()).(*apierror.ApiError)
 	}
 
 	switch err.Code() {
