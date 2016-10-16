@@ -22,11 +22,17 @@ type Endpoint struct {
 	Params  interface{}
 }
 
+// ParseParams will parse the params from the given request, and store them
+// into the endpoint
 func (e *Endpoint) ParseParams(r *Request) error {
 	params := reflect.ValueOf(e.Params)
-
 	if params.Kind() == reflect.Ptr {
 		params = params.Elem()
+	}
+
+	sources, err := r.ParamsBySource()
+	if err != nil {
+		return err
 	}
 
 	nbParams := params.NumField()
@@ -46,11 +52,6 @@ func (e *Endpoint) ParseParams(r *Request) error {
 
 		// We control the type of
 		paramLocation := strings.ToLower(tags.Get("from"))
-		sources, err := r.ParamsBySource()
-		if err != nil {
-			return err
-		}
-
 		source, found := sources[paramLocation]
 		if !found {
 			source = sources["url"]
@@ -92,7 +93,7 @@ func (e *Endpoint) setParamValue(args *setParamValueArgs) error {
 		opts.Name = args.paramInfo.Name
 	}
 
-	// We get the valye apply the transformations
+	// We get the value and apply the transformations
 	value := args.source.Get(opts.Name)
 	if opts.Trim {
 		value = strings.TrimSpace(value)
@@ -126,6 +127,5 @@ func (e *Endpoint) setParamValue(args *setParamValueArgs) error {
 			args.param.SetInt(v)
 		}
 	}
-
 	return nil
 }

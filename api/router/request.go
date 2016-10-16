@@ -7,13 +7,14 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/logger"
 	"github.com/gorilla/mux"
 )
 
-const CTFormData = "application/x-www-form-urlencoded"
-const CTMultipartFormData = "multipart/form-data"
+const (
+	ContentTypeJSON          = "application/json"
+	ContentTypeMultipartForm = "multipart/form-data"
+)
 
 type Request struct {
 	ID           string              `json:"req_id"`
@@ -37,6 +38,7 @@ func (req *Request) String() string {
 	return string(dump)
 }
 
+// ContentType returns the content type of the current request
 func (req *Request) ContentType() string {
 	if req == nil {
 		return ""
@@ -44,6 +46,7 @@ func (req *Request) ContentType() string {
 
 	if req._contentType == "" {
 		contentType := req.Request.Header.Get("Content-Type")
+
 		if contentType == "" {
 			req._contentType = "text/html"
 		} else {
@@ -54,6 +57,7 @@ func (req *Request) ContentType() string {
 	return req._contentType
 }
 
+// MuxVariables returns the URL variables associated to the request
 func (req *Request) MuxVariables() url.Values {
 	var output url.Values
 
@@ -62,7 +66,6 @@ func (req *Request) MuxVariables() url.Values {
 	}
 
 	vars := mux.Vars(req.Request)
-
 	for k, v := range vars {
 		output.Set(k, v)
 	}
@@ -70,6 +73,27 @@ func (req *Request) MuxVariables() url.Values {
 	return output
 }
 
+// MuxVariables parses and returns the body of the request
+func (req *Request) JSONBody() (url.Values, error) {
+	output := url.Values{}
+
+	if req.ContentType() != ContentTypeJSON {
+		return output, nil
+	}
+
+	vars := map[string]string{}
+	if err := json.NewDecoder(req.Request.Body).Decode(&vars); err != nil {
+		return nil, err
+	}
+
+	for k, v := range vars {
+		output.Set(k, v)
+	}
+
+	return output, nil
+}
+
+// ParamsBySource returns a map of params ordered by their source (url, query, form, ...)
 func (req *Request) ParamsBySource() (map[string]url.Values, error) {
 	params := map[string]url.Values{
 		"url":   req.MuxVariables(),
@@ -77,13 +101,11 @@ func (req *Request) ParamsBySource() (map[string]url.Values, error) {
 		"form":  url.Values{},
 	}
 
-	if req.ContentType() == CTFormData {
-		if err := req.Request.ParseForm(); err != nil {
-			return nil, apierror.NewServerError("Error parsing request body %s", err.Error())
-		}
-
-		params["form"] = req.Request.Form
+	form, err := req.JSONBody()
+	if err != nil {
+		return nil, err
 	}
+	params["form"] = form
 
 	return params, nil
 }
