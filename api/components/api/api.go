@@ -13,7 +13,6 @@ func GetRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.Host("api.melvin.la")
 	r.Host("api.melvin.loc")
-	r.Headers("Content-Type", "application/json")
 	blog.SetRoutes(r.PathPrefix("/blog").Subrouter())
 	//router.NotFoundHandler = http.HandlerFunc(noRoutes)
 

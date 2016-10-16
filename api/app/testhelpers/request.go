@@ -33,6 +33,8 @@ func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
 	}
 
 	req, err := http.NewRequest(info.Endpoint.Verb, info.URI, params)
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+
 	if err != nil {
 		info.Test.Fatalf("could not execute request %s", err)
 	}
