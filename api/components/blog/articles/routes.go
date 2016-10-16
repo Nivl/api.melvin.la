@@ -30,6 +30,12 @@ var Endpoints = router.Endpoints{
 		Path:    "/",
 		Handler: HandlerAdd,
 		Auth:    nil,
+		Params: &HandlerAddParams{
+			Title:       "title",
+			Subtitle:    "subtitle",
+			Content:     "content",
+			Description: "description",
+		},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",

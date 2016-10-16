@@ -18,12 +18,9 @@ import (
 		Private  string `params:"-"`
 	}
 */
-type Params struct {
-	Query interface{}
-	Form  interface{}
-}
 
 type ParamOptions struct {
+	Ignore   bool
 	Name     string
 	Required bool
 	Trim     bool
@@ -37,7 +34,7 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 
 	if nbOptions > 0 {
 		if opts[0] == "-" {
-			continue
+			return &ParamOptions{Ignore: true}
 		}
 
 		// We only accept the "required" option so we just do a simple check
@@ -53,5 +50,5 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 		}
 	}
 
-	return nil
+	return output
 }

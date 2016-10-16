@@ -7,16 +7,28 @@ import (
 )
 
 // Error represents an error with a code attached.
-type Error struct {
+type Error interface {
 	error
-	Code int
+	Code() int
+}
+
+type ApiError struct {
+	error
+	ErrorCode int
+}
+
+func (err *ApiError) Code() int {
+	if err == nil {
+		return http.StatusInternalServerError
+	}
+
+	return err.ErrorCode
 }
 
 // NewError returns an error with an associated code
 func NewError(code int, message string, args ...interface{}) error {
 	fullMessage := fmt.Sprintf(message, args...)
-
-	return Error{errors.New(fullMessage), code}
+	return &ApiError{errors.New(fullMessage), code}
 }
 
 // NewServerError returns an Internal Error.
@@ -26,7 +38,7 @@ func NewServerError(message string, args ...interface{}) error {
 
 // NewBadRequest returns an error caused by a user. Example: A missing param
 func NewBadRequest(message string, args ...interface{}) error {
-	return NewError(http.StatusInternalServerError, message, args)
+	return NewError(http.StatusBadRequest, message, args)
 }
 
 // NewConflict returns an error caused by a conflict with the current state

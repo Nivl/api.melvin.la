@@ -1,18 +1,40 @@
 package testhelpers
 
 import (
-	"log"
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/Nivl/api.melvin.la/api/components/api"
 	"github.com/Nivl/api.melvin.la/api/router"
 )
 
-func NewRequest(e router.Endpoint, uri string) *httptest.ResponseRecorder {
-	req, err := http.NewRequest(e.Verb, uri, nil)
+type RequestInfo struct {
+	Test     *testing.T
+	Endpoint *router.Endpoint
+	URI      string
+	Params   interface{}
+}
+
+func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
+	var params *bytes.Buffer
+	var jsonDump []byte
+	var err error
+
+	if info.Params != nil {
+		jsonDump, err = json.Marshal(info.Params)
+		if err != nil {
+			info.Test.Fatalf("could not create request %s", err)
+		}
+
+		params = bytes.NewBuffer(jsonDump)
+	}
+
+	req, err := http.NewRequest(info.Endpoint.Verb, info.URI, params)
 	if err != nil {
-		log.Fatal(err)
+		info.Test.Fatalf("could not execute request %s", err)
 	}
 
 	rec := httptest.NewRecorder()

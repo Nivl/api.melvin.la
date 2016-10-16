@@ -2,28 +2,26 @@ package logger
 
 import (
 	"fmt"
+	"log"
 	"runtime/debug"
-
-	"github.com/Nivl/api.melvin.la/api/app"
 )
 
-func log(msg string) {
-	context := app.GetContext()
+func logg(msg string) {
+	// context := app.GetContext()
 
-	if context.LogEntries != nil {
-		context.LogEntries.Println(msg)
-	}
+	// if context != nil && context.LogEntries != nil {
+	// 	context.LogEntries.Println(msg)
+	// }
 
-	fmt.Println(msg)
+	log.Println(msg)
 }
 
 func Errorf(msg string, args ...interface{}) {
 	fullMessage := fmt.Sprintf("%s | \"level\": \"ERROR\", %s", debug.Stack(), fmt.Sprintf(msg, args...))
-
-	log(fullMessage)
+	logg(fullMessage)
 }
 
 func Error(msg string) {
 	fullMessage := fmt.Sprintf("%s | \"level\": \"ERROR\", %s", debug.Stack(), msg)
-	log(fullMessage)
+	logg(fullMessage)
 }

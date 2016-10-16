@@ -1,38 +1,31 @@
 package articles
 
-import (
-	"github.com/Nivl/api.melvin.la/api/apierror"
-	"github.com/Nivl/api.melvin.la/api/router"
-)
+import "github.com/Nivl/api.melvin.la/api/router"
 
-var HandlerAddParams = router.Params{
-	Query: struct{}{},
-	Form: struct {
-		Title       string `params:",required,trim"`
-		Subtitle    string
-		Description string
-		Content     string
-		Slug        string
-	}{},
+type HandlerAddParams struct {
+	Title       string `params:",required,trim" from:"query" json:"title,omitempty"`
+	Subtitle    string `from:"query" json:"subtitle,omitempty"`
+	Description string `from:"query" json:"description,omitempty"`
+	Content     string `from:"query" json:"content,omitempty"`
 }
 
 // HandlerAdd represents a API handler to add a new article
 func HandlerAdd(req *router.Request) {
+
+	params := req.Params.(HandlerAddParams)
+
 	a := &Article{
-		Title:       req.Params.Get("title"),
-		Subtitle:    req.Params.Get("subtitle"),
-		Content:     req.Params.Get("content"),
-		Description: req.Params.Get("description"),
+		Title:       params.Title,
+		Subtitle:    params.Subtitle,
+		Content:     params.Content,
+		Description: params.Description,
 		IsDeleted:   false,
 		IsPublished: false,
 	}
 
-	if a.Title == "" {
-		req.Error(apierror.NewBadRequest("Article Missing"))
-	}
+	// if err := a.Save(); err != nil {
+	// 	req.Error(err)
+	// }
 
-	if err := a.Save(); err != nil {
-		req.Error(err)
-	}
 	req.Created(a)
 }

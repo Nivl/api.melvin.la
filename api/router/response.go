@@ -14,22 +14,17 @@ func (req *Request) Error(e error) {
 		return
 	}
 
-	// todo(melvin): can we just cast e into `apierror.Error` and check
-	// if err.Code == 0
-	var err apierror.Error
-	switch e.(type) {
-	case apierror.Error:
-		err = e.(apierror.Error)
-	default:
-		err = apierror.NewServerError(err.Error()).(apierror.Error)
+	err, casted := e.(*apierror.ApiError)
+	if !casted {
+		err = apierror.NewServerError(err.Error()).(*apierror.ApiError)
 	}
 
-	switch err.Code {
+	switch err.Code() {
 	case http.StatusInternalServerError:
 		logger.Errorf("%s - %s", err.Error(), req)
 		http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
 	default:
-		http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code)
+		http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
 	}
 }
 

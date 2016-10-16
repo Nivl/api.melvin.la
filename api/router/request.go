@@ -7,17 +7,19 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/logger"
+	"github.com/gorilla/mux"
 )
 
 const CTFormData = "application/x-www-form-urlencoded"
 const CTMultipartFormData = "multipart/form-data"
 
 type Request struct {
-	ID           string
-	Response     http.ResponseWriter
-	Request      *http.Request
-	Params       url.Values
+	ID           string              `json:"req_id"`
+	Response     http.ResponseWriter `json:"-"`
+	Request      *http.Request       `json:"-"`
+	Params       interface{}
 	_contentType string
 }
 
@@ -29,13 +31,13 @@ func (req *Request) String() string {
 	dump, err := json.Marshal(req)
 	if err != nil {
 		logger.Errorf(err.Error())
-		return ""
+		return "failed to parse the request"
 	}
 
 	return string(dump)
 }
 
-func (req *Request) GetContentType() string {
+func (req *Request) ContentType() string {
 	if req == nil {
 		return ""
 	}
@@ -50,6 +52,40 @@ func (req *Request) GetContentType() string {
 	}
 
 	return req._contentType
+}
+
+func (req *Request) MuxVariables() url.Values {
+	var output url.Values
+
+	if req == nil {
+		return output
+	}
+
+	vars := mux.Vars(req.Request)
+
+	for k, v := range vars {
+		output.Set(k, v)
+	}
+
+	return output
+}
+
+func (req *Request) ParamsBySource() (map[string]url.Values, error) {
+	params := map[string]url.Values{
+		"url":   req.MuxVariables(),
+		"query": req.Request.URL.Query(),
+		"form":  url.Values{},
+	}
+
+	if req.ContentType() == CTFormData {
+		if err := req.Request.ParseForm(); err != nil {
+			return nil, apierror.NewServerError("Error parsing request body %s", err.Error())
+		}
+
+		params["form"] = req.Request.Form
+	}
+
+	return params, nil
 }
 
 func (req *Request) handlePanic() {
