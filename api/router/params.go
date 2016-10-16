@@ -5,27 +5,26 @@ import (
 	"strings"
 )
 
-/*
-	Accept the folowing tags
-	require
-
-
-	Example:
-
-	{
-		Title        string `params:",required"`
-		IsPublished  string `params:"" default:""`
-		Private  string `params:"-"`
-	}
-*/
-
+// ParamOptions represent all the options for a field
 type ParamOptions struct {
-	Ignore   bool
-	Name     string
+	// Ignore means the field should not been parsed
+	// json:"-"
+	Ignore bool
+
+	// Name contains the name of the field in the payload
+	// json:"my_field"
+	Name string
+
+	// Required means the request should fail with a Bad Request if the field is missing.
+	// params:"required"
 	Required bool
-	Trim     bool
+
+	// Trim means the field needs to be trimmed before being retrieved and checked
+	// params:"trim"
+	Trim bool
 }
 
+// NewParamOptions returns a ParamOptions from a StructTag
 func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 	output := &ParamOptions{}
 
