@@ -29,24 +29,25 @@ type ParamOptions struct {
 func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 	output := &ParamOptions{}
 
-	opts := strings.Split(tags.Get("params"), ",")
-	nbOptions := len(opts)
-
-	if nbOptions > 0 {
-		if opts[0] == "-" {
+	// We use the json tag to get the field name
+	jsonOpts := strings.Split(tags.Get("json"), ",")
+	if len(jsonOpts) > 0 {
+		if jsonOpts[0] == "-" {
 			return &ParamOptions{Ignore: true}
 		}
 
-		// We only accept the "required" option so we just do a simple check
-		output.Name = opts[0]
+		output.Name = jsonOpts[0]
+	}
 
-		for i := 1; i < nbOptions; i++ {
-			switch opts[i] {
-			case "required":
-				output.Required = true
-			case "trim":
-				output.Trim = true
-			}
+	// We parse the params
+	opts := strings.Split(tags.Get("params"), ",")
+	nbOptions := len(opts)
+	for i := 0; i < nbOptions; i++ {
+		switch opts[i] {
+		case "required":
+			output.Required = true
+		case "trim":
+			output.Trim = true
 		}
 	}
 

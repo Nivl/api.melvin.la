@@ -3,7 +3,7 @@ package articles
 import "github.com/Nivl/api.melvin.la/api/router"
 
 type HandlerAddParams struct {
-	Title       string `params:",required,trim" from:"query" json:"title,omitempty"`
+	Title       string `from:"query" json:"title" params:"required,trim"`
 	Subtitle    string `from:"query" json:"subtitle,omitempty"`
 	Description string `from:"query" json:"description,omitempty"`
 	Content     string `from:"query" json:"content,omitempty"`
