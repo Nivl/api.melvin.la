@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
+
+	"github.com/Nivl/api.melvin.la/api/app"
 )
 
 func logg(msg string) {
-	// context := app.GetContext()
+	context := app.GetContext()
 
-	// if context != nil && context.LogEntries != nil {
-	// 	context.LogEntries.Println(msg)
-	// }
+	if context != nil && context.LogEntries != nil {
+		context.LogEntries.Println(msg)
+	}
 
 	log.Println(msg)
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Nivl/api.melvin.la/api/apierror"
+	"github.com/Nivl/api.melvin.la/api/app"
 	"github.com/Nivl/api.melvin.la/api/logger"
 )
 
@@ -24,6 +25,9 @@ func (req *Request) Error(e error) {
 		logger.Errorf("%s - %s", err.Error(), req)
 		http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
 	default:
+		if app.GetContext().Params.Debug {
+			logger.Errorf("%s - %s", err.Error(), req)
+		}
 		http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
 	}
 }
