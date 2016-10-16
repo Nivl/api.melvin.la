@@ -29,9 +29,21 @@ type Article struct {
 	IsPublished bool          `bson:"is_published"`
 }
 
+func (a *Article) FullyDelete() error {
+	if a == nil {
+		return errors.New("article not instanced")
+	}
+
+	if a.ID == "" {
+		return errors.New("article has not been saved")
+	}
+
+	return Query().RemoveId(a.ID)
+}
+
 func (a *Article) Save() error {
 	if a == nil {
-		return errors.New("Article not instanced")
+		return errors.New("article not instanced")
 	}
 
 	if a.ID == "" {
@@ -43,7 +55,7 @@ func (a *Article) Save() error {
 
 func (a *Article) Create() error {
 	if a == nil {
-		return apierror.NewServerError("Article not instanced")
+		return apierror.NewServerError("article not instanced")
 	}
 
 	if a.Slug == "" {
