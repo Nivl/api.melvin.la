@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/Nivl/api.melvin.la/api/apierror"
-	"github.com/serenize/snaker"
 )
 
 type RouteAuth func(*Request) bool
@@ -89,10 +88,8 @@ func (e *Endpoint) setParamValue(args *setParamValueArgs) error {
 		return nil
 	}
 
-	// If no name has been specified, we'll use the snake version
-	// of the variable name
 	if opts.Name == "" {
-		opts.Name = snaker.SnakeToCamel(args.paramInfo.Name)
+		opts.Name = args.paramInfo.Name
 	}
 
 	// We get the valye apply the transformations

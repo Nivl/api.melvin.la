@@ -66,14 +66,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/serenize/snaker",
-			"repository": "https://github.com/serenize/snaker",
-			"vcs": "git",
-			"revision": "8824b61eca66d308fcb2d515287d3d7a28dba8d6",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/stretchr/testify",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",
