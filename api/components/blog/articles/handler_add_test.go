@@ -1,6 +1,7 @@
 package articles_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,6 +18,7 @@ func TestHandlerAdd(t *testing.T) {
 		code        int
 	}{
 		{"No Title", &articles.HandlerAddParams{}, http.StatusBadRequest},
+		{"Title filled with spaces", &articles.HandlerAddParams{Title: "       "}, http.StatusBadRequest},
 		{"As few params as possible", &articles.HandlerAddParams{Title: "My Super Article"}, http.StatusCreated},
 	}
 
@@ -24,6 +26,20 @@ func TestHandlerAdd(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			rec := callHandlerAdd(t, tc.params)
 			assert.Equal(t, tc.code, rec.Code)
+
+			if rec.Code == http.StatusCreated {
+				var a articles.Article
+				if err := json.NewDecoder(rec.Body).Decode(&a); err != nil {
+					t.Fatal(err)
+				}
+
+				assert.NotEmpty(t, a.ID)
+				assert.NotEmpty(t, a.Slug)
+				assert.Equal(t, tc.params.Title, a.Title)
+				if err := a.FullyDelete(); err != nil {
+					t.Fatal(err)
+				}
+			}
 		})
 	}
 }
