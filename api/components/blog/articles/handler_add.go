@@ -12,7 +12,7 @@ type HandlerAddParams struct {
 	Content     string `from:"form" json:"content,omitempty"`
 }
 
-// HandlerAdd represents a API handler to add a new article
+// HandlerAdd represents an API handler to add a new article
 func HandlerAdd(req *router.Request) {
 	params, ok := req.Params.(*HandlerAddParams)
 	if !ok {
@@ -28,9 +28,9 @@ func HandlerAdd(req *router.Request) {
 		IsPublished: false,
 	}
 
-	// if err := a.Save(); err != nil {
-	// 	req.Error(err)
-	// }
+	if err := a.Save(); err != nil {
+		req.Error(err)
+	}
 
 	req.Created(a)
 }
