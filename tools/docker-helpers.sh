@@ -1,7 +1,7 @@
 #!/bin/bash
-alias ddc-build="docker-compose build" # builds the container
-alias ddc-up="docker-compose up -d" # starts the container
-alias ddc-rm="docker-compose stop && docker-compose rm -f" # Removes the renning container
+alias ddc-build="docker-compose build" # builds the services
+alias ddc-up="docker-compose up -d" # starts the services
+alias ddc-rm="docker-compose stop && docker-compose rm -f" # Removes the services
 alias ddc-stop="docker-compose stop" # Stops the running services
 
 alias ml-log-mongo="docker logs apimelvinla_database_1" # print mongo logs
