@@ -1,0 +1,11 @@
+sudo: required
+
+services:
+  - docker
+
+install:
+  - docker-compose build
+  - docker-compose up -d
+
+script:
+  - docker exec -i -t apimelvinla_api_1 /bin/bash -ic "cd /go/src/github.com/Nivl/api.melvin.la/api && go test ./..."
