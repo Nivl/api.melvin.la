@@ -20,6 +20,7 @@ func TestHandlerAdd(t *testing.T) {
 		{"No Title", &articles.HandlerAddParams{}, http.StatusBadRequest},
 		{"Title filled with spaces", &articles.HandlerAddParams{Title: "       "}, http.StatusBadRequest},
 		{"As few params as possible", &articles.HandlerAddParams{Title: "My Super Article"}, http.StatusCreated},
+		{"Duplicate title", &articles.HandlerAddParams{Title: "My Super Article"}, http.StatusCreated},
 	}
 
 	for _, tc := range tests {
