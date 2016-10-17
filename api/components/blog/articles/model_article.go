@@ -3,10 +3,12 @@ package articles
 import (
 	"errors"
 	"fmt"
+	"testing"
 	"time"
 
 	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/app"
+	"github.com/dchest/uniuri"
 	"github.com/gosimple/slug"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -14,6 +16,10 @@ import (
 
 func Query() *mgo.Collection {
 	return app.GetContext().DB.C("article")
+}
+
+var defaultSearch = bson.M{
+	"is_deleted": false,
 }
 
 // Article is a structure representing an article that can be saved in the database
@@ -95,4 +101,22 @@ func (a *Article) Create() error {
 
 func (a *Article) Update() error {
 	return nil
+}
+
+func NewTestArticle(t *testing.T, a *Article) *Article {
+	if a == nil {
+		a = &Article{
+			IsDeleted:   false,
+			IsPublished: true,
+		}
+	}
+
+	if a.Title == "" {
+		a.Title = uniuri.New()
+	}
+
+	if err := a.Save(); err != nil {
+		t.Fatalf("failed to save article: %s", err)
+	}
+	return a
 }

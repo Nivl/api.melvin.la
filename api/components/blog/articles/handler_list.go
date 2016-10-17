@@ -8,7 +8,7 @@ import (
 func HandlerList(req *router.Request) {
 	arts := []*Article{}
 
-	if err := Query().Find(nil).Sort("-createdAt").All(&arts); err != nil {
+	if err := Query().Find(defaultSearch).Sort("-createdAt").All(&arts); err != nil {
 		req.Error(err)
 		return
 	}
