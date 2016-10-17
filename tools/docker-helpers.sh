@@ -37,3 +37,14 @@ function ml-test {
   echo "Start testings"
   ml-exec go test "$@"
 }
+
+# Execute a test
+function ml-tests {
+  echo "Restart services..."
+  ddc-stop &> /dev/null
+  ddc-build &> /dev/null
+  ddc-up &> /dev/null
+
+  echo "Start testings"
+  ml-exec "cd api && go test ./..."
+}
