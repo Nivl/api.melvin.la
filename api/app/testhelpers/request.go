@@ -19,12 +19,10 @@ type RequestInfo struct {
 }
 
 func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
-	var params *bytes.Buffer
-	var jsonDump []byte
-	var err error
+	params := bytes.NewBufferString("")
 
 	if info.Params != nil {
-		jsonDump, err = json.Marshal(info.Params)
+		jsonDump, err := json.Marshal(info.Params)
 		if err != nil {
 			info.Test.Fatalf("could not create request %s", err)
 		}
@@ -33,11 +31,11 @@ func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
 	}
 
 	req, err := http.NewRequest(info.Endpoint.Verb, info.URI, params)
-	req.Header.Add("Content-Type", "application/json; charset=utf-8")
-
 	if err != nil {
 		info.Test.Fatalf("could not execute request %s", err)
 	}
+
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 
 	rec := httptest.NewRecorder()
 	r := api.GetRouter()

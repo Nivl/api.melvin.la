@@ -30,11 +30,13 @@ func Handler(e *Endpoint) http.Handler {
 
 		request.Response.Header().Set("X-Request-Id", request.ID)
 
-		// We give request.Params the same type as e.Params
-		request.Params = reflect.New(reflect.TypeOf(e.Params).Elem()).Interface()
-		if err := request.ParseParams(); err != nil {
-			request.Error(err)
-			return
+		if e.Params != nil {
+			// We give request.Params the same type as e.Params
+			request.Params = reflect.New(reflect.TypeOf(e.Params).Elem()).Interface()
+			if err := request.ParseParams(); err != nil {
+				request.Error(err)
+				return
+			}
 		}
 
 		defer request.handlePanic()
