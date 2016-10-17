@@ -8,7 +8,7 @@ api:
     - database
   env_file:
     - ./variables.env
-    - ./private.env
+    - ./${ML_BUILD_ENV}.env
 
 database:
   image: mongo:3.3

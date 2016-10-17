@@ -1,6 +1,6 @@
 #!/bin/bash
-alias ddc-build="docker-compose build" # builds the services
-alias ddc-up="docker-compose up -d" # starts the services
+alias ddc-build="ML_BUILD_ENV=travis docker-compose build" # builds the services
+alias ddc-up="ML_BUILD_ENV=travis docker-compose up -d" # starts the services
 alias ddc-rm="docker-compose stop && docker-compose rm -f" # Removes the services
 alias ddc-stop="docker-compose stop" # Stops the running services
 

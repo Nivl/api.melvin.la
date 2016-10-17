@@ -3,6 +3,9 @@ sudo: required
 services:
   - docker
 
+env:
+  - ML_BUILD_ENV=test
+
 install:
   - docker-compose build
   - docker-compose up -d
