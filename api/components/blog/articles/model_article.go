@@ -15,7 +15,7 @@ import (
 )
 
 func Query() *mgo.Collection {
-	return app.GetContext().DB.C("article")
+	return app.GetContext().DB.C("articles")
 }
 
 var defaultSearch = bson.M{

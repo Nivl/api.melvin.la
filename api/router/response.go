@@ -25,10 +25,16 @@ func (req *Request) Error(e error) {
 		logger.Errorf("%s - %s", err.Error(), req)
 		http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
 	default:
-		if app.GetContext().Params.Debug {
-			logger.Errorf("%s - %s", err.Error(), req)
+		// Some errors do not need a body
+		if err.Error() == "" {
+			req.Response.WriteHeader(err.Code())
+		} else {
+			if app.GetContext().Params.Debug {
+				logger.Errorf("%s - %s", err.Error(), req)
+			}
+
+			http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
 		}
-		http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
 	}
 }
 

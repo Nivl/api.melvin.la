@@ -1,11 +1,13 @@
 package api
 
 import (
+	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/blog"
 	"github.com/gorilla/mux"
 )
 
 func EnsureIndexes() {
+	auth.EnsureIndexes()
 	blog.EnsureIndexes()
 }
 

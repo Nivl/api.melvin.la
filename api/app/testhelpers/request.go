@@ -7,15 +7,34 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/Nivl/api.melvin.la/api/components/api"
 	"github.com/Nivl/api.melvin.la/api/router"
+	"github.com/gorilla/mux"
 )
+
+type RequestAuth struct {
+	Session string
+	UserId  string
+}
+
+func NewRequestAuth(sess bson.ObjectId, user bson.ObjectId) *RequestAuth {
+	return &RequestAuth{
+		Session: sess.Hex(),
+		UserId:  user.Hex(),
+	}
+}
 
 type RequestInfo struct {
 	Test     *testing.T
 	Endpoint *router.Endpoint
 	URI      string
 	Params   interface{}
+	Auth     *RequestAuth
+
+	// Router is used to parse Mux Variables. Default on the api router
+	Router *mux.Router
 }
 
 func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
@@ -35,10 +54,19 @@ func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
 		info.Test.Fatalf("could not execute request %s", err)
 	}
 
+	if info.Auth != nil {
+		req.Header.Add("X-Session-Id", info.Auth.Session)
+		req.Header.Add("X-User-Id", info.Auth.UserId)
+	}
+
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 
+	// If no router is provided we assume that we want to execute a regular endpoint
+	if info.Router == nil {
+		info.Router = api.GetRouter()
+	}
+
 	rec := httptest.NewRecorder()
-	r := api.GetRouter()
-	r.ServeHTTP(rec, req)
+	info.Router.ServeHTTP(rec, req)
 	return rec
 }

@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/logger"
 	"github.com/gorilla/mux"
 )
@@ -20,7 +21,8 @@ type Request struct {
 	ID           string              `json:"req_id"`
 	Response     http.ResponseWriter `json:"-"`
 	Request      *http.Request       `json:"-"`
-	Params       interface{}
+	Params       interface{}         `json:"-"`
+	User         *auth.User          `json:"-"`
 	_contentType string
 }
 

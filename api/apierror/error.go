@@ -46,3 +46,9 @@ func NewBadRequest(message string, args ...interface{}) error {
 func NewConflict(message string, args ...interface{}) error {
 	return NewError(http.StatusConflict, message, args)
 }
+
+// NewUnauthorized returns an error caused by a anonymous user trying access
+// a protected ressource
+func NewUnauthorized() error {
+	return NewError(http.StatusUnauthorized, "")
+}

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/Nivl/api.melvin.la/api/apierror"
+	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 )
@@ -27,9 +29,9 @@ func Handler(e *Endpoint) http.Handler {
 			Request:  req,
 			Response: resWriter,
 		}
+		defer request.handlePanic()
 
-		request.Response.Header().Set("X-Request-Id", request.ID)
-
+		// We Parse the request params
 		if e.Params != nil {
 			// We give request.Params the same type as e.Params
 			request.Params = reflect.New(reflect.TypeOf(e.Params).Elem()).Interface()
@@ -39,12 +41,39 @@ func Handler(e *Endpoint) http.Handler {
 			}
 		}
 
-		defer request.handlePanic()
+		// We check the auth
+		sess := auth.NewSessionFromStrings(req.Header.Get("X-Session-Id"), req.Header.Get("X-User-Id"))
+		if sess.ID != "" && sess.UserID != "" {
+			exists, err := sess.Exists()
+			if err != nil {
+				request.Error(err)
+				return
+			}
+			if !exists {
+				request.Error(apierror.NewBadRequest("invalid auth data"))
+				return
+			}
+			// we get the user and make sure it (still) exists
+			request.User, err = auth.GetUser(sess.UserID)
+			if err != nil {
+				request.Error(err)
+				return
+			}
+			if request.User == nil {
+				request.Error(apierror.NewBadRequest("user not found"))
+				return
+			}
+		}
+
+		// We set some response data
+		request.Response.Header().Set("X-Request-Id", request.ID)
 
 		accessGranted := e.Auth == nil || e.Auth(request)
-		if accessGranted {
-			e.Handler(request)
+		if !accessGranted {
+			request.Error(apierror.NewUnauthorized())
+			return
 		}
+		e.Handler(request)
 	}
 
 	return http.HandlerFunc(HTTPHandler)

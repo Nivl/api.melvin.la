@@ -1,6 +1,5 @@
 package router
 
-type RouteAuth func(*Request) bool
 type RouteHandler func(*Request)
 
 // Endpoint represents an HTTP endpoint
