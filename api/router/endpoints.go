@@ -42,9 +42,9 @@ func Handler(e *Endpoint) http.Handler {
 		}
 
 		// We check the auth
-		sess := auth.NewSessionFromStrings(req.Header.Get("X-Session-Id"), req.Header.Get("X-User-Id"))
-		if sess.ID != "" && sess.UserID != "" {
-			exists, err := sess.Exists()
+		session := auth.NewSessionFromStrings(req.Header.Get("X-Session-Id"), req.Header.Get("X-User-Id"))
+		if session.ID != "" && session.UserID != "" {
+			exists, err := session.Exists()
 			if err != nil {
 				request.Error(err)
 				return
@@ -54,7 +54,7 @@ func Handler(e *Endpoint) http.Handler {
 				return
 			}
 			// we get the user and make sure it (still) exists
-			request.User, err = auth.GetUser(sess.UserID)
+			request.User, err = auth.GetUser(session.UserID)
 			if err != nil {
 				request.Error(err)
 				return
