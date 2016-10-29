@@ -28,7 +28,7 @@ type User struct {
 
 	Name         string    `bson:"name"`
 	Email        string    `bson:"email"`
-	Password     string    `bson:"slug"`
+	Password     string    `bson:"password"`
 	SignUpIp     string    `bson:"sign_up_ip"`
 	LastActionIp string    `bson:"last_action_ip"`
 	LastActionAt time.Time `bson:"last_action_at"`
