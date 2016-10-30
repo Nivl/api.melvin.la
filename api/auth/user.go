@@ -58,12 +58,21 @@ func CryptPassword(raw string) (string, error) {
 	return string(password), nil
 }
 
+func IsPasswordValid(hash string, raw string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(raw))
+	return err == nil
+}
+
 func (u *User) Save() error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
 
-	return u.Create()
+	if u.ID == "" {
+		return u.Create()
+	}
+
+	return u.Update()
 }
 
 func (u *User) FullyDelete() error {
@@ -92,6 +101,25 @@ func (u *User) Create() error {
 	u.UpdatedAt = time.Now()
 
 	err := QueryUsers().Insert(u)
+	if err != nil && mgo.IsDup(err) {
+		return apierror.NewConflict("email address already in use")
+	}
+
+	return err
+}
+
+func (u *User) Update() error {
+	if u == nil {
+		return apierror.NewServerError("user is not instanced")
+	}
+
+	if u.ID == "" {
+		return apierror.NewServerError("cannot update a non-persisted user")
+	}
+
+	u.UpdatedAt = time.Now()
+
+	err := QueryUsers().UpdateId(u.ID, u)
 	if err != nil && mgo.IsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
