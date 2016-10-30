@@ -1,8 +1,8 @@
 #!/bin/bash
 alias ddc-build="ML_BUILD_ENV=test docker-compose build" # builds the services
 alias ddc-up="ML_BUILD_ENV=test docker-compose up -d" # starts the services
-alias ddc-rm="docker-compose stop && docker-compose rm -f" # Removes the services
-alias ddc-stop="docker-compose stop" # Stops the running services
+alias ddc-rm="ML_BUILD_ENV=test docker-compose stop && docker-compose rm -f" # Removes the services
+alias ddc-stop="ML_BUILD_ENV=test docker-compose stop" # Stops the running services
 
 alias ml-log-mongo="docker logs apimelvinla_database_1" # print mongo logs
 

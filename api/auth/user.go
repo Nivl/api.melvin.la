@@ -84,6 +84,10 @@ func (u *User) FullyDelete() error {
 		return errors.New("user has not been saved")
 	}
 
+	if !u.ID.Valid() {
+		return errors.New("user has not a valid ID")
+	}
+
 	return QueryUsers().RemoveId(u.ID)
 }
 
@@ -139,7 +143,7 @@ func NewTestUser(t *testing.T, u *User) *User {
 	}
 
 	if u.Name == "" {
-		u.Email = "Fake Account"
+		u.Name = "Fake Account"
 	}
 
 	if u.Password == "" {

@@ -10,9 +10,11 @@ import (
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/users"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerAdd(t *testing.T) {
+	globalT := t
 	defer testhelpers.PurgeModels(t)
 
 	tests := []struct {
@@ -28,12 +30,12 @@ func TestHandlerAdd(t *testing.T) {
 		{
 			"Valid User",
 			http.StatusCreated,
-			&users.HandlerAddParams{Name: "Name", Email: "email@fake.com", Password: "password"},
+			&users.HandlerAddParams{Name: "Name", Email: "email+TestHandlerAdd@fake.com", Password: "password"},
 		},
 		{
 			"Duplicate Email",
 			http.StatusConflict,
-			&users.HandlerAddParams{Name: "Name", Email: "email@fake.com", Password: "password"},
+			&users.HandlerAddParams{Name: "Name", Email: "email+TestHandlerAdd@fake.com", Password: "password"},
 		},
 	}
 
@@ -43,14 +45,14 @@ func TestHandlerAdd(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
-				var u auth.User
+				var u users.PrivatePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
 				}
 
 				assert.NotEmpty(t, u.ID)
 				assert.Equal(t, tc.params.Email, u.Email)
-				testhelpers.SaveModel(t, &u)
+				testhelpers.SaveModel(globalT, &auth.User{ID: bson.ObjectIdHex(u.ID)})
 			}
 		})
 	}
