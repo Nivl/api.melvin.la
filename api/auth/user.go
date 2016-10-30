@@ -59,7 +59,11 @@ func CryptPassword(raw string) (string, error) {
 }
 
 func (u *User) Save() error {
-	return nil
+	if u == nil {
+		return apierror.NewServerError("user is not instanced")
+	}
+
+	return u.Create()
 }
 
 func (u *User) FullyDelete() error {
@@ -88,7 +92,7 @@ func (u *User) Create() error {
 	u.UpdatedAt = time.Now()
 
 	err := QueryUsers().Insert(u)
-	if mgo.IsDup(err) {
+	if err != nil && mgo.IsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
 
