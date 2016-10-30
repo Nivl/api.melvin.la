@@ -61,7 +61,7 @@ func (req *Request) ContentType() string {
 
 // MuxVariables returns the URL variables associated to the request
 func (req *Request) MuxVariables() url.Values {
-	var output url.Values
+	output := url.Values{}
 
 	if req == nil {
 		return output
