@@ -58,3 +58,9 @@ func NewUnauthorized() error {
 func NewForbidden() error {
 	return NewError(http.StatusForbidden, "")
 }
+
+// NewNotFound returns an error caused by a user trying to access
+// a resource that does not exists
+func NewNotFound() error {
+	return NewError(http.StatusNotFound, "")
+}
