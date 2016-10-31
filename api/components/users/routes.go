@@ -5,12 +5,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Contains the index of all Endpoints
 const (
 	EndpointAdd = iota
 	EndpointUpdate
 	EndpointDelete
 )
 
+// Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
 	EndpointAdd: {
 		Verb:    "POST",
