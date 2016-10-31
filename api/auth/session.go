@@ -89,6 +89,7 @@ func (s *Session) Create() error {
 	return QuerySessions().Insert(s)
 }
 
+// FullyDelete deletes a session from the database
 func (s *Session) FullyDelete() error {
 	if s == nil {
 		return errors.New("session not instanced")
@@ -99,4 +100,20 @@ func (s *Session) FullyDelete() error {
 	}
 
 	return QuerySessions().RemoveId(s.ID)
+}
+
+// Delete flags a session for deletion
+func (s *Session) Delete() error {
+	if s == nil {
+		return apierror.NewServerError("session is not instanced")
+	}
+
+	if s.ID == "" || !s.ID.Valid() {
+		return apierror.NewServerError("cannot delete a non-persisted session")
+	}
+
+	s.IsDeleted = true
+
+	err := QuerySessions().UpdateId(s.ID, s)
+	return err
 }
