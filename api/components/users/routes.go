@@ -8,6 +8,7 @@ import (
 const (
 	EndpointAdd = iota
 	EndpointUpdate
+	EndpointDelete
 )
 
 var Endpoints = router.Endpoints{
@@ -24,6 +25,13 @@ var Endpoints = router.Endpoints{
 		Auth:    router.LoggedUser,
 		Handler: HandlerUpdate,
 		Params:  &HandlerUpdateParams{},
+	},
+	EndpointDelete: {
+		Verb:    "DELETE",
+		Path:    "/{id}",
+		Auth:    router.LoggedUser,
+		Handler: HandlerDelete,
+		Params:  &HandlerDeleteParams{},
 	},
 }
 

@@ -131,6 +131,22 @@ func (u *User) Update() error {
 	return err
 }
 
+func (u *User) Delete() error {
+	if u == nil {
+		return apierror.NewServerError("user is not instanced")
+	}
+
+	if u.ID == "" {
+		return apierror.NewServerError("cannot delete a non-persisted user")
+	}
+
+	u.UpdatedAt = time.Now()
+	u.IsDeleted = true
+
+	err := QueryUsers().UpdateId(u.ID, u)
+	return err
+}
+
 func NewTestUser(t *testing.T, u *User) *User {
 	if u == nil {
 		u = &User{
