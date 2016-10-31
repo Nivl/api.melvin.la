@@ -10,6 +10,7 @@ const (
 	EndpointAdd = iota
 	EndpointUpdate
 	EndpointDelete
+	EndpointGet
 )
 
 // Endpoints is a list of endpoints for this components
@@ -34,6 +35,13 @@ var Endpoints = router.Endpoints{
 		Auth:    router.LoggedUser,
 		Handler: HandlerDelete,
 		Params:  &HandlerDeleteParams{},
+	},
+	EndpointGet: {
+		Verb:    "GET",
+		Path:    "/{id}",
+		Auth:    nil,
+		Handler: HandlerGet,
+		Params:  &HandlerGetParams{},
 	},
 }
 
