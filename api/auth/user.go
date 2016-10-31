@@ -46,6 +46,12 @@ func GetUser(userID bson.ObjectId) (*User, error) {
 
 	var user User
 	err := QueryUsers().Find(toFind).One(&user)
+
+	// No user found
+	if err != nil && err == mgo.ErrNotFound {
+		return nil, nil
+	}
+
 	return &user, err
 }
 
