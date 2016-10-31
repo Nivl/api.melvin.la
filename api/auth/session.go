@@ -80,8 +80,8 @@ func (s *Session) Create() error {
 		return apierror.NewServerError("sessions cannot be updated")
 	}
 
-	if s.UserID == "" {
-		return apierror.NewServerError("cannot create a session without a user id")
+	if s.UserID == "" || !s.UserID.Valid() {
+		return apierror.NewServerError("invalid user id")
 	}
 
 	s.ID = bson.NewObjectId()
