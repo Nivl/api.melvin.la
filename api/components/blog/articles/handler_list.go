@@ -1,8 +1,6 @@
 package articles
 
-import (
-	"github.com/Nivl/api.melvin.la/api/router"
-)
+import "github.com/Nivl/api.melvin.la/api/router"
 
 // HandlerList represents a API handler to get a list of articles
 func HandlerList(req *router.Request) {

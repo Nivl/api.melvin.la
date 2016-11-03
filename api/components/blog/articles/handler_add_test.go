@@ -7,29 +7,65 @@ import (
 	"testing"
 
 	"github.com/Nivl/api.melvin.la/api/app/testhelpers"
+	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/blog/articles"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerAdd(t *testing.T) {
+	globalT := t
+	defer testhelpers.PurgeModels(t)
+
+	u1, s1 := auth.NewTestAuth(t)
+	testhelpers.SaveModel(t, u1)
+	testhelpers.SaveModel(t, s1)
+
 	tests := []struct {
 		description string
-		params      *articles.HandlerAddParams
 		code        int
+		params      *articles.HandlerAddParams
+		auth        *testhelpers.RequestAuth
 	}{
-		{"No Title", &articles.HandlerAddParams{}, http.StatusBadRequest},
-		{"Title filled with spaces", &articles.HandlerAddParams{Title: "       "}, http.StatusBadRequest},
-		{"As few params as possible", &articles.HandlerAddParams{Title: "My Super Article"}, http.StatusCreated},
-		{"Duplicate title", &articles.HandlerAddParams{Title: "My Super Article"}, http.StatusCreated},
+		{
+			"No logged",
+			http.StatusBadRequest,
+			&articles.HandlerAddParams{},
+			nil,
+		},
+		{
+			"No Title",
+			http.StatusBadRequest,
+			&articles.HandlerAddParams{},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+		},
+		{
+			"Title filled with spaces",
+			http.StatusBadRequest,
+			&articles.HandlerAddParams{Title: "       "},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+		},
+		{
+			"As few params as possible",
+			http.StatusCreated,
+			&articles.HandlerAddParams{Title: "My Super Article"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+		},
+		{
+			"Duplicate title",
+			http.StatusCreated,
+			&articles.HandlerAddParams{Title: "My Super Article"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerAdd(t, tc.params)
+			rec := callHandlerAdd(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
-				var a articles.Article
+				var a articles.Exportable
 				if err := json.NewDecoder(rec.Body).Decode(&a); err != nil {
 					t.Fatal(err)
 				}
@@ -37,20 +73,19 @@ func TestHandlerAdd(t *testing.T) {
 				assert.NotEmpty(t, a.ID)
 				assert.NotEmpty(t, a.Slug)
 				assert.Equal(t, tc.params.Title, a.Title)
-				if err := a.FullyDelete(); err != nil {
-					t.Fatal(err)
-				}
+				testhelpers.SaveModel(globalT, &articles.Article{ID: bson.ObjectIdHex(a.ID)})
 			}
 		})
 	}
 }
 
-func callHandlerAdd(t *testing.T, params *articles.HandlerAddParams) *httptest.ResponseRecorder {
+func callHandlerAdd(t *testing.T, params *articles.HandlerAddParams, auth *testhelpers.RequestAuth) *httptest.ResponseRecorder {
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: articles.Endpoints[articles.EndpointAdd],
 		URI:      "/blog/articles/",
 		Params:   params,
+		Auth:     auth,
 	}
 
 	return testhelpers.NewRequest(ri)

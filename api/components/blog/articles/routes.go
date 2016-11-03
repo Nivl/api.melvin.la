@@ -29,14 +29,14 @@ var Endpoints = router.Endpoints{
 		Verb:    "POST",
 		Path:    "/",
 		Handler: HandlerAdd,
-		Auth:    nil,
+		Auth:    router.LoggedUser,
 		Params:  &HandlerAddParams{},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",
 		Path:    "/{id}",
 		Handler: HandlerUpdate,
-		Auth:    nil,
+		Auth:    router.LoggedUser,
 	},
 }
 

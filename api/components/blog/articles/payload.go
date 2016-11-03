@@ -4,6 +4,7 @@ import "github.com/Nivl/api.melvin.la/api/app/helpers"
 
 // Exportable represents an Article that can be safely returned by the API
 type Exportable struct {
+	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Content     string `json:"content"`
 	Slug        string `json:"slug"`
@@ -16,6 +17,7 @@ type Exportable struct {
 // returned by the API
 func NewPayloadFromModel(a *Article) *Exportable {
 	return &Exportable{
+		ID:          a.ID.Hex(),
 		Title:       a.Title,
 		Content:     a.Content,
 		Slug:        a.Slug,

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/app"
+	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/dchest/uniuri"
 	"github.com/gosimple/slug"
 	mgo "gopkg.in/mgo.v2"
@@ -33,6 +34,7 @@ type Article struct {
 	CreatedAt   time.Time     `bson:"created_at"`
 	IsDeleted   bool          `bson:"is_deleted"`
 	IsPublished bool          `bson:"is_published"`
+	UserID      bson.ObjectId `bson:"user_id"`
 }
 
 func (a *Article) FullyDelete() error {
@@ -103,7 +105,7 @@ func (a *Article) Update() error {
 	return nil
 }
 
-func NewTestArticle(t *testing.T, a *Article) *Article {
+func NewTestArticle(t *testing.T, a *Article) (*Article, *auth.User, *auth.Session) {
 	if a == nil {
 		a = &Article{
 			IsDeleted:   false,
@@ -115,8 +117,11 @@ func NewTestArticle(t *testing.T, a *Article) *Article {
 		a.Title = uniuri.New()
 	}
 
+	user, session := auth.NewTestAuth(t)
+	a.UserID = user.ID
+
 	if err := a.Save(); err != nil {
 		t.Fatalf("failed to save article: %s", err)
 	}
-	return a
+	return a, user, session
 }

@@ -14,8 +14,10 @@ import (
 // ListTest tests the List handler
 func TestHandlerList(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		a := articles.NewTestArticle(t, nil)
+		a, u, s := articles.NewTestArticle(t, nil)
 		testhelpers.SaveModel(t, a)
+		testhelpers.SaveModel(t, u)
+		testhelpers.SaveModel(t, s)
 	}
 	defer testhelpers.PurgeModels(t)
 
