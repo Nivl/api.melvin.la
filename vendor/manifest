@@ -50,6 +50,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/jmoiron/sqlx",
+			"repository": "https://github.com/jmoiron/sqlx",
+			"vcs": "git",
+			"revision": "5f97679e23f75f42b265fec8d3bdb1c8de90b79d",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/kelseyhightower/envconfig",
 			"repository": "https://github.com/kelseyhightower/envconfig",
 			"vcs": "git",
