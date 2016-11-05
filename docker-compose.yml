@@ -5,11 +5,20 @@ api:
   volumes:
     - ./:/go/src/github.com/Nivl/api.melvin.la
   links:
+    - legacy_db
     - database
   env_file:
-    - ./variables.env
-    - ./${ML_BUILD_ENV}.env
+    - ./config/api-common.env
+    - ./config/database-common.env
+    - ./config/api-${ML_BUILD_ENV}.env
 
 database:
+  image: postgres:9.6
+  ports:
+    - "5432:5432"
+  env_file:
+    - ./config/database-common.env
+
+legacy_db:
   image: mongo:3.3
   command: mongod
