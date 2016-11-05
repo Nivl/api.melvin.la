@@ -11,6 +11,7 @@ api:
     - ./config/api-common.env
     - ./config/database-common.env
     - ./config/api-${ML_BUILD_ENV}.env
+  container_name: ml_api
 
 database:
   image: postgres:9.6
@@ -18,7 +19,9 @@ database:
     - "5432:5432"
   env_file:
     - ./config/database-common.env
+  container_name: ml_api_postgres
 
 legacy_db:
   image: mongo:3.3
   command: mongod
+  container_name: ml_api_mongodb

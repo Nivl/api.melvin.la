@@ -4,12 +4,12 @@ alias ddc-up="ML_BUILD_ENV=test docker-compose up -d" # starts the services
 alias ddc-rm="ML_BUILD_ENV=test docker-compose stop && docker-compose rm -f" # Removes the services
 alias ddc-stop="ML_BUILD_ENV=test docker-compose stop" # Stops the running services
 
-alias ml-log-mongo="docker logs apimelvinla_database_1" # print mongo logs
+alias ml-log-mongo="docker logs ml_api_mongodb" # print mongo logs
 
 # Execute any command in the container
 function ml-exec {
   CMD="cd /go/src/github.com/Nivl/api.melvin.la && $@"
-  docker exec -i -t apimelvinla_api_1 /bin/bash -ic $CMD
+  docker exec -i -t ml_api /bin/bash -ic $CMD
 }
 
 # Open a bash session
@@ -51,5 +51,5 @@ function ml-tests {
 
 function ml-reset-mongo {
   CMD="mongo api-melvin --eval \"printjson(db.dropDatabase())\""
-  docker exec -i -t apimelvinla_database_1 /bin/bash -ic $CMD
+  docker exec -i -t ml_api_mongodb /bin/bash -ic $CMD
 }
