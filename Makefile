@@ -15,5 +15,8 @@ LDFLAGS=-ldflags "-X main.Version=$(VERSION) -X main.Build=$(BUILD_INFO)"
 install:
 	$(INSTALL_CMD) $(LDFLAGS) $(SOURCES_DIR)
 
+migration:
+	goose up
+
 .PHONY:
 	install
