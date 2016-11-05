@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bsphere/le_go"
+	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/mgo.v2"
 )
@@ -12,6 +13,7 @@ import (
 type Args struct {
 	Port            string `default:"5000"`
 	MongoURI        string `required:"true" envconfig:"mongo_uri"`
+	PostgresURI     string `required:"true" envconfig:"postgres_uri"`
 	LogEntriesToken string `envconfig:"mongo_uri" envconfig:"logentries_token"`
 	Debug           bool   `default:"false"`
 }
@@ -19,6 +21,7 @@ type Args struct {
 // Context represent the global context of the app
 type Context struct {
 	DB         *mgo.Database
+	SQL        *sqlx.DB
 	Session    *mgo.Session
 	Params     Args
 	LogEntries *le_go.Logger
@@ -48,6 +51,11 @@ func InitContext() *Context {
 	_context.Session.SetMode(mgo.Monotonic, true)
 	_context.DB = session.DB("")
 
+	_context.SQL, err = sqlx.Connect("postgres", _context.Params.PostgresURI)
+	if err != nil {
+		panic(err)
+	}
+
 	// LogEntries
 	if _context.Params.LogEntriesToken != "" {
 		_context.LogEntries, err = le_go.Connect(_context.Params.LogEntriesToken)
@@ -64,10 +72,14 @@ func GetContext() *Context {
 	return _context
 }
 
-// Destroy clears the context when the app is quiting
+// Destroy clears the context when the app is quitting
 func (ctx *Context) Destroy() {
 	if ctx.Session != nil {
 		ctx.Session.Close()
+	}
+
+	if ctx.SQL != nil {
+		ctx.SQL.Close()
 	}
 
 	if ctx.LogEntries != nil {
