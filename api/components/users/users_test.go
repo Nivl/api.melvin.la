@@ -3,6 +3,6 @@ package users_test
 import "github.com/Nivl/api.melvin.la/api/app"
 
 func init() {
-	app.InitContex()
+	app.InitContext()
 	// defer app.GetContext().Destroy()
 }

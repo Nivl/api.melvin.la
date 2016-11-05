@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	app.InitContex()
+	app.InitContext()
 	defer app.GetContext().Destroy()
 
 	api.EnsureIndexes()

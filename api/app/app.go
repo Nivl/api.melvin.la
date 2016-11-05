@@ -26,8 +26,8 @@ type Context struct {
 
 var _context *Context
 
-// InitContex initializes the app context
-func InitContex() *Context {
+// InitContext initializes the app context
+func InitContext() *Context {
 	if _context != nil {
 		panic("Context already exists")
 	}
