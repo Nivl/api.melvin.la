@@ -66,6 +66,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/lib/pq",
+			"repository": "https://github.com/lib/pq",
+			"vcs": "git",
+			"revision": "d8eeeb8bae8896dd8e1b7e514ab0d396c4f12a1b",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/rainycape/unidecode",
 			"repository": "https://github.com/rainycape/unidecode",
 			"vcs": "git",

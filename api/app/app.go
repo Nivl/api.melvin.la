@@ -7,6 +7,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/mgo.v2"
+
+	_ "github.com/lib/pq"
 )
 
 // Args represents the app args
