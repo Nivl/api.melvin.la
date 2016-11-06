@@ -4,8 +4,13 @@ import (
 	"testing"
 
 	"github.com/Nivl/api.melvin.la/api/app"
+	"github.com/jmoiron/sqlx"
 	mgo "gopkg.in/mgo.v2"
 )
+
+func sql() *sqlx.DB {
+	return app.GetContext().SQL
+}
 
 // EnsureIndexes sets the indexes for the Users and Sessions document
 func EnsureIndexes() {
@@ -22,10 +27,11 @@ func EnsureIndexes() {
 	}
 }
 
+// NewTestAuth creates a new user and their session
 func NewTestAuth(t *testing.T) (*User, *Session) {
 	user := NewTestUser(t, nil)
 	session := &Session{
-		UserID: user.ID,
+		UserUUID: user.UUID,
 	}
 
 	if err := session.Create(); err != nil {

@@ -51,7 +51,7 @@ func TestEndpointExecution(t *testing.T) {
 			"Private GET as logged user",
 			&router.Endpoint{Verb: "GET", Path: "/items/{id}", Handler: hdlr, Auth: router.LoggedUser},
 			"/items/item-id",
-			testhelpers.NewRequestAuth(s.ID, u.ID),
+			testhelpers.NewRequestAuth(s.UUID, u.UUID),
 			http.StatusNoContent,
 		},
 	}

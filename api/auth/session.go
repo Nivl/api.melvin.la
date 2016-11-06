@@ -5,37 +5,17 @@ import (
 	"time"
 
 	"github.com/Nivl/api.melvin.la/api/apierror"
-	"github.com/Nivl/api.melvin.la/api/app"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/Nivl/api.melvin.la/api/db"
+	uuid "github.com/satori/go.uuid"
 )
-
-func QuerySessions() *mgo.Collection {
-	return app.GetContext().DB.C("sessions")
-}
 
 // Session is a structure representing a session that can be saved in the database
 type Session struct {
-	ID        bson.ObjectId `bson:"_id"`
-	CreatedAt time.Time     `bson:"created_at,omitempty"`
-	IsDeleted bool          `bson:"is_deleted"`
+	UUID      string     `db:"uuid"`
+	CreatedAt time.Time  `db:"created_at"`
+	DeletedAt *time.Time `db:"deleted_at"`
 
-	UserID bson.ObjectId `bson:"user_id"`
-}
-
-// NewSessionFromStrings returns a Session using the provided strings
-func NewSessionFromStrings(sessionID string, userID string) *Session {
-	sess := &Session{}
-
-	if bson.IsObjectIdHex(sessionID) {
-		sess.ID = bson.ObjectIdHex(sessionID)
-	}
-
-	if bson.IsObjectIdHex(userID) {
-		sess.UserID = bson.ObjectIdHex(userID)
-	}
-
-	return sess
+	UserUUID string `db:"user_uuid"`
 }
 
 // Exists check if a session exists in the database
@@ -44,24 +24,26 @@ func (s *Session) Exists() (bool, error) {
 		return false, apierror.NewServerError("session is nil")
 	}
 
-	if s.UserID == "" {
+	if s.UserUUID == "" {
 		return false, apierror.NewServerError("user id required")
 	}
 
 	// Deleted sessions should be explicitly checked
-	if s.IsDeleted {
+	if s.DeletedAt != nil {
 		return false, nil
 	}
 
-	count, err := QuerySessions().Find(s).Count()
-	if err != nil {
-		return false, err
-	}
-
-	return (count > 0), nil
+	var count int
+	stmt := `SELECT count(1)
+					FROM sessions
+					WHERE deleted_at IS NULL
+						AND uuid = $1
+						AND user_uuid = $2`
+	err := db.Get(&count, stmt, s.UUID, s.UserUUID)
+	return (count > 0), err
 }
 
-// Save is an alias for Create
+// Save is an alias for Create since sessions are not updatable
 func (s *Session) Save() error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
@@ -76,17 +58,20 @@ func (s *Session) Create() error {
 		return apierror.NewServerError("session is nil")
 	}
 
-	if s.ID != "" {
+	if s.UUID != "" {
 		return apierror.NewServerError("sessions cannot be updated")
 	}
 
-	if s.UserID == "" || !s.UserID.Valid() {
-		return apierror.NewServerError("invalid user id")
+	if s.UserUUID == "" {
+		return apierror.NewServerError("cannot save a session with no user uuid")
 	}
 
-	s.ID = bson.NewObjectId()
+	s.UUID = uuid.NewV4().String()
 	s.CreatedAt = time.Now()
-	return QuerySessions().Insert(s)
+
+	stmt := "INSERT INTO sessions (uuid, created_at, user_uuid) VALUES ($1, $2, $3)"
+	_, err := sql().Exec(stmt, s.UUID, s.CreatedAt, s.UserUUID)
+	return err
 }
 
 // FullyDelete deletes a session from the database
@@ -95,25 +80,28 @@ func (s *Session) FullyDelete() error {
 		return errors.New("session not instanced")
 	}
 
-	if s.ID == "" {
+	if s.UUID == "" {
 		return errors.New("session has not been saved")
 	}
 
-	return QuerySessions().RemoveId(s.ID)
+	_, err := sql().Exec("DELETE FROM sessions WHERE uuid=$1", s.UUID)
+	return err
 }
 
-// Delete flags a session for deletion
+// Delete soft-deletes a session
 func (s *Session) Delete() error {
 	if s == nil {
 		return apierror.NewServerError("session is not instanced")
 	}
 
-	if s.ID == "" || !s.ID.Valid() {
+	if s.UUID == "" {
 		return apierror.NewServerError("cannot delete a non-persisted session")
 	}
 
-	s.IsDeleted = true
+	now := time.Now()
+	s.DeletedAt = &now
 
-	err := QuerySessions().UpdateId(s.ID, s)
+	stmt := `UPDATE sessions SET deleted_at = $2 WHERE uuid=$1`
+	_, err := sql().Exec(stmt, s.UUID, *s.DeletedAt)
 	return err
 }

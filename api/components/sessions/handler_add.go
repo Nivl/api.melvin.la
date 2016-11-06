@@ -3,9 +3,8 @@ package sessions
 import (
 	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/auth"
+	"github.com/Nivl/api.melvin.la/api/db"
 	"github.com/Nivl/api.melvin.la/api/router"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // HandlerAddParams represent the request params accepted by HandlerAdd
@@ -19,22 +18,20 @@ func HandlerAdd(req *router.Request) {
 	params := req.Params.(*HandlerAddParams)
 
 	var user auth.User
-	toFind := bson.M{
-		"email": params.Email,
-	}
-	err := auth.QueryUsers().Find(toFind).One(&user)
-	if err != nil && err != mgo.ErrNotFound {
+	stmt := "SELECT * FROM users WHERE email=$1 LIMIT 1"
+	err := db.Get(&user, stmt, params.Email)
+	if err != nil {
 		req.Error(err)
 		return
 	}
 
-	if user.ID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
+	if user.UUID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
 		req.Error(apierror.NewBadRequest("Bad email/password"))
 		return
 	}
 
 	s := &auth.Session{
-		UserID: user.ID,
+		UserUUID: user.UUID,
 	}
 	if err := s.Save(); err != nil {
 		req.Error(err)

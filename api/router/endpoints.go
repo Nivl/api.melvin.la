@@ -42,8 +42,8 @@ func Handler(e *Endpoint) http.Handler {
 		}
 
 		// We check the auth
-		session := auth.NewSessionFromStrings(req.Header.Get("X-Session-Id"), req.Header.Get("X-User-Id"))
-		if session.ID != "" && session.UserID != "" {
+		session := &auth.Session{UUID: req.Header.Get("X-Session-Token"), UserUUID: req.Header.Get("X-User-Id")}
+		if session.UUID != "" && session.UserUUID != "" {
 			exists, err := session.Exists()
 			if err != nil {
 				request.Error(err)
@@ -54,7 +54,7 @@ func Handler(e *Endpoint) http.Handler {
 				return
 			}
 			// we get the user and make sure it (still) exists
-			request.User, err = auth.GetUser(session.UserID)
+			request.User, err = auth.GetUser(session.UserUUID)
 			if err != nil {
 				request.Error(err)
 				return

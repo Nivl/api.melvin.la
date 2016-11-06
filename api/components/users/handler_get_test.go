@@ -33,31 +33,31 @@ func TestHandlerGet(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusOK,
-			&users.HandlerGetParams{ID: u1.ID.Hex()},
+			&users.HandlerGetParams{UUID: u1.UUID},
 			nil,
 		},
 		{
 			"Getting an other user",
 			http.StatusOK,
-			&users.HandlerGetParams{ID: u1.ID.Hex()},
-			testhelpers.NewRequestAuth(s2.ID, u2.ID),
+			&users.HandlerGetParams{UUID: u1.UUID},
+			testhelpers.NewRequestAuth(s2.UUID, u2.UUID),
 		},
 		{
 			"Getting own data",
 			http.StatusOK,
-			&users.HandlerGetParams{ID: u1.ID.Hex()},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			&users.HandlerGetParams{UUID: u1.UUID},
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		{
-			"Getting un-existing user with valid ID",
+			"Getting un-existing user with valid UUID",
 			http.StatusNotFound,
-			&users.HandlerGetParams{ID: "550146d1b51bc1c208d1924d"},
+			&users.HandlerGetParams{UUID: "550146d1b51bc1c208d1924d"},
 			nil,
 		},
 		{
-			"Getting un-existing user with invalid ID",
+			"Getting un-existing user with invalid UUID",
 			http.StatusNotFound,
-			&users.HandlerGetParams{ID: "invalidID"},
+			&users.HandlerGetParams{UUID: "invalidUUID"},
 			nil,
 		},
 	}
@@ -73,9 +73,9 @@ func TestHandlerGet(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if assert.Equal(t, tc.params.ID, u.ID, "Not the same user") {
+				if assert.Equal(t, tc.params.UUID, u.UUID, "Not the same user") {
 					// User access their own data
-					if tc.auth != nil && u.ID == tc.auth.UserId {
+					if tc.auth != nil && u.UUID == tc.auth.UserUUID {
 						assert.NotEmpty(t, u.Email, "Same user needs their private data")
 					} else { // user access an other user data
 						assert.Empty(t, u.Email, "Should not return private data")
@@ -90,7 +90,7 @@ func callHandlerGet(t *testing.T, params *users.HandlerGetParams, auth *testhelp
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: users.Endpoints[users.EndpointGet],
-		URI:      fmt.Sprintf("/users/%s", params.ID),
+		URI:      fmt.Sprintf("/users/%s", params.UUID),
 		Params:   params,
 		Auth:     auth,
 	}

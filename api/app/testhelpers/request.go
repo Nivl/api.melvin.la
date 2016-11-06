@@ -7,22 +7,20 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/Nivl/api.melvin.la/api/components/api"
 	"github.com/Nivl/api.melvin.la/api/router"
 	"github.com/gorilla/mux"
 )
 
 type RequestAuth struct {
-	Session string
-	UserId  string
+	SessionUUID string
+	UserUUID    string
 }
 
-func NewRequestAuth(sess bson.ObjectId, user bson.ObjectId) *RequestAuth {
+func NewRequestAuth(sessionUUID string, userUUID string) *RequestAuth {
 	return &RequestAuth{
-		Session: sess.Hex(),
-		UserId:  user.Hex(),
+		SessionUUID: sessionUUID,
+		UserUUID:    userUUID,
 	}
 }
 
@@ -55,8 +53,8 @@ func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
 	}
 
 	if info.Auth != nil {
-		req.Header.Add("X-Session-Id", info.Auth.Session)
-		req.Header.Add("X-User-Id", info.Auth.UserId)
+		req.Header.Add("X-Session-Token", info.Auth.SessionUUID)
+		req.Header.Add("X-User-Id", info.Auth.UserUUID)
 	}
 
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")

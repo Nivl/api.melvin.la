@@ -10,9 +10,8 @@ import (
 	"github.com/Nivl/api.melvin.la/api/app/testhelpers"
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/sessions"
+	"github.com/Nivl/api.melvin.la/api/db"
 	"github.com/stretchr/testify/assert"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerDelete(t *testing.T) {
@@ -34,33 +33,33 @@ func TestHandlerDelete(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&sessions.HandlerDeleteParams{ID: s1.ID.Hex()},
+			&sessions.HandlerDeleteParams{Token: s1.UUID},
 			nil,
 		},
 		{
 			"Deleting an other user sessions",
 			http.StatusNotFound,
-			&sessions.HandlerDeleteParams{ID: s1.ID.Hex(), CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s2.ID, u2.ID),
+			&sessions.HandlerDeleteParams{Token: s1.UUID, CurrentPassword: "fake"},
+			testhelpers.NewRequestAuth(s2.UUID, u2.UUID),
 		},
 		{
 			"Deleting an invalid ID",
 			http.StatusNotFound,
-			&sessions.HandlerDeleteParams{ID: "invalid", CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			&sessions.HandlerDeleteParams{Token: "invalid", CurrentPassword: "fake"},
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
-			&sessions.HandlerDeleteParams{ID: s1.ID.Hex()},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			&sessions.HandlerDeleteParams{Token: s1.UUID},
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		// Keep this one last for u1 as it deletes the session
 		{
 			"Deleting session",
 			http.StatusNoContent,
-			&sessions.HandlerDeleteParams{ID: s1.ID.Hex(), CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			&sessions.HandlerDeleteParams{Token: s1.UUID, CurrentPassword: "fake"},
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 	}
 
@@ -71,15 +70,15 @@ func TestHandlerDelete(t *testing.T) {
 
 			if rec.Code == http.StatusNoContent {
 				// We check that the user is still in DB but is flagged for deletion
-				sessionID := bson.ObjectIdHex(tc.params.ID)
-				var s auth.Session
-				err := auth.QuerySessions().FindId(sessionID).One(&s)
-				if err != nil && err != mgo.ErrNotFound {
+				var session auth.Session
+				stmt := "SELECT * FROM sessions WHERE uuid=$1 LIMIT 1"
+				err := db.Get(&session, stmt, tc.params.Token)
+				if err != nil {
 					t.Fatal(err)
 				}
 
-				if assert.NotEmpty(t, s.ID, "session fully deleted") {
-					assert.True(t, s.IsDeleted, "User not marked for deletion")
+				if assert.NotEmpty(t, session.UUID, "session fully deleted") {
+					assert.NotNil(t, session.DeletedAt, "User not marked for deletion")
 				}
 			}
 		})
@@ -90,7 +89,7 @@ func callHandlerDelete(t *testing.T, params *sessions.HandlerDeleteParams, auth 
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: sessions.Endpoints[sessions.EndpointDelete],
-		URI:      fmt.Sprintf("/sessions/%s", params.ID),
+		URI:      fmt.Sprintf("/sessions/%s", params.Token),
 		Params:   params,
 		Auth:     auth,
 	}

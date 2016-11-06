@@ -10,8 +10,8 @@ import (
 	"github.com/Nivl/api.melvin.la/api/app/testhelpers"
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/users"
+	"github.com/Nivl/api.melvin.la/api/db"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerDelete(t *testing.T) {
@@ -33,27 +33,27 @@ func TestHandlerDelete(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&users.HandlerDeleteParams{ID: u1.ID.Hex()},
+			&users.HandlerDeleteParams{UUID: u1.UUID},
 			nil,
 		},
 		{
 			"Deleting an other user",
 			http.StatusForbidden,
-			&users.HandlerDeleteParams{ID: u1.ID.Hex()},
-			testhelpers.NewRequestAuth(s2.ID, u2.ID),
+			&users.HandlerDeleteParams{UUID: u1.UUID},
+			testhelpers.NewRequestAuth(s2.UUID, u2.UUID),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
-			&users.HandlerDeleteParams{ID: u1.ID.Hex()},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			&users.HandlerDeleteParams{UUID: u1.UUID},
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		// Keep this one last for u1 as it deletes the user
 		{
 			"Deleting user",
 			http.StatusNoContent,
-			&users.HandlerDeleteParams{ID: u1.ID.Hex(), CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			&users.HandlerDeleteParams{UUID: u1.UUID, CurrentPassword: "fake"},
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 	}
 
@@ -64,14 +64,15 @@ func TestHandlerDelete(t *testing.T) {
 
 			if rec.Code == http.StatusNoContent {
 				// We check that the user is still in DB but is flagged for deletion
-				userID := bson.ObjectIdHex(tc.params.ID)
-				var u auth.User
-				if err := auth.QueryUsers().FindId(userID).One(&u); err != nil {
+				var user auth.User
+				stmt := "SELECT * FROM users WHERE uuid=$1 LIMIT 1"
+				err := db.Get(&user, stmt, tc.params.UUID)
+				if err != nil {
 					t.Fatal(err)
 				}
 
-				if assert.NotNil(t, u, "User fully deleted") {
-					assert.True(t, u.IsDeleted, "User not marked for deletion")
+				if assert.NotEmpty(t, user.UUID, "User fully deleted") {
+					assert.NotNil(t, user.DeletedAt, "User not marked for deletion")
 				}
 			}
 		})
@@ -82,7 +83,7 @@ func callHandlerDelete(t *testing.T, params *users.HandlerDeleteParams, auth *te
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: users.Endpoints[users.EndpointDelete],
-		URI:      fmt.Sprintf("/users/%s", params.ID),
+		URI:      fmt.Sprintf("/users/%s", params.UUID),
 		Params:   params,
 		Auth:     auth,
 	}

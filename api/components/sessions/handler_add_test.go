@@ -10,7 +10,6 @@ import (
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/sessions"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerAdd(t *testing.T) {
@@ -53,10 +52,10 @@ func TestHandlerAdd(t *testing.T) {
 				}
 
 				assert.NotEmpty(t, session.Token)
-				assert.Equal(t, u1.ID.Hex(), session.UserID)
+				assert.Equal(t, u1.UUID, session.UserUUID)
 
 				// clean the test
-				(&auth.Session{ID: bson.ObjectIdHex(session.Token)}).FullyDelete()
+				(&auth.Session{UUID: session.Token}).FullyDelete()
 			}
 		})
 	}

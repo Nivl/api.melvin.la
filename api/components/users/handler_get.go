@@ -4,25 +4,18 @@ import (
 	"github.com/Nivl/api.melvin.la/api/apierror"
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/router"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // HandlerGetParams represent the request params accepted by HandlerGet
 type HandlerGetParams struct {
-	ID string `from:"url" json:"id"`
+	UUID string `from:"url" json:"uuid"`
 }
 
 // HandlerGet represent an API handler to get a user
 func HandlerGet(req *router.Request) {
 	params := req.Params.(*HandlerGetParams)
 
-	// ID is not valid
-	if !bson.IsObjectIdHex(params.ID) {
-		req.Error(apierror.NewNotFound())
-		return
-	}
-
-	user, err := auth.GetUser(bson.ObjectIdHex(params.ID))
+	user, err := auth.GetUser(params.UUID)
 	if err != nil {
 		req.Error(err)
 		return
@@ -33,7 +26,7 @@ func HandlerGet(req *router.Request) {
 	}
 
 	// if a user asks for their own data, we return as much as possible
-	if req.User != nil && req.User.ID == user.ID {
+	if req.User != nil && req.User.UUID == user.UUID {
 		req.Ok(NewPrivatePayload(user))
 		return
 	}

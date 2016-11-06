@@ -8,7 +8,7 @@ import (
 
 // HandlerDeleteParams represent the request params accepted by HandlerDelete
 type HandlerDeleteParams struct {
-	ID              string `from:"url" json:"id"`
+	UUID            string `from:"url" json:"uuid"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
 }
 
@@ -17,7 +17,7 @@ func HandlerDelete(req *router.Request) {
 	params := req.Params.(*HandlerDeleteParams)
 	user := req.User
 
-	if params.ID != user.ID.Hex() {
+	if params.UUID != user.UUID {
 		req.Error(apierror.NewForbidden())
 		return
 	}

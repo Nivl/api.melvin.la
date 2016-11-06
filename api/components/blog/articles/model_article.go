@@ -34,7 +34,7 @@ type Article struct {
 	CreatedAt   time.Time     `bson:"created_at"`
 	IsDeleted   bool          `bson:"is_deleted"`
 	IsPublished bool          `bson:"is_published"`
-	UserID      bson.ObjectId `bson:"user_id"`
+	// UserID      bson.ObjectId `bson:"user_id"`
 }
 
 func (a *Article) FullyDelete() error {
@@ -118,7 +118,7 @@ func NewTestArticle(t *testing.T, a *Article) (*Article, *auth.User, *auth.Sessi
 	}
 
 	user, session := auth.NewTestAuth(t)
-	a.UserID = user.ID
+	// a.UserID = user.ID
 
 	if err := a.Save(); err != nil {
 		t.Fatalf("failed to save article: %s", err)

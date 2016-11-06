@@ -8,6 +8,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/mgo.v2"
 
+	// Required to connect to postgres
 	_ "github.com/lib/pq"
 )
 

@@ -4,7 +4,7 @@ import "github.com/Nivl/api.melvin.la/api/auth"
 
 // PrivatePayload represents a user payload with non public field
 type PrivatePayload struct {
-	ID    string `json:"id"`
+	UUID  string `json:"uuid"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
@@ -13,7 +13,7 @@ type PrivatePayload struct {
 // returned by the API
 func NewPrivatePayload(u *auth.User) *PrivatePayload {
 	return &PrivatePayload{
-		ID:    u.ID.Hex(),
+		UUID:  u.UUID,
 		Name:  u.Name,
 		Email: u.Email,
 	}
@@ -21,7 +21,7 @@ func NewPrivatePayload(u *auth.User) *PrivatePayload {
 
 // PublicPayload represents a user payload with no private field
 type PublicPayload struct {
-	ID   string `json:"id"`
+	UUID string `json:"uuid"`
 	Name string `json:"name"`
 }
 
@@ -29,7 +29,7 @@ type PublicPayload struct {
 // returned by the API
 func NewPublicPayload(u *auth.User) *PublicPayload {
 	return &PublicPayload{
-		ID:   u.ID.Hex(),
+		UUID: u.UUID,
 		Name: u.Name,
 	}
 }

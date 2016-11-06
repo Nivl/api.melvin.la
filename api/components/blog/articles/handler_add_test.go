@@ -37,25 +37,25 @@ func TestHandlerAdd(t *testing.T) {
 			"No Title",
 			http.StatusBadRequest,
 			&articles.HandlerAddParams{},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		{
 			"Title filled with spaces",
 			http.StatusBadRequest,
 			&articles.HandlerAddParams{Title: "       "},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		{
 			"As few params as possible",
 			http.StatusCreated,
 			&articles.HandlerAddParams{Title: "My Super Article"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 		{
 			"Duplicate title",
 			http.StatusCreated,
 			&articles.HandlerAddParams{Title: "My Super Article"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
 		},
 	}
 

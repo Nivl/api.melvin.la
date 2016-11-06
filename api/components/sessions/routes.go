@@ -19,7 +19,7 @@ var Endpoints = router.Endpoints{
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
-		Path:    "/{id}",
+		Path:    "/{token}",
 		Handler: HandlerDelete,
 		Params:  &HandlerDeleteParams{},
 		Auth:    router.LoggedUser,

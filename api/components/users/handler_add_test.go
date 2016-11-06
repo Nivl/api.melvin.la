@@ -10,7 +10,6 @@ import (
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/users"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerAdd(t *testing.T) {
@@ -50,9 +49,9 @@ func TestHandlerAdd(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				assert.NotEmpty(t, u.ID)
+				assert.NotEmpty(t, u.UUID)
 				assert.Equal(t, tc.params.Email, u.Email)
-				testhelpers.SaveModel(globalT, &auth.User{ID: bson.ObjectIdHex(u.ID)})
+				testhelpers.SaveModel(globalT, &auth.User{UUID: u.UUID})
 			}
 		})
 	}
