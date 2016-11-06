@@ -1,9 +1,8 @@
 #!/bin/bash
 alias ddc-build="ML_BUILD_ENV=test docker-compose build" # builds the services
 alias ddc-up="ML_BUILD_ENV=test docker-compose up -d" # starts the services
-alias ddc-rm="ML_BUILD_ENV=test docker-compose stop && docker-compose rm -f" # Removes the services
+alias ddc-rm="ML_BUILD_ENV=test docker-compose stop && ML_BUILD_ENV=test docker-compose rm -f" # Removes the services
 alias ddc-stop="ML_BUILD_ENV=test docker-compose stop" # Stops the running services
-
 alias ml-log-mongo="docker logs ml_api_mongodb" # print mongo logs
 
 # Execute any command in the container
@@ -27,12 +26,24 @@ function ml-go {
   ml-exec go "$@"
 }
 
+# Remove and rebuild the containers
+function ml-reset {
+  export ML_BUILD_ENV=test
+  ddc-rm
+  ddc-build
+  ddc-up
+  ml-make "migration"
+}
+
 # Execute a test
 function ml-test {
   echo "Restart services..."
   ddc-stop &> /dev/null
   ddc-build &> /dev/null
   ddc-up &> /dev/null
+
+  echo "Update database"
+  ml-make "migration"
 
   echo "Start testings"
   ml-exec "go test $@"
@@ -44,6 +55,9 @@ function ml-tests {
   ddc-stop &> /dev/null
   ddc-build &> /dev/null
   ddc-up &> /dev/null
+
+  echo "Update database"
+  ml-make "migration"
 
   echo "Start testings"
   ml-exec "cd api && go test ./..."
