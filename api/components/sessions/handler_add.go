@@ -25,13 +25,13 @@ func HandlerAdd(req *router.Request) {
 		return
 	}
 
-	if user.UUID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
+	if user.ID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
 		req.Error(apierror.NewBadRequest("Bad email/password"))
 		return
 	}
 
 	s := &auth.Session{
-		UserUUID: user.UUID,
+		UserID: user.ID,
 	}
 	if err := s.Save(); err != nil {
 		req.Error(err)

@@ -33,45 +33,45 @@ func TestHandlerUpdate(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&users.HandlerUpdateParams{UUID: u1.UUID},
+			&users.HandlerUpdateParams{ID: u1.ID},
 			nil,
 		},
 		{
 			"Updating an other user",
 			http.StatusForbidden,
-			&users.HandlerUpdateParams{UUID: u1.UUID},
-			testhelpers.NewRequestAuth(s2.UUID, u2.UUID),
+			&users.HandlerUpdateParams{ID: u1.ID},
+			testhelpers.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Updating email without providing password",
 			http.StatusUnauthorized,
-			&users.HandlerUpdateParams{UUID: u1.UUID, Email: "melvin@fake.io"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&users.HandlerUpdateParams{ID: u1.ID, Email: "melvin@fake.io"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating password without providing current Password",
 			http.StatusUnauthorized,
-			&users.HandlerUpdateParams{UUID: u1.UUID, NewPassword: "TestUpdateUser"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&users.HandlerUpdateParams{ID: u1.ID, NewPassword: "TestUpdateUser"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating regular field",
 			http.StatusOK,
-			&users.HandlerUpdateParams{UUID: u1.UUID, Name: "Melvin"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&users.HandlerUpdateParams{ID: u1.ID, Name: "Melvin"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating email to a used one",
 			http.StatusConflict,
-			&users.HandlerUpdateParams{UUID: u1.UUID, CurrentPassword: "fake", Email: u2.Email},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&users.HandlerUpdateParams{ID: u1.ID, CurrentPassword: "fake", Email: u2.Email},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it changes the password
 		{
 			"Updating password",
 			http.StatusOK,
-			&users.HandlerUpdateParams{UUID: u1.UUID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&users.HandlerUpdateParams{ID: u1.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
@@ -97,7 +97,7 @@ func TestHandlerUpdate(t *testing.T) {
 				if tc.params.NewPassword != "" {
 					// To check the password has been updated with need to get the
 					// encrypted version, and compare it to the raw one
-					updatedUser, err := auth.GetUser(tc.params.UUID)
+					updatedUser, err := auth.GetUser(tc.params.ID)
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -114,7 +114,7 @@ func callHandlerUpdate(t *testing.T, params *users.HandlerUpdateParams, auth *te
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: users.Endpoints[users.EndpointUpdate],
-		URI:      fmt.Sprintf("/users/%s", params.UUID),
+		URI:      fmt.Sprintf("/users/%s", params.ID),
 		Params:   params,
 		Auth:     auth,
 	}

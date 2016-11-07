@@ -33,33 +33,33 @@ func TestHandlerDelete(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&sessions.HandlerDeleteParams{Token: s1.UUID},
+			&sessions.HandlerDeleteParams{Token: s1.ID},
 			nil,
 		},
 		{
 			"Deleting an other user sessions",
 			http.StatusNotFound,
-			&sessions.HandlerDeleteParams{Token: s1.UUID, CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s2.UUID, u2.UUID),
+			&sessions.HandlerDeleteParams{Token: s1.ID, CurrentPassword: "fake"},
+			testhelpers.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Deleting an invalid ID",
-			http.StatusNotFound,
+			http.StatusBadRequest,
 			&sessions.HandlerDeleteParams{Token: "invalid", CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
-			&sessions.HandlerDeleteParams{Token: s1.UUID},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&sessions.HandlerDeleteParams{Token: s1.ID},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it deletes the session
 		{
 			"Deleting session",
 			http.StatusNoContent,
-			&sessions.HandlerDeleteParams{Token: s1.UUID, CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&sessions.HandlerDeleteParams{Token: s1.ID, CurrentPassword: "fake"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
@@ -71,13 +71,13 @@ func TestHandlerDelete(t *testing.T) {
 			if rec.Code == http.StatusNoContent {
 				// We check that the user is still in DB but is flagged for deletion
 				var session auth.Session
-				stmt := "SELECT * FROM sessions WHERE uuid=$1 LIMIT 1"
+				stmt := "SELECT * FROM sessions WHERE id=$1 LIMIT 1"
 				err := db.Get(&session, stmt, tc.params.Token)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if assert.NotEmpty(t, session.UUID, "session fully deleted") {
+				if assert.NotEmpty(t, session.ID, "session fully deleted") {
 					assert.NotNil(t, session.DeletedAt, "User not marked for deletion")
 				}
 			}

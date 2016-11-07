@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Nivl/api.melvin.la/api/apierror"
+	"github.com/Nivl/api.melvin.la/api/validators"
 )
 
 // ParamOptions represent all the options for a field
@@ -27,6 +28,33 @@ type ParamOptions struct {
 	// Trim means the field needs to be trimmed before being retrieved and checked
 	// params:"trim"
 	Trim bool
+
+	// ValidateUUID means the field should contain a valid UUIDv4
+	// params:"uuid"
+	ValidateUUID bool
+}
+
+// Validate checks the given value passes the options set
+func (opts *ParamOptions) Validate(value string) error {
+	if value == "" && opts.Required {
+		return apierror.NewBadRequest("parameter missing: %s", opts.Name)
+	}
+
+	if value != "" {
+		if opts.ValidateUUID && !validators.IsValidUUID(value) {
+			return apierror.NewBadRequest("not a valid format: %s - %s", opts.Name, value)
+		}
+	}
+
+	return nil
+}
+
+// ApplyTransformations applies all the wanted transformations to the given value
+func (opts *ParamOptions) ApplyTransformations(value string) string {
+	if opts.Trim {
+		value = strings.TrimSpace(value)
+	}
+	return value
 }
 
 // NewParamOptions returns a ParamOptions from a StructTag
@@ -52,6 +80,8 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 			output.Required = true
 		case "trim":
 			output.Trim = true
+		case "uuid":
+			output.ValidateUUID = true
 		}
 	}
 
@@ -129,17 +159,13 @@ func (r *Request) setParamValue(args *setParamValueArgs) error {
 		opts.Name = args.paramInfo.Name
 	}
 
-	// We get the value and apply the transformations
-	value := args.source.Get(opts.Name)
-	if opts.Trim {
-		value = strings.TrimSpace(value)
-	}
-
+	value := opts.ApplyTransformations(args.source.Get(opts.Name))
 	if value == "" {
 		value = defaultValue
-		if opts.Required {
-			return apierror.NewBadRequest("parameter [%s] missing", opts.Name)
-		}
+	}
+
+	if err := opts.Validate(value); err != nil {
+		return err
 	}
 
 	// We now set the value in the struct

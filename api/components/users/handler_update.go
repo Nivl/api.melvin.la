@@ -7,7 +7,7 @@ import (
 )
 
 type HandlerUpdateParams struct {
-	UUID            string `from:"url" json:"uuid"`
+	ID              string `from:"url" json:"id"  params:"uuid"`
 	Name            string `from:"form" json:"name" params:"trim"`
 	Email           string `from:"form" json:"email" params:"trim"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
@@ -18,7 +18,7 @@ func HandlerUpdate(req *router.Request) {
 	params := req.Params.(*HandlerUpdateParams)
 	user := req.User
 
-	if params.UUID != user.UUID {
+	if params.ID != user.ID {
 		req.Error(apierror.NewForbidden())
 		return
 	}

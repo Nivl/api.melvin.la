@@ -33,31 +33,31 @@ func TestHandlerGet(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusOK,
-			&users.HandlerGetParams{UUID: u1.UUID},
+			&users.HandlerGetParams{ID: u1.ID},
 			nil,
 		},
 		{
 			"Getting an other user",
 			http.StatusOK,
-			&users.HandlerGetParams{UUID: u1.UUID},
-			testhelpers.NewRequestAuth(s2.UUID, u2.UUID),
+			&users.HandlerGetParams{ID: u1.ID},
+			testhelpers.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Getting own data",
 			http.StatusOK,
-			&users.HandlerGetParams{UUID: u1.UUID},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			&users.HandlerGetParams{ID: u1.ID},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
-			"Getting un-existing user with valid UUID",
+			"Getting un-existing user with valid ID",
 			http.StatusNotFound,
-			&users.HandlerGetParams{UUID: "550146d1b51bc1c208d1924d"},
+			&users.HandlerGetParams{ID: "f76700e7-988c-4ae9-9f02-ac3f9d7cd88e"},
 			nil,
 		},
 		{
-			"Getting un-existing user with invalid UUID",
-			http.StatusNotFound,
-			&users.HandlerGetParams{UUID: "invalidUUID"},
+			"Getting un-existing user with invalid ID",
+			http.StatusBadRequest,
+			&users.HandlerGetParams{ID: "invalidID"},
 			nil,
 		},
 	}
@@ -73,9 +73,9 @@ func TestHandlerGet(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if assert.Equal(t, tc.params.UUID, u.UUID, "Not the same user") {
+				if assert.Equal(t, tc.params.ID, u.ID, "Not the same user") {
 					// User access their own data
-					if tc.auth != nil && u.UUID == tc.auth.UserUUID {
+					if tc.auth != nil && u.ID == tc.auth.UserID {
 						assert.NotEmpty(t, u.Email, "Same user needs their private data")
 					} else { // user access an other user data
 						assert.Empty(t, u.Email, "Should not return private data")
@@ -90,7 +90,7 @@ func callHandlerGet(t *testing.T, params *users.HandlerGetParams, auth *testhelp
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: users.Endpoints[users.EndpointGet],
-		URI:      fmt.Sprintf("/users/%s", params.UUID),
+		URI:      fmt.Sprintf("/users/%s", params.ID),
 		Params:   params,
 		Auth:     auth,
 	}

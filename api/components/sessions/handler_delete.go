@@ -9,7 +9,7 @@ import (
 
 // HandlerDeleteParams represent the request params accepted by HandlerDelete
 type HandlerDeleteParams struct {
-	Token           string `from:"url" json:"token"`
+	Token           string `from:"url" json:"token" params:"uuid"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
 }
 
@@ -23,7 +23,7 @@ func HandlerDelete(req *router.Request) {
 	}
 
 	var session auth.Session
-	stmt := "SELECT * FROM sessions WHERE uuid=$1 AND deleted_at IS NULL LIMIT 1"
+	stmt := "SELECT * FROM sessions WHERE id=$1 AND deleted_at IS NULL LIMIT 1"
 	err := db.Get(&session, stmt, params.Token)
 	if err != nil {
 		req.Error(err)
@@ -31,7 +31,7 @@ func HandlerDelete(req *router.Request) {
 	}
 
 	// We always return a 404 in case of a user error to avoid brute-force
-	if session.UUID == "" || session.UserUUID != req.User.UUID {
+	if session.ID == "" || session.UserID != req.User.ID {
 		req.Error(apierror.NewNotFound())
 		return
 	}

@@ -49,9 +49,9 @@ func TestHandlerAdd(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				assert.NotEmpty(t, u.UUID)
+				assert.NotEmpty(t, u.ID)
 				assert.Equal(t, tc.params.Email, u.Email)
-				testhelpers.SaveModel(globalT, &auth.User{UUID: u.UUID})
+				testhelpers.SaveModel(globalT, &auth.User{ID: u.ID})
 			}
 		})
 	}

@@ -16,7 +16,7 @@ import (
 
 // User is a structure representing a user that can be saved in the database
 type User struct {
-	UUID      string     `db:"uuid"`
+	ID        string     `db:"id"`
 	CreatedAt time.Time  `db:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at"`
@@ -26,13 +26,30 @@ type User struct {
 	Password string `db:"password"`
 }
 
-// GetUser finds and returns an active user by UUID
-func GetUser(uuid string) (*User, error) {
+// GetForeignSelect returns a string ready to be embed in a JOIN query
+func UserForeignSelect(prefix string) string {
+	fields := []string{"id", "created_at", "updated_at", "deleted_at", "name", "email", "password"}
+	output := ""
+
+	for i, field := range fields {
+		if i != 0 {
+			output += ", "
+		}
+
+		fullName := fmt.Sprintf(`%s.%s`, prefix, field)
+		output += fmt.Sprintf(`%s "%s"`, fullName, fullName)
+	}
+
+	return output
+}
+
+// GetUser finds and returns an active user by ID
+func GetUser(id string) (*User, error) {
 	user := &User{}
-	stmt := "SELECT * from users WHERE uuid=$1 and deleted_at IS NULL"
-	err := db.Get(user, stmt, uuid)
+	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL"
+	err := db.Get(user, stmt, id)
 	// We want to return nil if a user is not found
-	if user.UUID == "" {
+	if user.ID == "" {
 		return nil, err
 	}
 	return user, err
@@ -54,30 +71,30 @@ func IsPasswordValid(hash string, raw string) bool {
 	return err == nil
 }
 
-// Save creates or updates the user depending on the value of the uuid
+// Save creates or updates the user depending on the value of the id
 func (u *User) Save() error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
 
-	if u.UUID == "" {
+	if u.ID == "" {
 		return u.Create()
 	}
 
 	return u.Update()
 }
 
-// FullyDelete remove the user from the database
+// FullyDelete removes the user from the database
 func (u *User) FullyDelete() error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
 
-	if u.UUID == "" {
+	if u.ID == "" {
 		return errors.New("user has not been saved")
 	}
 
-	_, err := sql().Exec("DELETE FROM users WHERE uuid=$1", u.UUID)
+	_, err := sql().Exec("DELETE FROM users WHERE id=$1", u.ID)
 	return err
 }
 
@@ -87,16 +104,16 @@ func (u *User) Create() error {
 		return apierror.NewServerError("user is not instanced")
 	}
 
-	if u.UUID != "" {
-		return apierror.NewServerError("cannot persist a user that already has a UUID")
+	if u.ID != "" {
+		return apierror.NewServerError("cannot persist a user that already has a ID")
 	}
 
-	u.UUID = uuid.NewV4().String()
+	u.ID = uuid.NewV4().String()
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 
-	stmt := "INSERT INTO users (uuid, created_at, updated_at, name, email, password) VALUES ($1, $2, $3, $4, $5, $6)"
-	_, err := sql().Exec(stmt, u.UUID, u.CreatedAt, u.UpdatedAt, u.Name, u.Email, u.Password)
+	stmt := "INSERT INTO users (id, created_at, updated_at, name, email, password) VALUES ($1, $2, $3, $4, $5, $6)"
+	_, err := sql().Exec(stmt, u.ID, u.CreatedAt, u.UpdatedAt, u.Name, u.Email, u.Password)
 
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
@@ -106,13 +123,13 @@ func (u *User) Create() error {
 }
 
 // Update updates most of the fields of a persisted user.
-// Excluded fields are uuid, created_at, deleted_at
+// Excluded fields are id, created_at, deleted_at
 func (u *User) Update() error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
 
-	if u.UUID == "" {
+	if u.ID == "" {
 		return apierror.NewServerError("cannot update a non-persisted user")
 	}
 
@@ -123,8 +140,8 @@ func (u *User) Update() error {
 					 		name = $3,
 							email = $4,
 							password = $5
-	         WHERE uuid=$1`
-	_, err := sql().Exec(stmt, u.UUID, u.UpdatedAt, u.Name, u.Email, u.Password)
+	         WHERE id=$1`
+	_, err := sql().Exec(stmt, u.ID, u.UpdatedAt, u.Name, u.Email, u.Password)
 
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
@@ -139,15 +156,15 @@ func (u *User) Delete() error {
 		return apierror.NewServerError("user is not instanced")
 	}
 
-	if u.UUID == "" {
+	if u.ID == "" {
 		return apierror.NewServerError("cannot delete a non-persisted user")
 	}
 
 	now := time.Now()
 	u.DeletedAt = &now
 
-	stmt := `UPDATE users SET deleted_at = $2 WHERE uuid=$1`
-	_, err := sql().Exec(stmt, u.UUID, *u.DeletedAt)
+	stmt := `UPDATE users SET deleted_at = $2 WHERE id=$1`
+	_, err := sql().Exec(stmt, u.ID, *u.DeletedAt)
 	return err
 }
 

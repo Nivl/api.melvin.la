@@ -31,7 +31,7 @@ func EnsureIndexes() {
 func NewTestAuth(t *testing.T) (*User, *Session) {
 	user := NewTestUser(t, nil)
 	session := &Session{
-		UserUUID: user.UUID,
+		UserID: user.ID,
 	}
 
 	if err := session.Create(); err != nil {

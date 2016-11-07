@@ -13,14 +13,14 @@ import (
 )
 
 type RequestAuth struct {
-	SessionUUID string
-	UserUUID    string
+	SessionID string
+	UserID    string
 }
 
-func NewRequestAuth(sessionUUID string, userUUID string) *RequestAuth {
+func NewRequestAuth(sessionID string, userID string) *RequestAuth {
 	return &RequestAuth{
-		SessionUUID: sessionUUID,
-		UserUUID:    userUUID,
+		SessionID: sessionID,
+		UserID:    userID,
 	}
 }
 
@@ -53,8 +53,8 @@ func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
 	}
 
 	if info.Auth != nil {
-		req.Header.Add("X-Session-Token", info.Auth.SessionUUID)
-		req.Header.Add("X-User-Id", info.Auth.UserUUID)
+		req.Header.Add("X-Session-Token", info.Auth.SessionID)
+		req.Header.Add("X-User-Id", info.Auth.UserID)
 	}
 
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")

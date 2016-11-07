@@ -52,10 +52,10 @@ func TestHandlerAdd(t *testing.T) {
 				}
 
 				assert.NotEmpty(t, session.Token)
-				assert.Equal(t, u1.UUID, session.UserUUID)
+				assert.Equal(t, u1.ID, session.UserID)
 
 				// clean the test
-				(&auth.Session{UUID: session.Token}).FullyDelete()
+				(&auth.Session{ID: session.Token}).FullyDelete()
 			}
 		})
 	}

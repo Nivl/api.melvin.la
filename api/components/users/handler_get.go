@@ -8,14 +8,14 @@ import (
 
 // HandlerGetParams represent the request params accepted by HandlerGet
 type HandlerGetParams struct {
-	UUID string `from:"url" json:"uuid"`
+	ID string `from:"url" json:"id" params:"uuid"`
 }
 
 // HandlerGet represent an API handler to get a user
 func HandlerGet(req *router.Request) {
 	params := req.Params.(*HandlerGetParams)
 
-	user, err := auth.GetUser(params.UUID)
+	user, err := auth.GetUser(params.ID)
 	if err != nil {
 		req.Error(err)
 		return
@@ -26,7 +26,7 @@ func HandlerGet(req *router.Request) {
 	}
 
 	// if a user asks for their own data, we return as much as possible
-	if req.User != nil && req.User.UUID == user.UUID {
+	if req.User != nil && req.User.ID == user.ID {
 		req.Ok(NewPrivatePayload(user))
 		return
 	}
