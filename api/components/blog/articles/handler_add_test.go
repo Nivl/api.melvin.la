@@ -10,7 +10,6 @@ import (
 	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/blog/articles"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func TestHandlerAdd(t *testing.T) {
@@ -37,25 +36,25 @@ func TestHandlerAdd(t *testing.T) {
 			"No Title",
 			http.StatusBadRequest,
 			&articles.HandlerAddParams{},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Title filled with spaces",
 			http.StatusBadRequest,
 			&articles.HandlerAddParams{Title: "       "},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"As few params as possible",
 			http.StatusCreated,
 			&articles.HandlerAddParams{Title: "My Super Article"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Duplicate title",
 			http.StatusCreated,
 			&articles.HandlerAddParams{Title: "My Super Article"},
-			testhelpers.NewRequestAuth(s1.UUID, u1.UUID),
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
@@ -73,7 +72,7 @@ func TestHandlerAdd(t *testing.T) {
 				assert.NotEmpty(t, a.ID)
 				assert.NotEmpty(t, a.Slug)
 				assert.Equal(t, tc.params.Title, a.Title)
-				testhelpers.SaveModel(globalT, &articles.Article{ID: bson.ObjectIdHex(a.ID)})
+				testhelpers.SaveModel(globalT, &articles.Article{ID: a.ID})
 			}
 		})
 	}

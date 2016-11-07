@@ -2,8 +2,13 @@ package articles
 
 import (
 	"github.com/Nivl/api.melvin.la/api/app"
+	"github.com/jmoiron/sqlx"
 	"gopkg.in/mgo.v2"
 )
+
+func sql() *sqlx.DB {
+	return app.GetContext().SQL
+}
 
 // EnsureIndexes sets the indexes for the Articles document
 func EnsureIndexes() {

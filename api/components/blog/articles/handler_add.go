@@ -24,8 +24,9 @@ func HandlerAdd(req *router.Request) {
 		Subtitle:    params.Subtitle,
 		Content:     params.Content,
 		Description: params.Description,
-		IsDeleted:   false,
 		IsPublished: false,
+		UserID:      req.User.ID,
+		User:        *req.User,
 	}
 
 	if err := a.Save(); err != nil {
