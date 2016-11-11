@@ -1,17 +1,11 @@
 package api
 
 import (
-	"github.com/Nivl/api.melvin.la/api/auth"
 	"github.com/Nivl/api.melvin.la/api/components/blog"
 	"github.com/Nivl/api.melvin.la/api/components/sessions"
 	"github.com/Nivl/api.melvin.la/api/components/users"
 	"github.com/gorilla/mux"
 )
-
-func EnsureIndexes() {
-	auth.EnsureIndexes()
-	blog.EnsureIndexes()
-}
 
 func GetRouter() *mux.Router {
 	r := mux.NewRouter()

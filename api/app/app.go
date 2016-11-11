@@ -1,12 +1,9 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/bsphere/le_go"
 	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
-	"gopkg.in/mgo.v2"
 
 	// Required to connect to postgres
 	_ "github.com/lib/pq"
@@ -15,7 +12,6 @@ import (
 // Args represents the app args
 type Args struct {
 	Port            string `default:"5000"`
-	MongoURI        string `required:"true" envconfig:"mongo_uri"`
 	PostgresURI     string `required:"true" envconfig:"postgres_uri"`
 	LogEntriesToken string `envconfig:"mongo_uri" envconfig:"logentries_token"`
 	Debug           bool   `default:"false"`
@@ -23,9 +19,7 @@ type Args struct {
 
 // Context represent the global context of the app
 type Context struct {
-	DB         *mgo.Database
 	SQL        *sqlx.DB
-	Session    *mgo.Session
 	Params     Args
 	LogEntries *le_go.Logger
 }
@@ -39,21 +33,12 @@ func InitContext() *Context {
 	}
 
 	_context = new(Context)
-
 	if err := envconfig.Process("api", &_context.Params); err != nil {
 		panic(err)
 	}
 
+	var err error
 	// Setup database
-	session, err := mgo.Dial(_context.Params.MongoURI)
-	if err != nil {
-		fmt.Println("Cannot start mongo")
-		panic(err)
-	}
-	_context.Session = session
-	_context.Session.SetMode(mgo.Monotonic, true)
-	_context.DB = session.DB("")
-
 	_context.SQL, err = sqlx.Connect("postgres", _context.Params.PostgresURI)
 	if err != nil {
 		panic(err)
@@ -77,10 +62,6 @@ func GetContext() *Context {
 
 // Destroy clears the context when the app is quitting
 func (ctx *Context) Destroy() {
-	if ctx.Session != nil {
-		ctx.Session.Close()
-	}
-
 	if ctx.SQL != nil {
 		ctx.SQL.Close()
 	}

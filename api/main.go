@@ -11,7 +11,6 @@ func main() {
 	app.InitContext()
 	defer app.GetContext().Destroy()
 
-	api.EnsureIndexes()
 	r := api.GetRouter()
 	port := ":" + app.GetContext().Params.Port
 	http.ListenAndServe(port, r)
