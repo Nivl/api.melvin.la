@@ -30,6 +30,9 @@ type Article struct {
 	auth.User   `db:"users"`
 }
 
+// Articles represents a list of Articles
+type Articles []Article
+
 // FullyDelete removes an article from the database
 func (a *Article) FullyDelete() error {
 	if a == nil {

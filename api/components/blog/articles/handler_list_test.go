@@ -35,12 +35,12 @@ func TestHandlerList(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				var body []*articles.Article
+				var body *articles.PublicPayloads
 				if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
 					t.Fatal(err)
 				}
 
-				assert.Equal(t, tc.countWanted, len(body))
+				assert.Equal(t, tc.countWanted, len(body.Results))
 			}
 		})
 	}

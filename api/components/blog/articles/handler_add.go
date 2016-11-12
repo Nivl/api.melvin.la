@@ -33,5 +33,5 @@ func HandlerAdd(req *router.Request) {
 		req.Error(err)
 	}
 
-	req.Created(NewPayloadFromModel(a))
+	req.Created(a.Export())
 }

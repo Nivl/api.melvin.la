@@ -7,7 +7,7 @@ import (
 
 // HandlerList represents a API handler to get a list of articles
 func HandlerList(req *router.Request) {
-	arts := []Article{}
+	arts := Articles{}
 
 	stmt := `SELECT articles.*, ` + auth.UserForeignSelect("users") + `
 					FROM blog_articles articles
@@ -19,5 +19,5 @@ func HandlerList(req *router.Request) {
 		return
 	}
 
-	req.Ok(NewPayloadFromModels(&arts))
+	req.Ok(arts.Export())
 }

@@ -2,8 +2,8 @@ package articles
 
 import "github.com/Nivl/api.melvin.la/api/app/helpers"
 
-// Exportable represents an Article that can be safely returned by the API
-type Exportable struct {
+// PublicPayload represents an Article that can be safely returned by the API
+type PublicPayload struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Content     string `json:"content"`
@@ -14,10 +14,15 @@ type Exportable struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
-// NewPayloadFromModel turns an Article into an object that is safe to be
+// PublicPayloads is used to handle a list of publicPayload.
+type PublicPayloads struct {
+	Results []*PublicPayload `json:"results"`
+}
+
+// Export turns an Article into an object that is safe to be
 // returned by the API
-func NewPayloadFromModel(a *Article) *Exportable {
-	return &Exportable{
+func (a *Article) Export() *PublicPayload {
+	return &PublicPayload{
 		ID:          a.ID,
 		Title:       a.Title,
 		Content:     a.Content,
@@ -29,12 +34,14 @@ func NewPayloadFromModel(a *Article) *Exportable {
 	}
 }
 
-// NewPayloadFromModels turns a []*Article into a list object that is safe to be
+// Export turns a list of Articles into an object that is safe to be
 // returned by the API
-func NewPayloadFromModels(list *[]Article) []*Exportable {
-	pld := make([]*Exportable, len(*list))
-	for i, a := range *list {
-		pld[i] = NewPayloadFromModel(&a)
+func (arts Articles) Export() *PublicPayloads {
+	output := &PublicPayloads{}
+
+	output.Results = make([]*PublicPayload, len(arts))
+	for i, a := range arts {
+		output.Results[i] = a.Export()
 	}
-	return pld
+	return output
 }
