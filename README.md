@@ -1,6 +1,7 @@
-# api.melvin.la
+# ml-api
 
-[![Build Status](https://travis-ci.org/Nivl/api.melvin.la.svg?branch=master)](https://travis-ci.org/Nivl/api.melvin.la)
+[![Build Status](https://travis-ci.org/melvin-laplanche/ml-api.svg?branch=master)](https://travis-ci.org/melvin-laplanche/ml-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/melvin-laplanche/ml-api)](https://goreportcard.com/report/github.com/melvin-laplanche/ml-api)
 
 ## Run the API using docker
 
