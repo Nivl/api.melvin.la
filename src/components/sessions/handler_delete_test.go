@@ -7,10 +7,10 @@ import (
 
 	"fmt"
 
-	"github.com/melvin-laplanche/ml-api/src/app/testhelpers"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/melvin-laplanche/ml-api/src/db"
+	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
