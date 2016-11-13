@@ -6,7 +6,7 @@ alias ddc-stop="ML_BUILD_ENV=test docker-compose stop" # Stops the running servi
 
 # Execute any command in the container
 function ml-exec {
-  CMD="cd /go/src/github.com/Nivl/api.melvin.la && $@"
+  CMD="cd /go/src/github.com/melvin-laplanche/ml-api && $@"
   docker exec -i -t ml_api /bin/bash -ic $CMD
 }
 
@@ -59,5 +59,5 @@ function ml-tests {
   ml-make "migration"
 
   echo "Start testings"
-  ml-exec "cd api && go test ./..."
+  ml-exec "cd src && go test ./..."
 }

@@ -4,12 +4,12 @@ FROM golang:1.7
 RUN go get bitbucket.org/liamstask/goose/cmd/goose
 
 # Copy the local package files to the container’s workspace.
-ADD . /go/src/github.com/Nivl/api.melvin.la
+ADD . /go/src/github.com/melvin-laplanche/ml-api
 
 # Install api binary globally within container
-RUN cd /go/src/github.com/Nivl/api.melvin.la && make install
+RUN cd /go/src/github.com/melvin-laplanche/ml-api && make install
 
 # Set binary as entrypoint
-ENTRYPOINT /go/bin/api
+ENTRYPOINT /go/bin/ml-api
 
 EXPOSE 5000

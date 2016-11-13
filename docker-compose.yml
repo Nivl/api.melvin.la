@@ -5,7 +5,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - ./:/go/src/github.com/Nivl/api.melvin.la
+      - ./:/go/src/github.com/melvin-laplanche/ml-api
     depends_on:
       - database
     env_file:
