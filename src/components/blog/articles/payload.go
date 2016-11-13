@@ -1,17 +1,17 @@
 package articles
 
-import "github.com/melvin-laplanche/ml-api/src/app/helpers"
+import "github.com/melvin-laplanche/ml-api/src/db"
 
 // PublicPayload represents an Article that can be safely returned by the API
 type PublicPayload struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Content     string `json:"content"`
-	Slug        string `json:"slug"`
-	Subtitle    string `json:"subtitle"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
+	ID          string  `json:"id"`
+	Title       string  `json:"title"`
+	Content     string  `json:"content"`
+	Slug        string  `json:"slug"`
+	Subtitle    string  `json:"subtitle"`
+	Description string  `json:"description"`
+	CreatedAt   db.Time `json:"created_at"`
+	UpdatedAt   db.Time `json:"updated_at"`
 }
 
 // PublicPayloads is used to handle a list of publicPayload.
@@ -29,8 +29,8 @@ func (a *Article) Export() *PublicPayload {
 		Slug:        a.Slug,
 		Subtitle:    a.Subtitle,
 		Description: a.Description,
-		CreatedAt:   helpers.GetDateForJSON(a.CreatedAt),
-		UpdatedAt:   helpers.GetDateForJSON(a.UpdatedAt),
+		CreatedAt:   a.CreatedAt,
+		UpdatedAt:   a.UpdatedAt,
 	}
 }
 

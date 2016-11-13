@@ -4,29 +4,28 @@ import (
 	"errors"
 	"fmt"
 	"testing"
-	"time"
 
+	"github.com/dchest/uniuri"
+	"github.com/gosimple/slug"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
-	"github.com/dchest/uniuri"
-	"github.com/gosimple/slug"
 	uuid "github.com/satori/go.uuid"
 )
 
 // Article is a structure representing an article that can be saved in the database
 type Article struct {
-	ID          string     `db:"id"`
-	Title       string     `db:"title"`
-	Content     string     `db:"content"`
-	Slug        string     `db:"slug"`
-	Subtitle    string     `db:"subtitle"`
-	Description string     `db:"description"`
-	CreatedAt   time.Time  `db:"created_at"`
-	UpdatedAt   time.Time  `db:"updated_at"`
-	DeletedAt   *time.Time `db:"deleted_at"`
-	IsPublished bool       `db:"is_published"`
-	UserID      string     `db:"user_id"`
+	ID          string   `db:"id"`
+	Title       string   `db:"title"`
+	Content     string   `db:"content"`
+	Slug        string   `db:"slug"`
+	Subtitle    string   `db:"subtitle"`
+	Description string   `db:"description"`
+	CreatedAt   db.Time  `db:"created_at"`
+	UpdatedAt   db.Time  `db:"updated_at"`
+	DeletedAt   *db.Time `db:"deleted_at"`
+	IsPublished bool     `db:"is_published"`
+	UserID      string   `db:"user_id"`
 	auth.User   `db:"users"`
 }
 
@@ -70,7 +69,7 @@ func (a *Article) Create() error {
 		a.Slug = slug.Make(a.Title)
 	}
 
-	a.CreatedAt = time.Now()
+	a.CreatedAt = db.Now()
 
 	// To prevent duplicates on the slug, we'll retry the insert() up to 10 times
 	originalSlug := a.Slug

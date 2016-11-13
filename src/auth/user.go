@@ -4,29 +4,28 @@ import (
 	"errors"
 	"fmt"
 	"testing"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
-	"github.com/dchest/uniuri"
 	uuid "github.com/satori/go.uuid"
 )
 
 // User is a structure representing a user that can be saved in the database
 type User struct {
-	ID        string     `db:"id"`
-	CreatedAt time.Time  `db:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at"`
-	DeletedAt *time.Time `db:"deleted_at"`
+	ID        string   `db:"id"`
+	CreatedAt db.Time  `db:"created_at"`
+	UpdatedAt db.Time  `db:"updated_at"`
+	DeletedAt *db.Time `db:"deleted_at"`
 
 	Name     string `db:"name"`
 	Email    string `db:"email"`
 	Password string `db:"password"`
 }
 
-// GetForeignSelect returns a string ready to be embed in a JOIN query
+// UserForeignSelect returns a string ready to be embed in a JOIN query
 func UserForeignSelect(prefix string) string {
 	fields := []string{"id", "created_at", "updated_at", "deleted_at", "name", "email", "password"}
 	output := ""
@@ -109,8 +108,8 @@ func (u *User) Create() error {
 	}
 
 	u.ID = uuid.NewV4().String()
-	u.CreatedAt = time.Now()
-	u.UpdatedAt = time.Now()
+	u.CreatedAt = db.Now()
+	u.UpdatedAt = db.Now()
 
 	stmt := "INSERT INTO users (id, created_at, updated_at, name, email, password) VALUES ($1, $2, $3, $4, $5, $6)"
 	_, err := sql().Exec(stmt, u.ID, u.CreatedAt, u.UpdatedAt, u.Name, u.Email, u.Password)
@@ -133,7 +132,7 @@ func (u *User) Update() error {
 		return apierror.NewServerError("cannot update a non-persisted user")
 	}
 
-	u.UpdatedAt = time.Now()
+	u.UpdatedAt = db.Now()
 
 	stmt := `UPDATE users
 					 SET updated_at = $2,
@@ -160,7 +159,7 @@ func (u *User) Delete() error {
 		return apierror.NewServerError("cannot delete a non-persisted user")
 	}
 
-	now := time.Now()
+	now := db.Now()
 	u.DeletedAt = &now
 
 	stmt := `UPDATE users SET deleted_at = $2 WHERE id=$1`

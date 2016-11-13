@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"time"
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
@@ -11,9 +10,9 @@ import (
 
 // Session is a structure representing a session that can be saved in the database
 type Session struct {
-	ID        string     `db:"id"`
-	CreatedAt time.Time  `db:"created_at"`
-	DeletedAt *time.Time `db:"deleted_at"`
+	ID        string   `db:"id"`
+	CreatedAt db.Time  `db:"created_at"`
+	DeletedAt *db.Time `db:"deleted_at"`
 
 	UserID string `db:"user_id"`
 }
@@ -67,7 +66,7 @@ func (s *Session) Create() error {
 	}
 
 	s.ID = uuid.NewV4().String()
-	s.CreatedAt = time.Now()
+	s.CreatedAt = db.Now()
 
 	stmt := "INSERT INTO sessions (id, created_at, user_id) VALUES ($1, $2, $3)"
 	_, err := sql().Exec(stmt, s.ID, s.CreatedAt, s.UserID)
@@ -98,7 +97,7 @@ func (s *Session) Delete() error {
 		return apierror.NewServerError("cannot delete a non-persisted session")
 	}
 
-	now := time.Now()
+	now := db.Now()
 	s.DeletedAt = &now
 
 	stmt := `UPDATE sessions SET deleted_at = $2 WHERE id=$1`
