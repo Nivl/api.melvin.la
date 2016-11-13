@@ -16,7 +16,7 @@ func TestHandlerAdd(t *testing.T) {
 	defer testhelpers.PurgeModels(t)
 
 	u1 := auth.NewTestUser(t, nil)
-	testhelpers.SaveModel(t, u1)
+	testhelpers.SaveModels(t, u1)
 
 	tests := []struct {
 		description string

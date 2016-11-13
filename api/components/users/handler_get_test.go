@@ -19,10 +19,7 @@ func TestHandlerGet(t *testing.T) {
 
 	u1, s1 := auth.NewTestAuth(t)
 	u2, s2 := auth.NewTestAuth(t)
-	testhelpers.SaveModel(t, u1)
-	testhelpers.SaveModel(t, s1)
-	testhelpers.SaveModel(t, u2)
-	testhelpers.SaveModel(t, s2)
+	testhelpers.SaveModels(t, u1, s1, u2, s2)
 
 	tests := []struct {
 		description string

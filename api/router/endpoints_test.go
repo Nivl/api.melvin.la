@@ -22,8 +22,7 @@ func TestEndpointExecution(t *testing.T) {
 	}
 
 	u, s := auth.NewTestAuth(t)
-	testhelpers.SaveModel(t, u)
-	testhelpers.SaveModel(t, s)
+	testhelpers.SaveModels(t, u, s)
 	defer testhelpers.PurgeModels(t)
 
 	tests := []struct {

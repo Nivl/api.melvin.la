@@ -57,9 +57,11 @@ func (sm *savedModels) Purge(t testing.TB) {
 	delete(sm.list, t)
 }
 
-// SaveModel saves a model that can be purged using PurgeModels()
-func SaveModel(t testing.TB, i FullyDeletable) {
-	_models.Push(t, i)
+// SaveModels saves a list of models that can be purged using PurgeModels()
+func SaveModels(t testing.TB, models ...FullyDeletable) {
+	for _, model := range models {
+		_models.Push(t, model)
+	}
 }
 
 // PurgeModels removes all models stored for the given test

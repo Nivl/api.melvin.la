@@ -17,8 +17,7 @@ func TestHandlerAdd(t *testing.T) {
 	defer testhelpers.PurgeModels(t)
 
 	u1, s1 := auth.NewTestAuth(t)
-	testhelpers.SaveModel(t, u1)
-	testhelpers.SaveModel(t, s1)
+	testhelpers.SaveModels(t, u1, s1)
 
 	tests := []struct {
 		description string
@@ -72,7 +71,7 @@ func TestHandlerAdd(t *testing.T) {
 				assert.NotEmpty(t, a.ID)
 				assert.NotEmpty(t, a.Slug)
 				assert.Equal(t, tc.params.Title, a.Title)
-				testhelpers.SaveModel(globalT, &articles.Article{ID: a.ID})
+				testhelpers.SaveModels(globalT, &articles.Article{ID: a.ID})
 			}
 		})
 	}

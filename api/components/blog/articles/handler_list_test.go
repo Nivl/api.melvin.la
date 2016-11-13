@@ -15,9 +15,7 @@ import (
 func TestHandlerList(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		a, u, s := articles.NewTestArticle(t, nil)
-		testhelpers.SaveModel(t, a)
-		testhelpers.SaveModel(t, u)
-		testhelpers.SaveModel(t, s)
+		testhelpers.SaveModels(t, a, u, s)
 	}
 	defer testhelpers.PurgeModels(t)
 
