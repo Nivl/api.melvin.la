@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/melvin-laplanche/ml-api.svg?branch=master)](https://travis-ci.org/melvin-laplanche/ml-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/melvin-laplanche/ml-api)](https://goreportcard.com/report/github.com/melvin-laplanche/ml-api)
+[![codebeat badge](https://codebeat.co/badges/111cf407-0776-4331-96d2-da2e4df9c4f5)](https://codebeat.co/projects/github-com-melvin-laplanche-ml-api)
 
 ## Run the API using docker
 
