@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -10,14 +9,14 @@ import (
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
-	uuid "github.com/satori/go.uuid"
 )
 
 // User is a structure representing a user that can be saved in the database
+//go:generate api-cli generate model User -t users
 type User struct {
 	ID        string   `db:"id"`
-	CreatedAt db.Time  `db:"created_at"`
-	UpdatedAt db.Time  `db:"updated_at"`
+	CreatedAt *db.Time `db:"created_at"`
+	UpdatedAt *db.Time `db:"updated_at"`
 	DeletedAt *db.Time `db:"deleted_at"`
 
 	Name     string `db:"name"`
@@ -83,20 +82,6 @@ func (u *User) Save() error {
 	return u.Update()
 }
 
-// FullyDelete removes the user from the database
-func (u *User) FullyDelete() error {
-	if u == nil {
-		return errors.New("user not instanced")
-	}
-
-	if u.ID == "" {
-		return errors.New("user has not been saved")
-	}
-
-	_, err := sql().Exec("DELETE FROM users WHERE id=$1", u.ID)
-	return err
-}
-
 // Create persists a user in the database
 func (u *User) Create() error {
 	if u == nil {
@@ -107,13 +92,7 @@ func (u *User) Create() error {
 		return apierror.NewServerError("cannot persist a user that already has a ID")
 	}
 
-	u.ID = uuid.NewV4().String()
-	u.CreatedAt = db.Now()
-	u.UpdatedAt = db.Now()
-
-	stmt := "INSERT INTO users (id, created_at, updated_at, name, email, password) VALUES ($1, $2, $3, $4, $5, $6)"
-	_, err := sql().Exec(stmt, u.ID, u.CreatedAt, u.UpdatedAt, u.Name, u.Email, u.Password)
-
+	err := u.doCreate()
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
@@ -132,16 +111,7 @@ func (u *User) Update() error {
 		return apierror.NewServerError("cannot update a non-persisted user")
 	}
 
-	u.UpdatedAt = db.Now()
-
-	stmt := `UPDATE users
-					 SET updated_at = $2,
-					 		name = $3,
-							email = $4,
-							password = $5
-	         WHERE id=$1`
-	_, err := sql().Exec(stmt, u.ID, u.UpdatedAt, u.Name, u.Email, u.Password)
-
+	err := u.doUpdate()
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
@@ -151,20 +121,7 @@ func (u *User) Update() error {
 
 // Delete soft delete a user.
 func (u *User) Delete() error {
-	if u == nil {
-		return apierror.NewServerError("user is not instanced")
-	}
-
-	if u.ID == "" {
-		return apierror.NewServerError("cannot delete a non-persisted user")
-	}
-
-	now := db.Now()
-	u.DeletedAt = &now
-
-	stmt := `UPDATE users SET deleted_at = $2 WHERE id=$1`
-	_, err := sql().Exec(stmt, u.ID, *u.DeletedAt)
-	return err
+	return u.doDelete()
 }
 
 // NewTestUser creates a new user with "fake" as password

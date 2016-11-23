@@ -1,17 +1,15 @@
 package auth
 
 import (
-	"errors"
-
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
-	uuid "github.com/satori/go.uuid"
 )
 
 // Session is a structure representing a session that can be saved in the database
+//go:generate api-cli generate model Session -t sessions
 type Session struct {
 	ID        string   `db:"id"`
-	CreatedAt db.Time  `db:"created_at"`
+	CreatedAt *db.Time `db:"created_at"`
 	DeletedAt *db.Time `db:"deleted_at"`
 
 	UserID string `db:"user_id"`
@@ -65,42 +63,10 @@ func (s *Session) Create() error {
 		return apierror.NewServerError("cannot save a session with no user id")
 	}
 
-	s.ID = uuid.NewV4().String()
-	s.CreatedAt = db.Now()
-
-	stmt := "INSERT INTO sessions (id, created_at, user_id) VALUES ($1, $2, $3)"
-	_, err := sql().Exec(stmt, s.ID, s.CreatedAt, s.UserID)
-	return err
-}
-
-// FullyDelete deletes a session from the database
-func (s *Session) FullyDelete() error {
-	if s == nil {
-		return errors.New("session not instanced")
-	}
-
-	if s.ID == "" {
-		return errors.New("session has not been saved")
-	}
-
-	_, err := sql().Exec("DELETE FROM sessions WHERE id=$1", s.ID)
-	return err
+	return s.doCreate()
 }
 
 // Delete soft-deletes a session
 func (s *Session) Delete() error {
-	if s == nil {
-		return apierror.NewServerError("session is not instanced")
-	}
-
-	if s.ID == "" {
-		return apierror.NewServerError("cannot delete a non-persisted session")
-	}
-
-	now := db.Now()
-	s.DeletedAt = &now
-
-	stmt := `UPDATE sessions SET deleted_at = $2 WHERE id=$1`
-	_, err := sql().Exec(stmt, s.ID, *s.DeletedAt)
-	return err
+	return s.doCreate()
 }

@@ -15,12 +15,16 @@ type Time struct {
 }
 
 // Now returns the current local time.
-func Now() Time {
-	return Time{Time: time.Now()}
+func Now() *Time {
+	return &Time{Time: time.Now()}
 }
 
 // Value - Implementation of valuer for database/sql
-func (t Time) Value() (driver.Value, error) {
+func (t *Time) Value() (driver.Value, error) {
+	if t == nil {
+		return nil, nil
+	}
+
 	return t.Format(ISO8601), nil
 }
 

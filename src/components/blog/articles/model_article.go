@@ -10,10 +10,10 @@ import (
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
-	uuid "github.com/satori/go.uuid"
 )
 
 // Article is a structure representing an article that can be saved in the database
+//go:generate api-cli generate model Article -t blog_articles
 type Article struct {
 	ID          string   `db:"id"`
 	Title       string   `db:"title"`
@@ -21,8 +21,8 @@ type Article struct {
 	Slug        string   `db:"slug"`
 	Subtitle    string   `db:"subtitle"`
 	Description string   `db:"description"`
-	CreatedAt   db.Time  `db:"created_at"`
-	UpdatedAt   db.Time  `db:"updated_at"`
+	CreatedAt   *db.Time `db:"created_at"`
+	UpdatedAt   *db.Time `db:"updated_at"`
 	DeletedAt   *db.Time `db:"deleted_at"`
 	IsPublished bool     `db:"is_published"`
 	UserID      string   `db:"user_id"`
@@ -31,20 +31,6 @@ type Article struct {
 
 // Articles represents a list of Articles
 type Articles []Article
-
-// FullyDelete removes an article from the database
-func (a *Article) FullyDelete() error {
-	if a == nil {
-		return errors.New("article not instanced")
-	}
-
-	if a.ID == "" {
-		return errors.New("article has not been saved")
-	}
-
-	_, err := sql().Exec("DELETE FROM blog_articles WHERE id=$1", a.ID)
-	return err
-}
 
 // Save creates or updates the article depending on the value of the id
 func (a *Article) Save() error {
@@ -69,27 +55,20 @@ func (a *Article) Create() error {
 		a.Slug = slug.Make(a.Title)
 	}
 
-	a.CreatedAt = db.Now()
-
 	// To prevent duplicates on the slug, we'll retry the insert() up to 10 times
 	originalSlug := a.Slug
 	var err error
 	for i := 0; i < 10; i++ {
-		a.ID = uuid.NewV4().String()
-
-		stmt := `INSERT INTO blog_articles
-		(id, created_at, updated_at, title, content, slug, subtitle, description, is_published, user_id)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
-		_, err := sql().Exec(stmt, a.ID, a.CreatedAt, a.UpdatedAt, a.Title, a.Content, a.Slug, a.Subtitle, a.Description, a.IsPublished, a.User.ID)
+		err = a.doCreate()
 
 		if err != nil {
-			// In case of duplicate we'll add "-X" at the end of the slug, where X is
-			// a number
-			a.Slug = fmt.Sprintf("%s-%d", originalSlug, i)
-
 			if db.SQLIsDup(err) == false {
 				return apierror.NewServerError(err.Error())
 			}
+
+			// In case of duplicate we'll add "-X" at the end of the slug, where X is
+			// a number
+			a.Slug = fmt.Sprintf("%s-%d", originalSlug, i)
 		} else {
 			// everything went well
 			return nil
@@ -120,6 +99,7 @@ func NewTestArticle(t *testing.T, a *Article) (*Article, *auth.User, *auth.Sessi
 
 	user, session := auth.NewTestAuth(t)
 	a.User = *user
+	a.UserID = user.ID
 
 	if err := a.Save(); err != nil {
 		t.Fatalf("failed to save article: %s", err)

@@ -29,8 +29,8 @@ func (a *Article) Export() *PublicPayload {
 		Slug:        a.Slug,
 		Subtitle:    a.Subtitle,
 		Description: a.Description,
-		CreatedAt:   a.CreatedAt,
-		UpdatedAt:   a.UpdatedAt,
+		CreatedAt:   *a.CreatedAt,
+		UpdatedAt:   *a.UpdatedAt,
 	}
 }
 
