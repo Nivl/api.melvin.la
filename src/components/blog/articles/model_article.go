@@ -83,11 +83,16 @@ func NewTestArticle(t *testing.T, a *Article) (*Article, *auth.User, *auth.Sessi
 		a.Title = uniuri.New()
 	}
 
-	user, session := auth.NewTestAuth(t)
-	a.User = *user
-	a.UserID = user.ID
+	var user *auth.User
+	var session *auth.Session
 
-	if err := a.Save(); err != nil {
+	if a.UserID == "" {
+		user, session = auth.NewTestAuth(t)
+		a.User = *user
+		a.UserID = user.ID
+	}
+
+	if err := a.Create(); err != nil {
 		t.Fatalf("failed to save article: %s", err)
 	}
 	return a, user, session
