@@ -9,7 +9,7 @@ import (
 func HandlerList(req *router.Request) {
 	arts := Articles{}
 
-	stmt := `SELECT articles.*, ` + auth.UserForeignSelect("users") + `
+	stmt := `SELECT articles.*, ` + auth.UserJoinSQL("users") + `
 					FROM blog_articles articles
 					LEFT JOIN users ON users.id = articles.user_id
 					WHERE articles.deleted_at IS NULL

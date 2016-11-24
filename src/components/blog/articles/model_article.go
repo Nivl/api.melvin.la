@@ -1,7 +1,6 @@
 package articles
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -13,7 +12,7 @@ import (
 )
 
 // Article is a structure representing an article that can be saved in the database
-//go:generate api-cli generate model Article -t blog_articles
+//go:generate api-cli generate model Article -t blog_articles -e Create,Update
 type Article struct {
 	ID          string   `db:"id"`
 	Title       string   `db:"title"`
@@ -31,19 +30,6 @@ type Article struct {
 
 // Articles represents a list of Articles
 type Articles []Article
-
-// Save creates or updates the article depending on the value of the id
-func (a *Article) Save() error {
-	if a == nil {
-		return errors.New("article not instanced")
-	}
-
-	if a.ID == "" {
-		return a.Create()
-	}
-
-	return a.Update()
-}
 
 // Create persists an article in the database
 func (a *Article) Create() error {

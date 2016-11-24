@@ -12,7 +12,7 @@ import (
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate api-cli generate model User -t users
+//go:generate api-cli generate model User -t users -e Create,Update,JoinSQL
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -24,8 +24,8 @@ type User struct {
 	Password string `db:"password"`
 }
 
-// UserForeignSelect returns a string ready to be embed in a JOIN query
-func UserForeignSelect(prefix string) string {
+// UserJoinSQL returns a string ready to be embed in a JOIN query
+func UserJoinSQL(prefix string) string {
 	fields := []string{"id", "created_at", "updated_at", "deleted_at", "name", "email", "password"}
 	output := ""
 
@@ -34,8 +34,8 @@ func UserForeignSelect(prefix string) string {
 			output += ", "
 		}
 
-		fullName := fmt.Sprintf(`%s.%s`, prefix, field)
-		output += fmt.Sprintf(`%s "%s"`, fullName, fullName)
+		fullName := fmt.Sprintf("%s.%s", prefix, field)
+		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
 	}
 
 	return output
@@ -67,19 +67,6 @@ func CryptPassword(raw string) (string, error) {
 func IsPasswordValid(hash string, raw string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(raw))
 	return err == nil
-}
-
-// Save creates or updates the user depending on the value of the id
-func (u *User) Save() error {
-	if u == nil {
-		return apierror.NewServerError("user is not instanced")
-	}
-
-	if u.ID == "" {
-		return u.Create()
-	}
-
-	return u.Update()
 }
 
 // Create persists a user in the database
@@ -117,11 +104,6 @@ func (u *User) Update() error {
 	}
 
 	return err
-}
-
-// Delete soft delete a user.
-func (u *User) Delete() error {
-	return u.doDelete()
 }
 
 // NewTestUser creates a new user with "fake" as password

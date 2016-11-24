@@ -4,12 +4,45 @@ package articles
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	uuid "github.com/satori/go.uuid"
 )
+
+// JoinSQL returns a string ready to be embed in a JOIN query
+func JoinSQL(prefix string) string {
+	fields := []string{ "id", "title", "content", "slug", "subtitle", "description", "created_at", "updated_at", "deleted_at", "is_published", "user_id" }
+	output := ""
+
+	for i, field := range fields {
+		if i != 0 {
+			output += ", "
+		}
+
+		fullName := fmt.Sprintf("%s.%s", prefix, field)
+		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
+	}
+
+	return output
+}
+
+// Save creates or updates the article depending on the value of the id
+func (a *Article) Save() error {
+	if a == nil {
+		return apierror.NewServerError("article is not instanced")
+	}
+
+	if a.ID == "" {
+		return a.Create()
+	}
+
+	return a.Update()
+}
+
+
 
 // doCreate persists an object in the database
 func (a *Article) doCreate() error {
@@ -23,8 +56,10 @@ func (a *Article) doCreate() error {
 
 	stmt := "INSERT INTO blog_articles (id, title, content, slug, subtitle, description, created_at, updated_at, deleted_at, is_published, user_id) VALUES (:id, :title, :content, :slug, :subtitle, :description, :created_at, :updated_at, :deleted_at, :is_published, :user_id)"
 	_, err := app.GetContext().SQL.NamedExec(stmt, a)
-	return err
+  return err
 }
+
+
 
 // doUpdate updates an object in the database
 func (a *Article) doUpdate() error {
@@ -55,6 +90,11 @@ func (a *Article) FullyDelete() error {
 
 	_, err := sql().Exec("DELETE FROM blog_articles WHERE id=$1", a.ID)
 	return err
+}
+
+// Delete soft delete an object.
+func (a *Article) Delete() error {
+	return a.doDelete()
 }
 
 // doDelete performs a soft delete operation on an object

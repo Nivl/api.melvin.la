@@ -4,12 +4,19 @@ package auth
 
 import (
 	"errors"
+	
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	uuid "github.com/satori/go.uuid"
 )
+
+
+
+
+
+
 
 // doCreate persists an object in the database
 func (s *Session) doCreate() error {
@@ -19,26 +26,16 @@ func (s *Session) doCreate() error {
 
 	s.ID = uuid.NewV4().String()
 	s.CreatedAt = db.Now()
+	s.UpdatedAt = db.Now()
 
-	stmt := "INSERT INTO sessions (id, created_at, deleted_at, user_id) VALUES (:id, :created_at, :deleted_at, :user_id)"
+	stmt := "INSERT INTO sessions (id, created_at, updated_at, deleted_at, user_id) VALUES (:id, :created_at, :updated_at, :deleted_at, :user_id)"
 	_, err := app.GetContext().SQL.NamedExec(stmt, s)
-	return err
+  return err
 }
 
-// doUpdate updates an object in the database
-func (s *Session) doUpdate() error {
-	if s == nil {
-		return apierror.NewServerError("session is not instanced")
-	}
 
-	if s.ID == "" {
-		return apierror.NewServerError("cannot update a non-persisted session")
-	}
 
-	stmt := "UPDATE sessions SET id = $1, created_at = $2, deleted_at = $3, user_id = $4 WHERE id=$5"
-	_, err := app.GetContext().SQL.Exec(stmt, s.ID, s.CreatedAt, s.DeletedAt, s.UserID, s.ID)
-	return err
-}
+
 
 // FullyDelete removes an object from the database
 func (s *Session) FullyDelete() error {
@@ -52,6 +49,11 @@ func (s *Session) FullyDelete() error {
 
 	_, err := sql().Exec("DELETE FROM sessions WHERE id=$1", s.ID)
 	return err
+}
+
+// Delete soft delete an object.
+func (s *Session) Delete() error {
+	return s.doDelete()
 }
 
 // doDelete performs a soft delete operation on an object

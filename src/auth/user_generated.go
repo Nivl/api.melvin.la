@@ -4,12 +4,30 @@ package auth
 
 import (
 	"errors"
+	
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	uuid "github.com/satori/go.uuid"
 )
+
+
+
+// Save creates or updates the user depending on the value of the id
+func (u *User) Save() error {
+	if u == nil {
+		return apierror.NewServerError("user is not instanced")
+	}
+
+	if u.ID == "" {
+		return u.Create()
+	}
+
+	return u.Update()
+}
+
+
 
 // doCreate persists an object in the database
 func (u *User) doCreate() error {
@@ -23,8 +41,10 @@ func (u *User) doCreate() error {
 
 	stmt := "INSERT INTO users (id, created_at, updated_at, deleted_at, name, email, password) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :email, :password)"
 	_, err := app.GetContext().SQL.NamedExec(stmt, u)
-	return err
+  return err
 }
+
+
 
 // doUpdate updates an object in the database
 func (u *User) doUpdate() error {
@@ -55,6 +75,11 @@ func (u *User) FullyDelete() error {
 
 	_, err := sql().Exec("DELETE FROM users WHERE id=$1", u.ID)
 	return err
+}
+
+// Delete soft delete an object.
+func (u *User) Delete() error {
+	return u.doDelete()
 }
 
 // doDelete performs a soft delete operation on an object
