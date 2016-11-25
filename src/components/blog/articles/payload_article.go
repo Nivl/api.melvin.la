@@ -3,8 +3,8 @@ package articles
 import "github.com/melvin-laplanche/ml-api/src/db"
 import "github.com/melvin-laplanche/ml-api/src/components/users"
 
-// PublicPayload represents an Article that can be safely returned by the API
-type PublicPayload struct {
+// Payload represents an Article that can be safely returned by the API
+type Payload struct {
 	ID   string `json:"id"`
 	Slug string `json:"slug"`
 
@@ -13,50 +13,56 @@ type PublicPayload struct {
 	PublishedAt *db.Time             `json:"is_published,omitempty"`
 	User        *users.PublicPayload `json:"user"`
 	Content     *ContentPayload      `json:"content"`
+	Draft       *ContentPayload      `json:"draft,omitempty"`
 }
 
-// PublicPayloads is used to handle a list of publicPayload.
-type PublicPayloads struct {
-	Results []*PublicPayload `json:"results"`
-}
-
-// PrivatePayload represents an Article containing sensitive data that can returned by the API
-type PrivatePayload struct {
-	PublicPayload
-	Draft *ContentPayload `json:"draft"`
+// Payloads is used to handle a list of Payload.
+type Payloads struct {
+	Results []*Payload `json:"results"`
 }
 
 // PublicExport turns an Article into an object that is safe to be
 // returned by the API
-func (a *Article) PublicExport() *PublicPayload {
-	return &PublicPayload{
+func (a *Article) PublicExport() *Payload {
+	return &Payload{
 		ID:          a.ID,
 		Slug:        a.Slug,
 		CreatedAt:   *a.CreatedAt,
 		UpdatedAt:   *a.UpdatedAt,
 		PublishedAt: a.PublishedAt,
-		User:        users.NewPublicPayload(&a.User),
+		User:        users.NewPublicPayload(a.User),
 		Content:     a.Content.Export(),
 	}
 }
 
 // PrivateExport turns an Article into an object that will contain private data
 // that is safe to be returned by the API
-func (a *Article) PrivateExport() *PrivatePayload {
-	return &PrivatePayload{
-		PublicPayload: *a.PublicExport(),
-		Draft:         a.Draft.Export(),
-	}
+func (a *Article) PrivateExport() *Payload {
+	pld := a.PublicExport()
+	pld.Draft = a.Draft.Export()
+	return pld
 }
 
-// Export turns a list of Articles into an object that is safe to be
+// PublicExport turns a list of Articles into an object that is safe to be
 // returned by the API
-func (arts Articles) Export() *PublicPayloads {
-	output := &PublicPayloads{}
+func (arts Articles) PublicExport() *Payloads {
+	output := &Payloads{}
 
-	output.Results = make([]*PublicPayload, len(arts))
+	output.Results = make([]*Payload, len(arts))
 	for i, a := range arts {
 		output.Results[i] = a.PublicExport()
+	}
+	return output
+}
+
+// PrivateExport turns a list of Articles into an object that is safe to be
+// returned by the API, but contains privacy sensitive data
+func (arts Articles) PrivateExport() *Payloads {
+	output := &Payloads{}
+
+	output.Results = make([]*Payload, len(arts))
+	for i, a := range arts {
+		output.Results[i] = a.PrivateExport()
 	}
 	return output
 }

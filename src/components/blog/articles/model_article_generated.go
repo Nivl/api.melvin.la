@@ -53,7 +53,6 @@ func (a *Article) doCreate() error {
 	a.UpdatedAt = db.Now()
 
 	stmt := "INSERT INTO blog_articles (id, slug, created_at, updated_at, deleted_at, published_at, user_id) VALUES (:id, :slug, :created_at, :updated_at, :deleted_at, :published_at, :user_id)"
-	fmt.Printf("\n\n Query: %s\nData %#v \n\n", stmt, a)
 	_, err := app.GetContext().SQL.NamedExec(stmt, a)
 	return err
 }

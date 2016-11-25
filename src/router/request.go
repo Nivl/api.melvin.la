@@ -3,13 +3,14 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/logger"
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -75,7 +76,7 @@ func (req *Request) MuxVariables() url.Values {
 	return output
 }
 
-// MuxVariables parses and returns the body of the request
+// JSONBody parses and returns the body of the request
 func (req *Request) JSONBody() (url.Values, error) {
 	output := url.Values{}
 
@@ -84,7 +85,7 @@ func (req *Request) JSONBody() (url.Values, error) {
 	}
 
 	vars := map[string]string{}
-	if err := json.NewDecoder(req.Request.Body).Decode(&vars); err != nil {
+	if err := json.NewDecoder(req.Request.Body).Decode(&vars); err != nil && err != io.EOF {
 		return nil, err
 	}
 

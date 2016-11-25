@@ -28,7 +28,7 @@ func HandlerAdd(req *router.Request) {
 	a := &Article{
 		Slug:   slug.Make(content.Title),
 		UserID: req.User.ID,
-		User:   *req.User,
+		User:   req.User,
 	}
 
 	// todo(melvin): Add transaction
@@ -44,6 +44,6 @@ func HandlerAdd(req *router.Request) {
 		return
 	}
 
-	a.Content = *content
+	a.Content = content
 	req.Created(a.PublicExport())
 }

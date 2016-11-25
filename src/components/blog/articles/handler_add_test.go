@@ -69,7 +69,7 @@ func TestHandlerAdd(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
-				var a articles.PrivatePayload
+				var a articles.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&a); err != nil {
 					t.Fatal(err)
 				}

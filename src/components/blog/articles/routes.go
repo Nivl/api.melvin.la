@@ -7,6 +7,7 @@ import (
 
 const (
 	EndpointAdd = iota
+	EndpointList
 )
 
 var Endpoints = router.Endpoints{
@@ -16,6 +17,13 @@ var Endpoints = router.Endpoints{
 		Handler: HandlerAdd,
 		Auth:    router.LoggedUser,
 		Params:  &HandlerAddParams{},
+	},
+	EndpointList: {
+		Verb:    "GET",
+		Path:    "/",
+		Handler: HandlerList,
+		Auth:    nil,
+		Params:  &HandlerListParams{},
 	},
 }
 
