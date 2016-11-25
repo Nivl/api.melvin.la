@@ -10,10 +10,10 @@ import (
 	"github.com/melvin-laplanche/ml-api/src/components/blog/articles"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHandlerAdd(t *testing.T) {
-	globalT := t
 	defer testhelpers.PurgeModels(t)
 
 	u1, s1 := auth.NewTestAuth(t)
@@ -50,9 +50,15 @@ func TestHandlerAdd(t *testing.T) {
 			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
-			"Duplicate title",
+			"Duplicate title (should generate a different slug)",
 			http.StatusCreated,
 			&articles.HandlerAddParams{Title: "My Super Article"},
+			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+		},
+		{
+			"All fields set",
+			http.StatusCreated,
+			&articles.HandlerAddParams{Title: "Title", Subtitle: "Subtitle", Description: "Description", Content: "Content"},
 			testhelpers.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
@@ -63,15 +69,23 @@ func TestHandlerAdd(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
-				var a articles.PublicPayload
+				var a articles.PrivatePayload
 				if err := json.NewDecoder(rec.Body).Decode(&a); err != nil {
 					t.Fatal(err)
 				}
 
+				// Validate the article
 				assert.NotEmpty(t, a.ID)
 				assert.NotEmpty(t, a.Slug)
-				assert.Equal(t, tc.params.Title, a.Title)
-				testhelpers.SaveModels(globalT, &articles.Article{ID: a.ID})
+				assert.Nil(t, a.Draft)
+				assert.Nil(t, a.PublishedAt)
+
+				// Validate the article's content
+				require.NotNil(t, a.Content)
+				assert.Equal(t, tc.params.Title, a.Content.Title)
+				assert.Equal(t, tc.params.Subtitle, a.Content.Subtitle)
+				assert.Equal(t, tc.params.Description, a.Content.Description)
+				assert.Equal(t, tc.params.Content, a.Content.Content)
 			}
 		})
 	}

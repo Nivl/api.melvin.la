@@ -14,7 +14,7 @@ import (
 
 // JoinSQL returns a string ready to be embed in a JOIN query
 func JoinSQL(prefix string) string {
-	fields := []string{ "id", "title", "content", "slug", "subtitle", "description", "created_at", "updated_at", "deleted_at", "is_published", "user_id" }
+	fields := []string{"id", "slug", "created_at", "updated_at", "deleted_at", "published_at", "user_id"}
 	output := ""
 
 	for i, field := range fields {
@@ -42,8 +42,6 @@ func (a *Article) Save() error {
 	return a.Update()
 }
 
-
-
 // doCreate persists an object in the database
 func (a *Article) doCreate() error {
 	if a == nil {
@@ -54,12 +52,11 @@ func (a *Article) doCreate() error {
 	a.CreatedAt = db.Now()
 	a.UpdatedAt = db.Now()
 
-	stmt := "INSERT INTO blog_articles (id, title, content, slug, subtitle, description, created_at, updated_at, deleted_at, is_published, user_id) VALUES (:id, :title, :content, :slug, :subtitle, :description, :created_at, :updated_at, :deleted_at, :is_published, :user_id)"
+	stmt := "INSERT INTO blog_articles (id, slug, created_at, updated_at, deleted_at, published_at, user_id) VALUES (:id, :slug, :created_at, :updated_at, :deleted_at, :published_at, :user_id)"
+	fmt.Printf("\n\n Query: %s\nData %#v \n\n", stmt, a)
 	_, err := app.GetContext().SQL.NamedExec(stmt, a)
-  return err
+	return err
 }
-
-
 
 // doUpdate updates an object in the database
 func (a *Article) doUpdate() error {
@@ -73,8 +70,8 @@ func (a *Article) doUpdate() error {
 
 	a.UpdatedAt = db.Now()
 
-	stmt := "UPDATE blog_articles SET id = $1, title = $2, content = $3, slug = $4, subtitle = $5, description = $6, created_at = $7, updated_at = $8, deleted_at = $9, is_published = $10, user_id = $11 WHERE id=$12"
-	_, err := app.GetContext().SQL.Exec(stmt, a.ID, a.Title, a.Content, a.Slug, a.Subtitle, a.Description, a.CreatedAt, a.UpdatedAt, a.DeletedAt, a.IsPublished, a.UserID, a.ID)
+	stmt := "UPDATE blog_articles SET id = $1, slug = $2, created_at = $3, updated_at = $4, deleted_at = $5, published_at = $6, user_id = $7 WHERE id=$8"
+	_, err := app.GetContext().SQL.Exec(stmt, a.ID, a.Slug, a.CreatedAt, a.UpdatedAt, a.DeletedAt, a.PublishedAt, a.UserID, a.ID)
 	return err
 }
 

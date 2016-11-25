@@ -1,10 +1,13 @@
 package articles
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/apierror"
+	"fmt"
+
+	"github.com/gosimple/slug"
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
+// HandlerAddParams lists the params allowed by HandlerAdd
 type HandlerAddParams struct {
 	Title       string `from:"form" json:"title,omitempty" params:"required,trim"`
 	Subtitle    string `from:"form" json:"subtitle,omitempty"`
@@ -14,24 +17,36 @@ type HandlerAddParams struct {
 
 // HandlerAdd represents an API handler to add a new article
 func HandlerAdd(req *router.Request) {
-	params, ok := req.Params.(*HandlerAddParams)
-	if !ok {
-		req.Error(apierror.NewServerError("Couldn't cast params"))
-	}
+	params := req.Params.(*HandlerAddParams)
 
-	a := &Article{
+	content := &Content{
 		Title:       params.Title,
 		Subtitle:    params.Subtitle,
 		Content:     params.Content,
 		Description: params.Description,
-		IsPublished: false,
-		UserID:      req.User.ID,
-		User:        *req.User,
+		IsCurrent:   true,
 	}
+
+	a := &Article{
+		Slug:   slug.Make(content.Title),
+		UserID: req.User.ID,
+		User:   *req.User,
+	}
+
+	// todo(melvin): Add transaction
 
 	if err := a.Save(); err != nil {
+		fmt.Printf("\n\n %s \n\n", err)
 		req.Error(err)
+		return
 	}
 
-	req.Created(a.Export())
+	content.ArticleID = a.ID
+	if err := content.Save(); err != nil {
+		req.Error(err)
+		return
+	}
+
+	a.Content = *content
+	req.Created(a.PublicExport())
 }

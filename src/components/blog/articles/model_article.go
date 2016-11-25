@@ -2,10 +2,7 @@ package articles
 
 import (
 	"fmt"
-	"testing"
 
-	"github.com/dchest/uniuri"
-	"github.com/gosimple/slug"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
@@ -15,17 +12,16 @@ import (
 //go:generate api-cli generate model Article -t blog_articles -e Create,Update
 type Article struct {
 	ID          string   `db:"id"`
-	Title       string   `db:"title"`
-	Content     string   `db:"content"`
 	Slug        string   `db:"slug"`
-	Subtitle    string   `db:"subtitle"`
-	Description string   `db:"description"`
 	CreatedAt   *db.Time `db:"created_at"`
 	UpdatedAt   *db.Time `db:"updated_at"`
 	DeletedAt   *db.Time `db:"deleted_at"`
-	IsPublished bool     `db:"is_published"`
+	PublishedAt *db.Time `db:"published_at"`
 	UserID      string   `db:"user_id"`
-	auth.User   `db:"users"`
+
+	auth.User `db:"user"`
+	Content   `db:"content"`
+	Draft     `db:"draft"`
 }
 
 // Articles represents a list of Articles
@@ -38,7 +34,7 @@ func (a *Article) Create() error {
 	}
 
 	if a.Slug == "" {
-		a.Slug = slug.Make(a.Title)
+		return apierror.NewServerError("cannot persist an article with no slug")
 	}
 
 	// To prevent duplicates on the slug, we'll retry the insert() up to 10 times
@@ -69,31 +65,4 @@ func (a *Article) Create() error {
 // Excluded fields are id, created_at, deleted_at
 func (a *Article) Update() error {
 	return nil
-}
-
-// NewTestArticle returns a published article with random values
-func NewTestArticle(t *testing.T, a *Article) (*Article, *auth.User, *auth.Session) {
-	if a == nil {
-		a = &Article{
-			IsPublished: true,
-		}
-	}
-
-	if a.Title == "" {
-		a.Title = uniuri.New()
-	}
-
-	var user *auth.User
-	var session *auth.Session
-
-	if a.UserID == "" {
-		user, session = auth.NewTestAuth(t)
-		a.User = *user
-		a.UserID = user.ID
-	}
-
-	if err := a.Create(); err != nil {
-		t.Fatalf("failed to save article: %s", err)
-	}
-	return a, user, session
 }

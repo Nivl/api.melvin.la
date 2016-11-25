@@ -5,16 +5,14 @@ import "github.com/melvin-laplanche/ml-api/src/components/users"
 
 // PublicPayload represents an Article that can be safely returned by the API
 type PublicPayload struct {
-	ID          string               `json:"id"`
-	Title       string               `json:"title"`
-	Content     string               `json:"content"`
-	Slug        string               `json:"slug"`
-	Subtitle    string               `json:"subtitle"`
-	Description string               `json:"description"`
+	ID   string `json:"id"`
+	Slug string `json:"slug"`
+
 	CreatedAt   db.Time              `json:"created_at"`
 	UpdatedAt   db.Time              `json:"updated_at"`
-	IsPublished bool                 `json:"is_published"`
+	PublishedAt *db.Time             `json:"is_published,omitempty"`
 	User        *users.PublicPayload `json:"user"`
+	Content     *ContentPayload      `json:"content"`
 }
 
 // PublicPayloads is used to handle a list of publicPayload.
@@ -22,20 +20,32 @@ type PublicPayloads struct {
 	Results []*PublicPayload `json:"results"`
 }
 
-// Export turns an Article into an object that is safe to be
+// PrivatePayload represents an Article containing sensitive data that can returned by the API
+type PrivatePayload struct {
+	PublicPayload
+	Draft *ContentPayload `json:"draft"`
+}
+
+// PublicExport turns an Article into an object that is safe to be
 // returned by the API
-func (a *Article) Export() *PublicPayload {
+func (a *Article) PublicExport() *PublicPayload {
 	return &PublicPayload{
 		ID:          a.ID,
-		Title:       a.Title,
-		Content:     a.Content,
 		Slug:        a.Slug,
-		Subtitle:    a.Subtitle,
-		Description: a.Description,
 		CreatedAt:   *a.CreatedAt,
 		UpdatedAt:   *a.UpdatedAt,
-		IsPublished: a.IsPublished,
+		PublishedAt: a.PublishedAt,
 		User:        users.NewPublicPayload(&a.User),
+		Content:     a.Content.Export(),
+	}
+}
+
+// PrivateExport turns an Article into an object that will contain private data
+// that is safe to be returned by the API
+func (a *Article) PrivateExport() *PrivatePayload {
+	return &PrivatePayload{
+		PublicPayload: *a.PublicExport(),
+		Draft:         a.Draft.Export(),
 	}
 }
 
@@ -46,7 +56,7 @@ func (arts Articles) Export() *PublicPayloads {
 
 	output.Results = make([]*PublicPayload, len(arts))
 	for i, a := range arts {
-		output.Results[i] = a.Export()
+		output.Results[i] = a.PublicExport()
 	}
 	return output
 }

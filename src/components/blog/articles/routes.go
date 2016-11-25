@@ -1,42 +1,21 @@
 package articles
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/router"
 	"github.com/gorilla/mux"
+	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
 const (
-	EndpointList = iota
-	EndpointGet
-	EndpointAdd
-	EndpointUpdate
+	EndpointAdd = iota
 )
 
 var Endpoints = router.Endpoints{
-	EndpointList: {
-		Verb:    "GET",
-		Path:    "/",
-		Handler: HandlerList,
-		Auth:    nil,
-	},
-	EndpointGet: {
-		Verb:    "GET",
-		Path:    "/{id}",
-		Handler: HandlerGet,
-		Auth:    nil,
-	},
 	EndpointAdd: {
 		Verb:    "POST",
 		Path:    "/",
 		Handler: HandlerAdd,
 		Auth:    router.LoggedUser,
 		Params:  &HandlerAddParams{},
-	},
-	EndpointUpdate: {
-		Verb:    "PATCH",
-		Path:    "/{id}",
-		Handler: HandlerUpdate,
-		Auth:    router.LoggedUser,
 	},
 }
 
