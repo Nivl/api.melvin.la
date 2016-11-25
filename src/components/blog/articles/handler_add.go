@@ -1,8 +1,6 @@
 package articles
 
 import (
-	"fmt"
-
 	"github.com/gosimple/slug"
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
@@ -36,7 +34,6 @@ func HandlerAdd(req *router.Request) {
 	// todo(melvin): Add transaction
 
 	if err := a.Save(); err != nil {
-		fmt.Printf("\n\n %s \n\n", err)
 		req.Error(err)
 		return
 	}
