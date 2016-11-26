@@ -62,5 +62,11 @@ func NewForbidden() error {
 // NewNotFound returns an error caused by a user trying to access
 // a resource that does not exists
 func NewNotFound() error {
-	return NewError(http.StatusNotFound, "")
+	return NewNotFoundR("")
+}
+
+// NewNotFoundR returns an error caused by a user trying to access
+// a resource that does not exists. A reason is sent back to the user
+func NewNotFoundR(reason string) error {
+	return NewError(http.StatusNotFound, reason)
 }

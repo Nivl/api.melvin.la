@@ -44,7 +44,7 @@ func UserJoinSQL(prefix string) string {
 // GetUser finds and returns an active user by ID
 func GetUser(id string) (*User, error) {
 	user := &User{}
-	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL"
+	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
 	err := db.Get(user, stmt, id)
 	// We want to return nil if a user is not found
 	if user.ID == "" {

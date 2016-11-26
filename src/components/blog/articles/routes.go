@@ -9,6 +9,7 @@ import (
 const (
 	EndpointAdd = iota
 	EndpointList
+	EndpointUserList
 )
 
 // Endpoints contains the list of endpoints for this component
@@ -26,6 +27,14 @@ var Endpoints = router.Endpoints{
 		Handler: HandlerList,
 		Auth:    nil,
 		Params:  &HandlerListParams{},
+	},
+	EndpointUserList: {
+		Verb:    "GET",
+		Prefix:  "/users/{user_id}",
+		Path:    "/articles",
+		Handler: HandlerListForUser,
+		Auth:    nil,
+		Params:  &HandlerListForUserParams{},
 	},
 }
 

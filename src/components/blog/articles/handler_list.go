@@ -41,8 +41,8 @@ func listAll() (*Payloads, error) {
                   ` + auth.UserJoinSQL("users") + `,
                   ` + ContentJoinSQL("content") + `
 					FROM blog_articles articles
-					LEFT JOIN users ON users.id = articles.user_id
-					LEFT JOIN blog_article_contents content ON content.article_id = articles.id
+					JOIN users ON users.id = articles.user_id
+					JOIN blog_article_contents content ON content.article_id = articles.id
 					WHERE articles.deleted_at IS NULL
 						AND articles.published_at IS NOT NULL
 						AND content.is_current IS TRUE
