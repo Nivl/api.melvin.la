@@ -6,8 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
 	"github.com/melvin-laplanche/ml-api/src/components/blog/articles"
+	"github.com/melvin-laplanche/ml-api/src/components/blog/articles/articlestest"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,23 +16,20 @@ import (
 
 // TestHandlerList tests the List handler
 func TestHandlerList(t *testing.T) {
+	defer testhelpers.PurgeModels(t)
+
+	u1, s1 := authtest.NewAuth(t)
+
 	// Create 10 published articles
 	for i := 0; i < 10; i++ {
-		a, u, s := articles.NewTestArticle(t, nil)
-		testhelpers.SaveModels(t, a, u, s)
+		articlestest.NewArticle(t, nil)
 	}
-
-	u1, s1 := auth.NewTestAuth(t)
-	testhelpers.SaveModels(t, u1, s1)
 
 	// Create 10 unpublished articles
 	for i := 0; i < 10; i++ {
 		toSave := &articles.Article{PublishedAt: nil, User: u1, UserID: u1.ID}
-		a, _, _ := articles.NewTestArticle(t, toSave)
-		testhelpers.SaveModels(t, a)
+		articlestest.NewArticle(t, toSave)
 	}
-
-	defer testhelpers.PurgeModels(t)
 
 	tests := []struct {
 		description     string

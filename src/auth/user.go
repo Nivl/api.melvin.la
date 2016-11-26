@@ -2,11 +2,9 @@ package auth
 
 import (
 	"fmt"
-	"testing"
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
@@ -104,32 +102,4 @@ func (u *User) Update() error {
 	}
 
 	return err
-}
-
-// NewTestUser creates a new user with "fake" as password
-func NewTestUser(t *testing.T, u *User) *User {
-	if u == nil {
-		u = &User{}
-	}
-
-	if u.Email == "" {
-		u.Email = fmt.Sprintf("fake+%s@melvin.la", uniuri.New())
-	}
-
-	if u.Name == "" {
-		u.Name = "Fake Account"
-	}
-
-	if u.Password == "" {
-		var err error
-		u.Password, err = CryptPassword("fake")
-		if err != nil {
-			t.Fatalf("failed to create password: %s", err)
-		}
-	}
-
-	if err := u.Create(); err != nil {
-		t.Fatalf("failed to create user: %s", err)
-	}
-	return u
 }

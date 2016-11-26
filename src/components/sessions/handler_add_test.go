@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -14,9 +15,7 @@ import (
 
 func TestHandlerAdd(t *testing.T) {
 	defer testhelpers.PurgeModels(t)
-
-	u1 := auth.NewTestUser(t, nil)
-	testhelpers.SaveModels(t, u1)
+	u1 := authtest.NewUser(t, nil)
 
 	tests := []struct {
 		description string

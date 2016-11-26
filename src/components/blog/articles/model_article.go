@@ -2,10 +2,7 @@ package articles
 
 import (
 	"fmt"
-	"testing"
 
-	"github.com/dchest/uniuri"
-	"github.com/gosimple/slug"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
@@ -68,54 +65,4 @@ func (a *Article) Create() error {
 // Excluded fields are id, created_at, deleted_at
 func (a *Article) Update() error {
 	return nil
-}
-
-// NewTestArticle returns a published article with random values
-func NewTestArticle(t *testing.T, a *Article) (*Article, *auth.User, *auth.Session) {
-	if a == nil {
-		a = &Article{
-			PublishedAt: db.Now(),
-		}
-	}
-
-	if a.Content == nil {
-		a.Content = &Content{}
-	}
-
-	if a.Content.Title == "" {
-		a.Content.Title = uniuri.New()
-	}
-
-	if a.Slug == "" {
-		a.Slug = slug.Make(a.Content.Title)
-	}
-
-	var user *auth.User
-	var session *auth.Session
-
-	if a.UserID == "" {
-		user, session = auth.NewTestAuth(t)
-		a.User = user
-		a.UserID = user.ID
-	}
-
-	if err := a.Create(); err != nil {
-		t.Fatalf("failed to save article: %s", err)
-	}
-
-	a.Content.ArticleID = a.ID
-	a.Content.IsCurrent = true
-	if err := a.Content.Create(); err != nil {
-		t.Fatalf("failed to save article content: %s", err)
-	}
-
-	if a.Draft != nil {
-		a.Draft.ArticleID = a.ID
-		a.Draft.IsDraft = true
-		if err := a.Draft.Create(); err != nil {
-			t.Fatalf("failed to save article draft: %s", err)
-		}
-	}
-
-	return a, user, session
 }

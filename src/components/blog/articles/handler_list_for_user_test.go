@@ -7,8 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
 	"github.com/melvin-laplanche/ml-api/src/components/blog/articles"
+	"github.com/melvin-laplanche/ml-api/src/components/blog/articles/articlestest"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -19,22 +20,21 @@ import (
 func TestHandlerListForUser(t *testing.T) {
 	defer testhelpers.PurgeModels(t)
 
-	userNoArticles := auth.NewTestUser(t, nil)
-	userNoPrivate := auth.NewTestUser(t, nil)
-	userNoPublic := auth.NewTestUser(t, nil)
-	userAllKind := auth.NewTestUser(t, nil)
-	testhelpers.SaveModels(t, userNoArticles, userNoPrivate, userNoPublic, userAllKind)
+	userNoArticles := authtest.NewUser(t, nil)
+	userNoPrivate := authtest.NewUser(t, nil)
+	userNoPublic := authtest.NewUser(t, nil)
+	userAllKind := authtest.NewUser(t, nil)
 
 	// Create 10 published articles
 	for i := 0; i < 10; i++ {
-		articles.NewTestArticle(t, &articles.Article{PublishedAt: db.Now(), UserID: userNoPrivate.ID})
-		articles.NewTestArticle(t, &articles.Article{PublishedAt: db.Now(), UserID: userAllKind.ID})
+		articlestest.NewArticle(t, &articles.Article{PublishedAt: db.Now(), UserID: userNoPrivate.ID})
+		articlestest.NewArticle(t, &articles.Article{PublishedAt: db.Now(), UserID: userAllKind.ID})
 	}
 
 	// Create 10 unpublished articles
 	for i := 0; i < 10; i++ {
-		articles.NewTestArticle(t, &articles.Article{PublishedAt: nil, UserID: userNoPublic.ID})
-		articles.NewTestArticle(t, &articles.Article{PublishedAt: nil, UserID: userAllKind.ID})
+		articlestest.NewArticle(t, &articles.Article{PublishedAt: nil, UserID: userNoPublic.ID})
+		articlestest.NewArticle(t, &articles.Article{PublishedAt: nil, UserID: userAllKind.ID})
 	}
 
 	tests := []struct {
