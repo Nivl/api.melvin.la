@@ -95,7 +95,7 @@ func callHandlerAdd(t *testing.T, params *articles.HandlerAddParams, auth *testh
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: articles.Endpoints[articles.EndpointAdd],
-		URI:      "/blog/articles/",
+		URI:      "/blog/articles",
 		Params:   params,
 		Auth:     auth,
 	}

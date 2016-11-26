@@ -95,7 +95,7 @@ func callHandlerList(t *testing.T, auth *testhelpers.RequestAuth) *httptest.Resp
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: articles.Endpoints[articles.EndpointList],
-		URI:      "/blog/articles/",
+		URI:      "/blog/articles",
 		Auth:     auth,
 	}
 

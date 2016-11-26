@@ -5,22 +5,24 @@ import (
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
+// Indexes of all different endpoints
 const (
 	EndpointAdd = iota
 	EndpointList
 )
 
+// Endpoints contains the list of endpoints for this component
 var Endpoints = router.Endpoints{
 	EndpointAdd: {
 		Verb:    "POST",
-		Path:    "/",
+		Path:    "/articles",
 		Handler: HandlerAdd,
 		Auth:    router.LoggedUser,
 		Params:  &HandlerAddParams{},
 	},
 	EndpointList: {
 		Verb:    "GET",
-		Path:    "/",
+		Path:    "/articles",
 		Handler: HandlerList,
 		Auth:    nil,
 		Params:  &HandlerListParams{},
@@ -28,6 +30,6 @@ var Endpoints = router.Endpoints{
 }
 
 // SetRoutes is used to set all the routes of the article
-func SetRoutes(r *mux.Router) {
-	Endpoints.Activate(r)
+func SetRoutes(baseURI string, r *mux.Router) {
+	Endpoints.Activate(baseURI, r)
 }

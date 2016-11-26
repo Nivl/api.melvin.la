@@ -1,19 +1,19 @@
 package api
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/components/blog"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
-	"github.com/gorilla/mux"
 )
 
+// GetRouter return the api router with all the routes
 func GetRouter() *mux.Router {
+	baseURI := ""
 	r := mux.NewRouter()
-	r.Host("api.melvin.la")
-	r.Host("api.melvin.loc")
-	blog.SetRoutes(r.PathPrefix("/blog").Subrouter())
-	users.SetRoutes(r.PathPrefix("/users").Subrouter())
-	sessions.SetRoutes(r.PathPrefix("/sessions").Subrouter())
+	blog.SetRoutes(baseURI, r)
+	users.SetRoutes(baseURI, r)
+	sessions.SetRoutes(baseURI, r)
 	//router.NotFoundHandler = http.HandlerFunc(noRoutes)
 
 	return r
