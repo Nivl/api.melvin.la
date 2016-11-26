@@ -95,7 +95,7 @@ func (u *User) doDelete() error {
 	u.DeletedAt = db.Now()
 
 	stmt := "UPDATE users SET deleted_at = $2 WHERE id=$1"
-	_, err := sql().Exec(stmt, u.ID, *u.DeletedAt)
+	_, err := sql().Exec(stmt, u.ID, u.DeletedAt)
 	return err
 }
 

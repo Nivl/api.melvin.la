@@ -69,7 +69,7 @@ func (s *Session) doDelete() error {
 	s.DeletedAt = db.Now()
 
 	stmt := "UPDATE sessions SET deleted_at = $2 WHERE id=$1"
-	_, err := sql().Exec(stmt, s.ID, *s.DeletedAt)
+	_, err := sql().Exec(stmt, s.ID, s.DeletedAt)
 	return err
 }
 

@@ -118,7 +118,7 @@ func (c *Content) doDelete() error {
 	c.DeletedAt = db.Now()
 
 	stmt := "UPDATE blog_article_contents SET deleted_at = $2 WHERE id=$1"
-	_, err := sql().Exec(stmt, c.ID, *c.DeletedAt)
+	_, err := sql().Exec(stmt, c.ID, c.DeletedAt)
 	return err
 }
 

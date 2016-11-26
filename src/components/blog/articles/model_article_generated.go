@@ -14,7 +14,7 @@ import (
 
 // JoinSQL returns a string ready to be embed in a JOIN query
 func JoinSQL(prefix string) string {
-	fields := []string{"id", "slug", "created_at", "updated_at", "deleted_at", "published_at", "user_id"}
+	fields := []string{ "id", "slug", "created_at", "updated_at", "deleted_at", "published_at", "user_id" }
 	output := ""
 
 	for i, field := range fields {
@@ -42,6 +42,8 @@ func (a *Article) Save() error {
 	return a.Update()
 }
 
+
+
 // doCreate persists an object in the database
 func (a *Article) doCreate() error {
 	if a == nil {
@@ -54,8 +56,10 @@ func (a *Article) doCreate() error {
 
 	stmt := "INSERT INTO blog_articles (id, slug, created_at, updated_at, deleted_at, published_at, user_id) VALUES (:id, :slug, :created_at, :updated_at, :deleted_at, :published_at, :user_id)"
 	_, err := app.GetContext().SQL.NamedExec(stmt, a)
-	return err
+  return err
 }
+
+
 
 // doUpdate updates an object in the database
 func (a *Article) doUpdate() error {
@@ -106,7 +110,7 @@ func (a *Article) doDelete() error {
 	a.DeletedAt = db.Now()
 
 	stmt := "UPDATE blog_articles SET deleted_at = $2 WHERE id=$1"
-	_, err := sql().Exec(stmt, a.ID, *a.DeletedAt)
+	_, err := sql().Exec(stmt, a.ID, a.DeletedAt)
 	return err
 }
 

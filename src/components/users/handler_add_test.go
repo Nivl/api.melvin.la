@@ -61,7 +61,7 @@ func callHandlerAdd(t *testing.T, params *users.HandlerAddParams) *httptest.Resp
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: users.Endpoints[users.EndpointAdd],
-		URI:      "/users/",
+		URI:      "/users",
 		Params:   params,
 	}
 
