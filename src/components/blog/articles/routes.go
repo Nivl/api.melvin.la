@@ -26,7 +26,6 @@ var Endpoints = router.Endpoints{
 		Path:    "/articles",
 		Handler: HandlerList,
 		Auth:    nil,
-		Params:  &HandlerListParams{},
 	},
 	EndpointUserList: {
 		Verb:    "GET",
