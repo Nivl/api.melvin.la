@@ -19,17 +19,23 @@ func (d *Draft) Update() error {
 // Save creates or updates the content depending on the value of the id
 func (d *Draft) Save() error {
 	content := Content(*d)
-	return (&content).Update()
+	return (&content).Save()
 }
 
 // FullyDelete removes an object from the database
 func (d *Draft) FullyDelete() error {
 	content := Content(*d)
-	return (&content).Update()
+	return (&content).FullyDelete()
 }
 
 // Delete soft delete an object.
 func (d *Draft) Delete() error {
 	content := Content(*d)
-	return (&content).Update()
+	return (&content).Delete()
+}
+
+// IsZero checks if the object is either nil or don't have an ID
+func (d *Draft) IsZero() bool {
+	content := Content(*d)
+	return (&content).IsZero()
 }

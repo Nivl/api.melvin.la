@@ -9,6 +9,7 @@ import (
 const (
 	EndpointAdd = iota
 	EndpointList
+	EndpointGet
 	EndpointUserList
 )
 
@@ -26,6 +27,13 @@ var Endpoints = router.Endpoints{
 		Path:    "/articles",
 		Handler: HandlerList,
 		Auth:    nil,
+	},
+	EndpointGet: {
+		Verb:    "GET",
+		Path:    "/articles/{id}",
+		Handler: HandlerGet,
+		Auth:    nil,
+		Params:  &HandlerGetParams{},
 	},
 	EndpointUserList: {
 		Verb:    "GET",

@@ -27,6 +27,31 @@ type Article struct {
 // Articles represents a list of Articles
 type Articles []Article
 
+// FetchDraft fetches the article's draft from the database and attached
+// it to the current object
+func (a *Article) FetchDraft() error {
+	if a == nil {
+		return apierror.NewServerError("article not instanced")
+	}
+
+	d := &Draft{}
+	stmt := `SELECT *
+					FROM blog_article_contents
+					WHERE deleted_at IS NULL
+            AND article_id = $1
+						AND is_draft IS true`
+
+	if err := db.Get(d, stmt, a.ID); err != nil {
+		return err
+	}
+
+	if !d.IsZero() {
+		a.Draft = d
+	}
+
+	return nil
+}
+
 // Create persists an article in the database
 func (a *Article) Create() error {
 	if a == nil {
