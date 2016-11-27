@@ -9,8 +9,7 @@ env:
 install:
   - docker-compose build
   - docker-compose up -d
+  - docker exec -i -t ml_api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api && make migration"
 
 script:
-  - docker exec -i -t ml_api /bin/bash -ic "sh /go/src/github.com/melvin-laplanche/ml-api/wait-for-it.sh db:5432"
-  - docker exec -i -t ml_api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api && make migration"
   - docker exec -i -t ml_api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src && go test ./..."
