@@ -5,11 +5,13 @@ services:
 
 env:
   - ML_BUILD_ENV=test
+  - POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
 
 install:
   - docker-compose build
   - docker-compose up -d
-  - docker exec -i -t ml_api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api && make migration"
 
 script:
+  - until docker-compose exec database psql "$POSTGRES_URI" -c "select 1" > /dev/null 2>&1; do sleep 2; done
+  - docker exec -i -t ml_api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api && make migration"
   - docker exec -i -t ml_api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src && go test ./..."

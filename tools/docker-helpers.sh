@@ -28,9 +28,14 @@ function ml-go {
 # Remove and rebuild the containers
 function ml-reset {
   export ML_BUILD_ENV=test
+  source config/api-common.env
+  source config/api-${ML_BUILD_ENV}.env
+
   ddc-rm
   ddc-build
   ddc-up
+
+  until docker-compose exec database psql "$API_POSTGRES_URI_STR" -c "select 1" > /dev/null 2>&1; do sleep 2; done
   ml-make "migration"
 }
 
