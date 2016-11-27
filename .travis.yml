@@ -4,8 +4,7 @@ services:
   - docker
 
 env:
-  - ML_BUILD_ENV=test
-  - POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
+  - ML_BUILD_ENV=test POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
 
 install:
   - docker-compose build
