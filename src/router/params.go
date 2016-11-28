@@ -134,8 +134,6 @@ func (r *Request) ParseParams() error {
 			paramLocation = "url"
 		}
 
-		fmt.Printf("\n\n %s \n\n", paramLocation)
-
 		source, found := sources[paramLocation]
 		if !found {
 			return apierror.NewServerError("source [%s] for field [%s] does not exists", paramLocation, paramInfo.Name)
