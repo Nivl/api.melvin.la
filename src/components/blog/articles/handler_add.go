@@ -22,7 +22,7 @@ func HandlerAdd(req *router.Request) {
 		Subtitle:    params.Subtitle,
 		Content:     params.Content,
 		Description: params.Description,
-		IsCurrent:   true,
+		IsCurrent:   &[]bool{true}[0],
 	}
 
 	a := &Article{

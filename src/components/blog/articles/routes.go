@@ -10,6 +10,7 @@ const (
 	EndpointAdd = iota
 	EndpointList
 	EndpointGet
+	EndpointUpdate
 	EndpointUserList
 )
 
@@ -34,6 +35,13 @@ var Endpoints = router.Endpoints{
 		Handler: HandlerGet,
 		Auth:    nil,
 		Params:  &HandlerGetParams{},
+	},
+	EndpointUpdate: {
+		Verb:    "PATCH",
+		Path:    "/articles/{id}",
+		Handler: HandlerUpdate,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerUpdateParams{},
 	},
 	EndpointUserList: {
 		Verb:    "GET",

@@ -46,14 +46,14 @@ func NewArticle(t *testing.T, a *articles.Article) (*articles.Article, *auth.Use
 	}
 
 	a.Content.ArticleID = a.ID
-	a.Content.IsCurrent = true
+	a.Content.IsCurrent = &[]bool{true}[0]
 	if err := a.Content.Create(); err != nil {
 		t.Fatalf("failed to save article content: %s", err)
 	}
 
 	if a.Draft != nil {
 		a.Draft.ArticleID = a.ID
-		a.Draft.IsDraft = true
+		a.Draft.IsDraft = &[]bool{true}[0]
 		if err := a.Draft.Create(); err != nil {
 			t.Fatalf("failed to save article draft: %s", err)
 		}

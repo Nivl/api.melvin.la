@@ -15,8 +15,8 @@ type Content struct {
 	DeletedAt *db.Time `db:"deleted_at"`
 
 	ArticleID string `db:"article_id"`
-	IsCurrent bool   `db:"is_current"`
-	IsDraft   bool   `db:"is_draft"`
+	IsCurrent *bool  `db:"is_current"`
+	IsDraft   *bool  `db:"is_draft"`
 
 	Title       string `db:"title"`
 	Content     string `db:"content"`
