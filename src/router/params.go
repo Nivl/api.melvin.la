@@ -125,14 +125,20 @@ func (r *Request) ParseParams() error {
 
 		// We make sure we can update the value of field
 		if !param.CanSet() {
-			return apierror.NewServerError("Field %s could not be set", paramInfo.Name)
+			return apierror.NewServerError("field [%s] could not be set", paramInfo.Name)
 		}
 
-		// We control the type of
+		// We control the source of the param. If nothing is provided, we take from the URL
 		paramLocation := strings.ToLower(tags.Get("from"))
+		if paramLocation == "" {
+			paramLocation = "url"
+		}
+
+		fmt.Printf("\n\n %s \n\n", paramLocation)
+
 		source, found := sources[paramLocation]
 		if !found {
-			source = sources["url"]
+			return apierror.NewServerError("source [%s] for field [%s] does not exists", paramLocation, paramInfo.Name)
 		}
 
 		args := &setParamValueArgs{
