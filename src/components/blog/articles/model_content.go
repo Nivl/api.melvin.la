@@ -40,3 +40,9 @@ func ContentJoinSQL(prefix string) string {
 
 	return output
 }
+
+// ToDraft returns a Draft from a Content
+func (c *Content) ToDraft() *Draft {
+	draft := Draft(*c)
+	return &draft
+}

@@ -11,6 +11,7 @@ const (
 	EndpointList
 	EndpointGet
 	EndpointUpdate
+	EndpointUpdateDraft
 	EndpointUserList
 )
 
@@ -42,6 +43,13 @@ var Endpoints = router.Endpoints{
 		Handler: HandlerUpdate,
 		Auth:    router.LoggedUser,
 		Params:  &HandlerUpdateParams{},
+	},
+	EndpointUpdateDraft: {
+		Verb:    "PATCH",
+		Path:    "/articles/{id}/draft",
+		Handler: HandlerUpdateDraft,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerUpdateDraftParams{},
 	},
 	EndpointUserList: {
 		Verb:    "GET",

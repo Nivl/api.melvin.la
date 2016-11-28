@@ -14,7 +14,7 @@ import (
 type HandlerUpdateParams struct {
 	ID string `from:"url" json:"id" params:"uuid"`
 
-	Title       string `from:"body" json:"title" params:"trim"`
+	Title       string `from:"form" json:"title" params:"trim"`
 	Subtitle    string `from:"form" json:"subtitle" params:"trim"`
 	Slug        string `from:"form" json:"slug" params:"trim"`
 	Content     string `from:"form" json:"content" params:"trim"`
