@@ -19,11 +19,11 @@ const (
 )
 
 type Request struct {
-	ID           string              `json:"req_id"`
-	Response     http.ResponseWriter `json:"-"`
-	Request      *http.Request       `json:"-"`
-	Params       interface{}         `json:"-"`
-	User         *auth.User          `json:"-"`
+	ID           string
+	Response     http.ResponseWriter
+	Request      *http.Request
+	Params       interface{}
+	User         *auth.User
 	_contentType string
 }
 
@@ -32,13 +32,12 @@ func (req *Request) String() string {
 		return ""
 	}
 
-	dump, err := json.Marshal(req)
-	if err != nil {
-		logger.Errorf(err.Error())
-		return "failed to parse the request"
+	user := "anonymous"
+	if req.User != nil {
+		user = fmt.Sprintf("%s (%s) ", req.User.ID, req.User.Name)
 	}
 
-	return string(dump)
+	return fmt.Sprintf("req_id: %s | user: %s | params: %#v", req.ID, user, req.Params)
 }
 
 // ContentType returns the content type of the current request
@@ -84,13 +83,13 @@ func (req *Request) JSONBody() (url.Values, error) {
 		return output, nil
 	}
 
-	vars := map[string]string{}
+	vars := map[string]interface{}{}
 	if err := json.NewDecoder(req.Request.Body).Decode(&vars); err != nil && err != io.EOF {
 		return nil, err
 	}
 
 	for k, v := range vars {
-		output.Set(k, v)
+		output.Set(k, fmt.Sprintf("%v", v))
 	}
 
 	return output, nil
