@@ -32,7 +32,7 @@ function ml-reset {
   source config/api-${ML_BUILD_ENV}.env
 
   ddc-rm
-  ddc-build
+  # ddc-build
   ddc-up
 
   until docker-compose exec database psql "$API_POSTGRES_URI_STR" -c "select 1" > /dev/null 2>&1; do sleep 2; done
@@ -43,7 +43,7 @@ function ml-reset {
 function ml-test {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  ddc-build &> /dev/null
+  # ddc-build &> /dev/null
   ddc-up &> /dev/null
 
   echo "Update database"
@@ -57,7 +57,7 @@ function ml-test {
 function ml-tests {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  ddc-build &> /dev/null
+  # ddc-build &> /dev/null
   ddc-up &> /dev/null
 
   echo "Update database"
