@@ -6,6 +6,7 @@ import (
 	"errors"
 	
 
+	"github.com/jmoiron/sqlx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
@@ -14,12 +15,22 @@ import (
 
 
 
+// Save creates or updates the session depending on the value of the id
+func (s *Session) Save() error {
+	return s.SaveTx(nil)
+}
 
 
 
+// Create persists a user in the database
+func (s *Session) Create() error {
+	return s.CreateTx(nil)
+}
 
-// doCreate persists an object in the database
-func (s *Session) doCreate() error {
+
+
+// doCreate persists an object in the database using an optional transaction
+func (s *Session) doCreate(tx *sqlx.Tx) error {
 	if s == nil {
 		return errors.New("session not instanced")
 	}
@@ -29,7 +40,13 @@ func (s *Session) doCreate() error {
 	s.UpdatedAt = db.Now()
 
 	stmt := "INSERT INTO sessions (id, created_at, updated_at, deleted_at, user_id) VALUES (:id, :created_at, :updated_at, :deleted_at, :user_id)"
-	_, err := app.GetContext().SQL.NamedExec(stmt, s)
+	var err error
+	if tx == nil {
+	  _, err = app.GetContext().SQL.NamedExec(stmt, s)
+	} else {
+		_, err = tx.NamedExec(stmt, s)
+	}
+
   return err
 }
 
@@ -37,8 +54,15 @@ func (s *Session) doCreate() error {
 
 
 
+
+
 // FullyDelete removes an object from the database
 func (s *Session) FullyDelete() error {
+	return s.FullyDeleteTx(nil)
+}
+
+// FullyDeleteTx removes an object from the database using a transaction
+func (s *Session) FullyDeleteTx(tx *sqlx.Tx) error {
 	if s == nil {
 		return errors.New("session not instanced")
 	}
@@ -47,17 +71,29 @@ func (s *Session) FullyDelete() error {
 		return errors.New("session has not been saved")
 	}
 
-	_, err := sql().Exec("DELETE FROM sessions WHERE id=$1", s.ID)
+	stmt := "DELETE FROM sessions WHERE id=$1"
+	var err error
+	if tx == nil {
+	  _, err = app.GetContext().SQL.Exec(stmt, s.ID)
+	} else {
+		_, err = tx.Exec(stmt, s.ID)
+	}
+
 	return err
 }
 
 // Delete soft delete an object.
 func (s *Session) Delete() error {
-	return s.doDelete()
+	return s.DeleteTx(nil)
 }
 
-// doDelete performs a soft delete operation on an object
-func (s *Session) doDelete() error {
+// DeleteTx soft delete an object using a transaction
+func (s *Session) DeleteTx(tx *sqlx.Tx) error {
+	return s.doDelete(tx)
+}
+
+// doDelete performs a soft delete operation on an object using an optional transaction
+func (s *Session) doDelete(tx *sqlx.Tx) error {
 	if s == nil {
 		return apierror.NewServerError("session is not instanced")
 	}
@@ -69,7 +105,12 @@ func (s *Session) doDelete() error {
 	s.DeletedAt = db.Now()
 
 	stmt := "UPDATE sessions SET deleted_at = $2 WHERE id=$1"
-	_, err := sql().Exec(stmt, s.ID, s.DeletedAt)
+	var err error
+	if tx == nil {
+	  _, err = app.GetContext().SQL.Exec(stmt, s.ID, s.DeletedAt)
+	} else {
+		_, err = tx.Exec(stmt, s.ID, s.DeletedAt)
+	}
 	return err
 }
 

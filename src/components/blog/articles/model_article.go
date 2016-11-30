@@ -3,13 +3,14 @@ package articles
 import (
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
 
 // Article is a structure representing an article that can be saved in the database
-//go:generate api-cli generate model Article -t blog_articles -e Create,Update
+//go:generate api-cli generate model Article -t blog_articles -e CreateTx,UpdateTx
 type Article struct {
 	ID          string   `db:"id"`
 	Slug        string   `db:"slug"`
@@ -52,8 +53,8 @@ func (a *Article) FetchDraft() error {
 	return nil
 }
 
-// Create persists an article in the database
-func (a *Article) Create() error {
+// CreateTx persists an article in the database
+func (a *Article) CreateTx(tx *sqlx.Tx) error {
 	if a == nil {
 		return apierror.NewServerError("article not instanced")
 	}
@@ -66,7 +67,7 @@ func (a *Article) Create() error {
 	originalSlug := a.Slug
 	var err error
 	for i := 0; i < 10; i++ {
-		err = a.doCreate()
+		err = a.doCreate(tx)
 
 		if err != nil {
 			if db.SQLIsDup(err) == false {
@@ -86,8 +87,8 @@ func (a *Article) Create() error {
 	return apierror.NewConflict(err.Error())
 }
 
-// Update updates most of the fields of a persisted user.
+// UpdateTx updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (a *Article) Update() error {
+func (a *Article) UpdateTx(tx *sqlx.Tx) error {
 	return nil
 }

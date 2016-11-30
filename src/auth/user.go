@@ -5,12 +5,13 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate api-cli generate model User -t users -e Create,Update,JoinSQL
+//go:generate api-cli generate model User -t users -e CreateTx,UpdateTx,JoinSQL
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -67,8 +68,8 @@ func IsPasswordValid(hash string, raw string) bool {
 	return err == nil
 }
 
-// Create persists a user in the database
-func (u *User) Create() error {
+// CreateTx persists a user in the database
+func (u *User) CreateTx(tx *sqlx.Tx) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -77,7 +78,7 @@ func (u *User) Create() error {
 		return apierror.NewServerError("cannot persist a user that already has a ID")
 	}
 
-	err := u.doCreate()
+	err := u.doCreate(tx)
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
@@ -85,9 +86,9 @@ func (u *User) Create() error {
 	return err
 }
 
-// Update updates most of the fields of a persisted user.
+// UpdateTx updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (u *User) Update() error {
+func (u *User) UpdateTx(tx *sqlx.Tx) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -96,7 +97,7 @@ func (u *User) Update() error {
 		return apierror.NewServerError("cannot update a non-persisted user")
 	}
 
-	err := u.doUpdate()
+	err := u.doUpdate(tx)
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}

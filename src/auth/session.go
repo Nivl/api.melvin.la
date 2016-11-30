@@ -3,12 +3,13 @@ package auth
 import (
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
 
 // Session is a structure representing a session that can be saved in the database
-//go:generate api-cli generate model Session -t sessions -e Save,Create,Update,doUpdate,JoinSQL
+//go:generate api-cli generate model Session -t sessions -e SaveTx,CreateTx,Update,UpdateTx,doUpdate,JoinSQL
 type Session struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -60,17 +61,17 @@ func SessionJoinSQL(prefix string) string {
 	return output
 }
 
-// Save is an alias for Create since sessions are not updatable
-func (s *Session) Save() error {
+// SaveTx is an alias for Create since sessions are not updatable
+func (s *Session) SaveTx(tx *sqlx.Tx) error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
 	}
 
-	return s.Create()
+	return s.CreateTx(tx)
 }
 
-// Create persists a session in the database
-func (s *Session) Create() error {
+// CreateTx persists a session in the database
+func (s *Session) CreateTx(tx *sqlx.Tx) error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
 	}
@@ -83,5 +84,5 @@ func (s *Session) Create() error {
 		return apierror.NewServerError("cannot save a session with no user id")
 	}
 
-	return s.doCreate()
+	return s.doCreate(tx)
 }
