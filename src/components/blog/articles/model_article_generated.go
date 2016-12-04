@@ -29,6 +29,26 @@ func JoinSQL(prefix string) string {
 	return output
 }
 
+// Get finds and returns an active article by ID
+func Get(id string) (*Article, error) {
+	a := &Article{}
+	stmt := "SELECT * from blog_articles WHERE id=$1 and deleted_at IS NULL LIMIT 1"
+	err := db.Get(a, stmt, id)
+	// We want to return nil if a article is not found
+	if a.ID == "" {
+		return nil, err
+	}
+	return a, err
+}
+
+// Exists checks if  article by ID
+func Exists(id string) (bool, error) {
+	exists := false
+	stmt := "SELECT exists(SELECT 1 FROM blog_articles WHERE id=$1 and deleted_at IS NULL)"
+	err := db.Con().Get(&exists, stmt, id)
+	return exists, err
+}
+
 // Save creates or updates the article depending on the value of the id
 func (a *Article) Save() error {
 	return a.SaveTx(db.Con())
@@ -48,14 +68,14 @@ func (a *Article) SaveTx(tx sqalx.Node) error {
 	return a.UpdateTx(tx)
 }
 
-// Create persists a user in the database
+// Create persists a article in the database
 func (a *Article) Create() error {
 	return a.CreateTx(db.Con())
 }
 
 
 
-// doCreate persists an object in the database using a Node
+// doCreate persists a article in the database using a Node
 func (a *Article) doCreate(tx sqalx.Node) error {
 	if a == nil {
 		return errors.New("article not instanced")
@@ -79,7 +99,7 @@ func (a *Article) Update() error {
 
 
 
-// doUpdate updates an object in the database using an optional transaction
+// doUpdate updates a article in the database using an optional transaction
 func (a *Article) doUpdate(tx sqalx.Node) error {
 	if a == nil {
 		return apierror.NewServerError("article is not instanced")
@@ -97,12 +117,12 @@ func (a *Article) doUpdate(tx sqalx.Node) error {
 	return err
 }
 
-// FullyDelete removes an object from the database
+// FullyDelete removes a article from the database
 func (a *Article) FullyDelete() error {
 	return a.FullyDeleteTx(db.Con())
 }
 
-// FullyDeleteTx removes an object from the database using a transaction
+// FullyDeleteTx removes a article from the database using a transaction
 func (a *Article) FullyDeleteTx(tx sqalx.Node) error {
 	if a == nil {
 		return errors.New("article not instanced")
@@ -118,17 +138,17 @@ func (a *Article) FullyDeleteTx(tx sqalx.Node) error {
 	return err
 }
 
-// Delete soft delete an object.
+// Delete soft delete a article.
 func (a *Article) Delete() error {
 	return a.DeleteTx(db.Con())
 }
 
-// DeleteTx soft delete an object using a transaction
+// DeleteTx soft delete a article using a transaction
 func (a *Article) DeleteTx(tx sqalx.Node) error {
 	return a.doDelete(tx)
 }
 
-// doDelete performs a soft delete operation on an object using an optional transaction
+// doDelete performs a soft delete operation on a article using an optional transaction
 func (a *Article) doDelete(tx sqalx.Node) error {
 	if a == nil {
 		return apierror.NewServerError("article is not instanced")
