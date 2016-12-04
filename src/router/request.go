@@ -33,11 +33,13 @@ func (req *Request) String() string {
 	}
 
 	user := "anonymous"
+	userID := "0"
 	if req.User != nil {
-		user = fmt.Sprintf("%s (%s) ", req.User.ID, req.User.Name)
+		user = req.User.Name
+		userID = req.User.ID
 	}
 
-	return fmt.Sprintf("req_id: %s | user: %s | params: %#v", req.ID, user, req.Params)
+	return fmt.Sprintf(`req_id: "%s", user: "%s", user_id: "%s", params: %#v`, req.ID, user, userID, req.Params)
 }
 
 // ContentType returns the content type of the current request

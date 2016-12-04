@@ -30,7 +30,7 @@ func (req *Request) Error(e error) {
 			req.Response.WriteHeader(err.Code())
 		} else {
 			if app.GetContext().Params.Debug {
-				logger.Errorf("%s - %s", err.Error(), req)
+				logger.Errorf("message: \"%s\", %s", err.Error(), req)
 			}
 
 			http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
