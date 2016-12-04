@@ -82,10 +82,16 @@ func HandlerUpdateDraft(req *router.Request) {
 		draftUpdated = true
 	}
 
-	// todo(melvin): start transaction
+	tx, err := db.Con().Beginx()
+	if err != nil {
+		req.Error(err)
+		return
+	}
+
 	if params.Promote {
 		a.Content.IsCurrent = nil
-		if err := a.Content.Save(); err != nil {
+		if err := a.Content.SaveTx(tx); err != nil {
+			tx.Rollback()
 			req.Error(err)
 			return
 		}
@@ -98,12 +104,17 @@ func HandlerUpdateDraft(req *router.Request) {
 	}
 
 	if draftUpdated {
-		if err := draft.Save(); err != nil {
+		if err := draft.SaveTx(tx); err != nil {
+			tx.Rollback()
 			req.Error(err)
 			return
 		}
 	}
-	// todo(melvin): stop transaction
+
+	if err := tx.Commit(); err != nil {
+		req.Error(err)
+		return
+	}
 
 	req.Ok(a.PrivateExport())
 }

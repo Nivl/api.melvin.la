@@ -6,9 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -32,12 +31,12 @@ func JoinSQL(prefix string) string {
 
 // Save creates or updates the article depending on the value of the id
 func (a *Article) Save() error {
-	return a.SaveTx(nil)
+	return a.SaveTx(db.Con())
 }
 
 // SaveTx creates or updates the article depending on the value of the id using
 // a transaction
-func (a *Article) SaveTx(tx *sqlx.Tx) error {
+func (a *Article) SaveTx(tx sqalx.Node) error {
 	if a == nil {
 		return apierror.NewServerError("article is not instanced")
 	}
@@ -51,13 +50,13 @@ func (a *Article) SaveTx(tx *sqlx.Tx) error {
 
 // Create persists a user in the database
 func (a *Article) Create() error {
-	return a.CreateTx(nil)
+	return a.CreateTx(db.Con())
 }
 
 
 
-// doCreate persists an object in the database using an optional transaction
-func (a *Article) doCreate(tx *sqlx.Tx) error {
+// doCreate persists an object in the database using a Node
+func (a *Article) doCreate(tx sqalx.Node) error {
 	if a == nil {
 		return errors.New("article not instanced")
 	}
@@ -67,12 +66,7 @@ func (a *Article) doCreate(tx *sqlx.Tx) error {
 	a.UpdatedAt = db.Now()
 
 	stmt := "INSERT INTO blog_articles (id, slug, created_at, updated_at, deleted_at, published_at, user_id) VALUES (:id, :slug, :created_at, :updated_at, :deleted_at, :published_at, :user_id)"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.NamedExec(stmt, a)
-	} else {
-		_, err = tx.NamedExec(stmt, a)
-	}
+	_, err := tx.NamedExec(stmt, a)
 
   return err
 }
@@ -80,13 +74,13 @@ func (a *Article) doCreate(tx *sqlx.Tx) error {
 // Update updates most of the fields of a persisted article.
 // Excluded fields are id, created_at, deleted_at, etc.
 func (a *Article) Update() error {
-	return a.UpdateTx(nil)
+	return a.UpdateTx(db.Con())
 }
 
 
 
 // doUpdate updates an object in the database using an optional transaction
-func (a *Article) doUpdate(tx *sqlx.Tx) error {
+func (a *Article) doUpdate(tx sqalx.Node) error {
 	if a == nil {
 		return apierror.NewServerError("article is not instanced")
 	}
@@ -98,23 +92,18 @@ func (a *Article) doUpdate(tx *sqlx.Tx) error {
 	a.UpdatedAt = db.Now()
 
 	stmt := "UPDATE blog_articles SET id=:id, slug=:slug, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, published_at=:published_at, user_id=:user_id WHERE id=:id"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.NamedExec(stmt, a)
-	} else {
-		_, err = tx.NamedExec(stmt, a)
-	}
+	_, err := tx.NamedExec(stmt, a)
 
 	return err
 }
 
 // FullyDelete removes an object from the database
 func (a *Article) FullyDelete() error {
-	return a.FullyDeleteTx(nil)
+	return a.FullyDeleteTx(db.Con())
 }
 
 // FullyDeleteTx removes an object from the database using a transaction
-func (a *Article) FullyDeleteTx(tx *sqlx.Tx) error {
+func (a *Article) FullyDeleteTx(tx sqalx.Node) error {
 	if a == nil {
 		return errors.New("article not instanced")
 	}
@@ -124,28 +113,23 @@ func (a *Article) FullyDeleteTx(tx *sqlx.Tx) error {
 	}
 
 	stmt := "DELETE FROM blog_articles WHERE id=$1"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.Exec(stmt, a.ID)
-	} else {
-		_, err = tx.Exec(stmt, a.ID)
-	}
+	_, err := tx.Exec(stmt, a.ID)
 
 	return err
 }
 
 // Delete soft delete an object.
 func (a *Article) Delete() error {
-	return a.DeleteTx(nil)
+	return a.DeleteTx(db.Con())
 }
 
 // DeleteTx soft delete an object using a transaction
-func (a *Article) DeleteTx(tx *sqlx.Tx) error {
+func (a *Article) DeleteTx(tx sqalx.Node) error {
 	return a.doDelete(tx)
 }
 
 // doDelete performs a soft delete operation on an object using an optional transaction
-func (a *Article) doDelete(tx *sqlx.Tx) error {
+func (a *Article) doDelete(tx sqalx.Node) error {
 	if a == nil {
 		return apierror.NewServerError("article is not instanced")
 	}
@@ -157,12 +141,7 @@ func (a *Article) doDelete(tx *sqlx.Tx) error {
 	a.DeletedAt = db.Now()
 
 	stmt := "UPDATE blog_articles SET deleted_at = $2 WHERE id=$1"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.Exec(stmt, a.ID, a.DeletedAt)
-	} else {
-		_, err = tx.Exec(stmt, a.ID, a.DeletedAt)
-	}
+	_, err := tx.Exec(stmt, a.ID, a.DeletedAt)
 	return err
 }
 

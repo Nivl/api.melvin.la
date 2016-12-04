@@ -2,6 +2,8 @@ package articles
 
 import (
 	"github.com/gosimple/slug"
+	"github.com/melvin-laplanche/ml-api/src/db"
+	"github.com/melvin-laplanche/ml-api/src/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
@@ -22,7 +24,7 @@ func HandlerAdd(req *router.Request) {
 		Subtitle:    params.Subtitle,
 		Content:     params.Content,
 		Description: params.Description,
-		IsCurrent:   &[]bool{true}[0],
+		IsCurrent:   ptrs.NewBool(true),
 	}
 
 	a := &Article{
@@ -31,15 +33,25 @@ func HandlerAdd(req *router.Request) {
 		User:   req.User,
 	}
 
-	// todo(melvin): Add transaction
+	tx, err := db.Con().Beginx()
+	if err != nil {
+		req.Error(err)
+		return
+	}
+	defer tx.Rollback()
 
-	if err := a.Save(); err != nil {
+	if err := a.SaveTx(tx); err != nil {
 		req.Error(err)
 		return
 	}
 
 	content.ArticleID = a.ID
-	if err := content.Save(); err != nil {
+	if err := content.SaveTx(tx); err != nil {
+		req.Error(err)
+		return
+	}
+
+	if err := tx.Commit(); err != nil {
 		req.Error(err)
 		return
 	}

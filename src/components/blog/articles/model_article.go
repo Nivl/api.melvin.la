@@ -3,7 +3,7 @@ package articles
 import (
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
@@ -54,7 +54,7 @@ func (a *Article) FetchDraft() error {
 }
 
 // CreateTx persists an article in the database
-func (a *Article) CreateTx(tx *sqlx.Tx) error {
+func (a *Article) CreateTx(tx sqalx.Node) error {
 	if a == nil {
 		return apierror.NewServerError("article not instanced")
 	}
@@ -67,9 +67,18 @@ func (a *Article) CreateTx(tx *sqlx.Tx) error {
 	originalSlug := a.Slug
 	var err error
 	for i := 0; i < 10; i++ {
-		err = a.doCreate(tx)
-
+		// We create a savepoint so we can rollback in case the request fails
+		// (a rollback to a savepoint is required inside a transaction)
+		savePoint, err := tx.Beginx()
 		if err != nil {
+			fmt.Printf("\n\n Failed to create savepoint: %d \n\n", i)
+			return err
+		}
+
+		// we do the insert and treat the error if theres one
+		if err = a.doCreate(savePoint); err != nil {
+			savePoint.Rollback()
+
 			if db.SQLIsDup(err) == false {
 				return apierror.NewServerError(err.Error())
 			}
@@ -78,6 +87,7 @@ func (a *Article) CreateTx(tx *sqlx.Tx) error {
 			// a number
 			a.Slug = fmt.Sprintf("%s-%d", originalSlug, i)
 		} else {
+			savePoint.Commit()
 			// everything went well
 			return nil
 		}
@@ -89,6 +99,6 @@ func (a *Article) CreateTx(tx *sqlx.Tx) error {
 
 // UpdateTx updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (a *Article) UpdateTx(tx *sqlx.Tx) error {
+func (a *Article) UpdateTx(tx sqalx.Node) error {
 	return nil
 }

@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
@@ -69,7 +69,7 @@ func IsPasswordValid(hash string, raw string) bool {
 }
 
 // CreateTx persists a user in the database
-func (u *User) CreateTx(tx *sqlx.Tx) error {
+func (u *User) CreateTx(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -88,7 +88,7 @@ func (u *User) CreateTx(tx *sqlx.Tx) error {
 
 // UpdateTx updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (u *User) UpdateTx(tx *sqlx.Tx) error {
+func (u *User) UpdateTx(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}

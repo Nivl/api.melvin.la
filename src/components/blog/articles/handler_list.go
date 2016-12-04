@@ -2,6 +2,7 @@ package articles
 
 import (
 	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/db"
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
@@ -18,7 +19,7 @@ func HandlerList(req *router.Request) {
 						AND articles.published_at IS NOT NULL
 						AND content.is_current IS TRUE
 					ORDER BY articles.created_at`
-	if err := sql().Select(&arts, stmt); err != nil {
+	if err := db.Con().Select(&arts, stmt); err != nil {
 		req.Error(err)
 		return
 	}

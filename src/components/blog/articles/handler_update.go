@@ -7,6 +7,7 @@ import (
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/db"
+	"github.com/melvin-laplanche/ml-api/src/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
@@ -89,23 +90,29 @@ func HandlerUpdate(req *router.Request) {
 		a.Slug = slug.Make(params.Slug)
 
 		if a.Slug != params.Slug {
-			req.Error(apierror.NewBadRequest("invalid value for slug: %s did you mean %s", a.Slug, params.Slug))
+			req.Error(apierror.NewBadRequest("invalid value for slug: %s did you mean %s", params.Slug, a.Slug))
 			return
 		}
 
 		articleUpdated = true
 	}
 
-	// todo(melvin): start transaction here
+	tx, err := db.Con().Beginx()
+	if err != nil {
+		req.Error(err)
+		return
+	}
+	defer tx.Rollback()
+
 	if contentUpdated {
-		a.Content.IsCurrent = &[]bool{false}[0]
-		if err := a.Content.Update(); err != nil {
+		a.Content.IsCurrent = ptrs.NewBool(false)
+		if err := a.Content.UpdateTx(tx); err != nil {
 			req.Error(err)
 			return
 		}
 
-		newContent.IsCurrent = &[]bool{true}[0]
-		if err := newContent.Create(); err != nil {
+		newContent.IsCurrent = ptrs.NewBool(true)
+		if err := newContent.CreateTx(tx); err != nil {
 			req.Error(err)
 			return
 		}
@@ -113,12 +120,16 @@ func HandlerUpdate(req *router.Request) {
 	}
 
 	if articleUpdated {
-		if err := a.Update(); err != nil {
+		if err := a.UpdateTx(tx); err != nil {
 			req.Error(err)
 			return
 		}
 	}
-	// todo(melvin): stop transaction here
+
+	if err := tx.Commit(); err != nil {
+		req.Error(err)
+		return
+	}
 
 	req.Ok(a.PrivateExport())
 }

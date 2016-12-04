@@ -3,7 +3,7 @@ package auth
 import (
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
@@ -62,7 +62,7 @@ func SessionJoinSQL(prefix string) string {
 }
 
 // SaveTx is an alias for Create since sessions are not updatable
-func (s *Session) SaveTx(tx *sqlx.Tx) error {
+func (s *Session) SaveTx(tx sqalx.Node) error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
 	}
@@ -71,7 +71,7 @@ func (s *Session) SaveTx(tx *sqlx.Tx) error {
 }
 
 // CreateTx persists a session in the database
-func (s *Session) CreateTx(tx *sqlx.Tx) error {
+func (s *Session) CreateTx(tx sqalx.Node) error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
 	}

@@ -4,11 +4,10 @@ package articles
 
 import (
 	"errors"
-	
 
-	"github.com/jmoiron/sqlx"
+
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -17,12 +16,12 @@ import (
 
 // Save creates or updates the content depending on the value of the id
 func (c *Content) Save() error {
-	return c.SaveTx(nil)
+	return c.SaveTx(db.Con())
 }
 
 // SaveTx creates or updates the article depending on the value of the id using
 // a transaction
-func (c *Content) SaveTx(tx *sqlx.Tx) error {
+func (c *Content) SaveTx(tx sqalx.Node) error {
 	if c == nil {
 		return apierror.NewServerError("content is not instanced")
 	}
@@ -36,24 +35,24 @@ func (c *Content) SaveTx(tx *sqlx.Tx) error {
 
 // Create persists a user in the database
 func (c *Content) Create() error {
-	return c.CreateTx(nil)
+	return c.CreateTx(db.Con())
 }
 
 // Create persists a user in the database
-func (c *Content) CreateTx(tx *sqlx.Tx) error {
+func (c *Content) CreateTx(tx sqalx.Node) error {
 	if c == nil {
 		return apierror.NewServerError("content is not instanced")
 	}
 
 	if c.ID != "" {
-		return apierror.NewServerError("cannot persist a content that already has a ID")
+		return apierror.NewServerError("cannot persist a content that already has an ID")
 	}
 
 	return c.doCreate(tx)
 }
 
-// doCreate persists an object in the database using an optional transaction
-func (c *Content) doCreate(tx *sqlx.Tx) error {
+// doCreate persists an object in the database using a Node
+func (c *Content) doCreate(tx sqalx.Node) error {
 	if c == nil {
 		return errors.New("content not instanced")
 	}
@@ -63,12 +62,7 @@ func (c *Content) doCreate(tx *sqlx.Tx) error {
 	c.UpdatedAt = db.Now()
 
 	stmt := "INSERT INTO blog_article_contents (id, created_at, updated_at, deleted_at, article_id, is_current, is_draft, title, content, subtitle, description) VALUES (:id, :created_at, :updated_at, :deleted_at, :article_id, :is_current, :is_draft, :title, :content, :subtitle, :description)"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.NamedExec(stmt, c)
-	} else {
-		_, err = tx.NamedExec(stmt, c)
-	}
+	_, err := tx.NamedExec(stmt, c)
 
   return err
 }
@@ -76,12 +70,12 @@ func (c *Content) doCreate(tx *sqlx.Tx) error {
 // Update updates most of the fields of a persisted content.
 // Excluded fields are id, created_at, deleted_at, etc.
 func (c *Content) Update() error {
-	return c.UpdateTx(nil)
+	return c.UpdateTx(db.Con())
 }
 
 // Update updates most of the fields of a persisted content using a transaction
 // Excluded fields are id, created_at, deleted_at, etc.
-func (c *Content) UpdateTx(tx *sqlx.Tx) error {
+func (c *Content) UpdateTx(tx sqalx.Node) error {
 	if c == nil {
 		return apierror.NewServerError("content is not instanced")
 	}
@@ -94,7 +88,7 @@ func (c *Content) UpdateTx(tx *sqlx.Tx) error {
 }
 
 // doUpdate updates an object in the database using an optional transaction
-func (c *Content) doUpdate(tx *sqlx.Tx) error {
+func (c *Content) doUpdate(tx sqalx.Node) error {
 	if c == nil {
 		return apierror.NewServerError("content is not instanced")
 	}
@@ -106,23 +100,18 @@ func (c *Content) doUpdate(tx *sqlx.Tx) error {
 	c.UpdatedAt = db.Now()
 
 	stmt := "UPDATE blog_article_contents SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, article_id=:article_id, is_current=:is_current, is_draft=:is_draft, title=:title, content=:content, subtitle=:subtitle, description=:description WHERE id=:id"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.NamedExec(stmt, c)
-	} else {
-		_, err = tx.NamedExec(stmt, c)
-	}
+	_, err := tx.NamedExec(stmt, c)
 
 	return err
 }
 
 // FullyDelete removes an object from the database
 func (c *Content) FullyDelete() error {
-	return c.FullyDeleteTx(nil)
+	return c.FullyDeleteTx(db.Con())
 }
 
 // FullyDeleteTx removes an object from the database using a transaction
-func (c *Content) FullyDeleteTx(tx *sqlx.Tx) error {
+func (c *Content) FullyDeleteTx(tx sqalx.Node) error {
 	if c == nil {
 		return errors.New("content not instanced")
 	}
@@ -132,28 +121,23 @@ func (c *Content) FullyDeleteTx(tx *sqlx.Tx) error {
 	}
 
 	stmt := "DELETE FROM blog_article_contents WHERE id=$1"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.Exec(stmt, c.ID)
-	} else {
-		_, err = tx.Exec(stmt, c.ID)
-	}
+	_, err := tx.Exec(stmt, c.ID)
 
 	return err
 }
 
 // Delete soft delete an object.
 func (c *Content) Delete() error {
-	return c.DeleteTx(nil)
+	return c.DeleteTx(db.Con())
 }
 
 // DeleteTx soft delete an object using a transaction
-func (c *Content) DeleteTx(tx *sqlx.Tx) error {
+func (c *Content) DeleteTx(tx sqalx.Node) error {
 	return c.doDelete(tx)
 }
 
 // doDelete performs a soft delete operation on an object using an optional transaction
-func (c *Content) doDelete(tx *sqlx.Tx) error {
+func (c *Content) doDelete(tx sqalx.Node) error {
 	if c == nil {
 		return apierror.NewServerError("content is not instanced")
 	}
@@ -165,12 +149,7 @@ func (c *Content) doDelete(tx *sqlx.Tx) error {
 	c.DeletedAt = db.Now()
 
 	stmt := "UPDATE blog_article_contents SET deleted_at = $2 WHERE id=$1"
-	var err error
-	if tx == nil {
-	  _, err = app.GetContext().SQL.Exec(stmt, c.ID, c.DeletedAt)
-	} else {
-		_, err = tx.Exec(stmt, c.ID, c.DeletedAt)
-	}
+	_, err := tx.Exec(stmt, c.ID, c.DeletedAt)
 	return err
 }
 
