@@ -21,7 +21,7 @@ type HandlerUpdateDraftParams struct {
 }
 
 // HandlerUpdateDraft is an API handler to update the draft of an article
-func HandlerUpdateDraft(req *router.Request) {
+func HandlerUpdateDraft(req *router.Request) error {
 	params := req.Params.(*HandlerUpdateDraftParams)
 
 	a := &Article{}
@@ -36,18 +36,15 @@ func HandlerUpdateDraft(req *router.Request) {
 						AND content.is_current IS true`
 
 	if err := db.Get(a, stmt, params.ID); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 	if a.IsZero() || req.User.ID != a.UserID {
-		req.Error(apierror.NewNotFound())
-		return
+		return apierror.NewNotFound()
 	}
 
 	// fetch the current draft
 	if err := a.FetchDraft(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	draft := a.Draft
@@ -84,16 +81,14 @@ func HandlerUpdateDraft(req *router.Request) {
 
 	tx, err := db.Con().Beginx()
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
+	defer tx.Rollback()
 
 	if params.Promote {
 		a.Content.IsCurrent = nil
 		if err := a.Content.SaveTx(tx); err != nil {
-			tx.Rollback()
-			req.Error(err)
-			return
+			return err
 		}
 
 		draft.IsDraft = nil
@@ -105,16 +100,14 @@ func HandlerUpdateDraft(req *router.Request) {
 
 	if draftUpdated {
 		if err := draft.SaveTx(tx); err != nil {
-			tx.Rollback()
-			req.Error(err)
-			return
+			return err
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Ok(a.PrivateExport())
+	return nil
 }

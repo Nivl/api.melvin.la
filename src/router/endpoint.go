@@ -1,7 +1,7 @@
 package router
 
 // RouteHandler is the function signature we nee
-type RouteHandler func(*Request)
+type RouteHandler func(*Request) error
 
 // Endpoint represents an HTTP endpoint
 type Endpoint struct {

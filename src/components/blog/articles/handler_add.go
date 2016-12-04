@@ -16,7 +16,7 @@ type HandlerAddParams struct {
 }
 
 // HandlerAdd represents an API handler to add a new article
-func HandlerAdd(req *router.Request) {
+func HandlerAdd(req *router.Request) error {
 	params := req.Params.(*HandlerAddParams)
 
 	content := &Content{
@@ -35,27 +35,24 @@ func HandlerAdd(req *router.Request) {
 
 	tx, err := db.Con().Beginx()
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 	defer tx.Rollback()
 
 	if err := a.SaveTx(tx); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	content.ArticleID = a.ID
 	if err := content.SaveTx(tx); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	if err := tx.Commit(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	a.Content = content
 	req.Created(a.PublicExport())
+	return nil
 }

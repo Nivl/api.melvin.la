@@ -13,17 +13,15 @@ type HandlerListForUserParams struct {
 }
 
 // HandlerListForUser represents a API handler to get a list of articles
-func HandlerListForUser(req *router.Request) {
+func HandlerListForUser(req *router.Request) error {
 	params := req.Params.(*HandlerListForUserParams)
 
 	user, err := auth.GetUser(params.UserID)
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 	if user == nil {
-		req.Error(apierror.NewNotFoundR("no such user"))
-		return
+		return apierror.NewNotFoundR("no such user")
 	}
 
 	var arts Articles
@@ -40,9 +38,9 @@ func HandlerListForUser(req *router.Request) {
 					ORDER BY articles.created_at`
 
 	if err := db.Con().Select(&arts, stmt, params.UserID); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Ok(arts.PublicExport())
+	return nil
 }

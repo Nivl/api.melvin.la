@@ -81,7 +81,12 @@ func Handler(e *Endpoint) http.Handler {
 			request.Error(apierror.NewUnauthorized())
 			return
 		}
-		e.Handler(request)
+
+		// Execute the actual route handler
+		err := e.Handler(request)
+		if err != nil {
+			request.Error(err)
+		}
 	}
 
 	return http.HandlerFunc(HTTPHandler)

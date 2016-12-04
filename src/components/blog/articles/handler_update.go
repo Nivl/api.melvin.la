@@ -24,7 +24,7 @@ type HandlerUpdateParams struct {
 }
 
 // HandlerUpdate represents a API handler to update a single article
-func HandlerUpdate(req *router.Request) {
+func HandlerUpdate(req *router.Request) error {
 	params := req.Params.(*HandlerUpdateParams)
 
 	a := &Article{}
@@ -39,12 +39,10 @@ func HandlerUpdate(req *router.Request) {
 						AND content.is_current IS true`
 
 	if err := db.Get(a, stmt, params.ID); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 	if a.IsZero() || req.User.ID != a.UserID {
-		req.Error(apierror.NewNotFound())
-		return
+		return apierror.NewNotFound()
 	}
 
 	articleUpdated := false
@@ -90,8 +88,7 @@ func HandlerUpdate(req *router.Request) {
 		a.Slug = slug.Make(params.Slug)
 
 		if a.Slug != params.Slug {
-			req.Error(apierror.NewBadRequest("invalid value for slug: %s did you mean %s", params.Slug, a.Slug))
-			return
+			return apierror.NewBadRequest("invalid value for slug: %s did you mean %s", params.Slug, a.Slug)
 		}
 
 		articleUpdated = true
@@ -99,37 +96,33 @@ func HandlerUpdate(req *router.Request) {
 
 	tx, err := db.Con().Beginx()
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 	defer tx.Rollback()
 
 	if contentUpdated {
 		a.Content.IsCurrent = ptrs.NewBool(false)
 		if err := a.Content.UpdateTx(tx); err != nil {
-			req.Error(err)
-			return
+			return err
 		}
 
 		newContent.IsCurrent = ptrs.NewBool(true)
 		if err := newContent.CreateTx(tx); err != nil {
-			req.Error(err)
-			return
+			return err
 		}
 		a.Content = &newContent
 	}
 
 	if articleUpdated {
 		if err := a.UpdateTx(tx); err != nil {
-			req.Error(err)
-			return
+			return err
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Ok(a.PrivateExport())
+	return nil
 }

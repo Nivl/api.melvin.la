@@ -14,20 +14,18 @@ type HandlerUpdateParams struct {
 	NewPassword     string `from:"form" json:"new_password" params:"trim"`
 }
 
-func HandlerUpdate(req *router.Request) {
+func HandlerUpdate(req *router.Request) error {
 	params := req.Params.(*HandlerUpdateParams)
 	user := req.User
 
 	if params.ID != user.ID {
-		req.Error(apierror.NewForbidden())
-		return
+		return apierror.NewForbidden()
 	}
 
 	// To change the email or the password we require the current password
 	if params.NewPassword != "" || params.Email != "" {
 		if !auth.IsPasswordValid(user.Password, params.CurrentPassword) {
-			req.Error(apierror.NewUnauthorized())
-			return
+			return apierror.NewUnauthorized()
 		}
 	}
 
@@ -42,16 +40,15 @@ func HandlerUpdate(req *router.Request) {
 	if params.NewPassword != "" {
 		hashedPassword, err := auth.CryptPassword(params.NewPassword)
 		if err != nil {
-			req.Error(err)
-			return
+			return err
 		}
 		user.Password = hashedPassword
 	}
 
 	if err := user.Save(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Ok(NewPrivatePayload(user))
+	return nil
 }

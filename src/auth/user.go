@@ -11,7 +11,7 @@ import (
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate api-cli generate model User -t users -e CreateTx,UpdateTx,JoinSQL
+//go:generate api-cli generate model User -t users -e CreateTx,UpdateTx,Get,JoinSQL
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`

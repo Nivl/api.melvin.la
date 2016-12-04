@@ -13,7 +13,7 @@ type HandlerGetParams struct {
 }
 
 // HandlerGet represents a API handler to get a single article
-func HandlerGet(req *router.Request) {
+func HandlerGet(req *router.Request) error {
 	params := req.Params.(*HandlerGetParams)
 
 	a := &Article{}
@@ -28,29 +28,27 @@ func HandlerGet(req *router.Request) {
 						AND content.is_current IS true`
 
 	if err := db.Get(a, stmt, params.ID); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	if a.IsZero() {
-		req.Error(apierror.NewNotFound())
-		return
+		return apierror.NewNotFound()
 	}
 
 	if req.User != nil && req.User.ID == a.UserID {
 		// If the user is the author, let's get it's draft
 		if err := a.FetchDraft(); err != nil {
-			req.Error(err)
-			return
+			return err
 		}
 
 		req.Ok(a.PrivateExport())
-		return
+		return nil
 	}
 
 	if a.PublishedAt == nil {
-		req.Error(apierror.NewNotFound())
-		return
+		return apierror.NewNotFound()
 	}
+
 	req.Ok(a.PublicExport())
+	return nil
 }

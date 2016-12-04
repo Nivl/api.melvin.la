@@ -14,32 +14,29 @@ type HandlerDeleteParams struct {
 }
 
 // HandlerDelete represent an API handler to remove a session
-func HandlerDelete(req *router.Request) {
+func HandlerDelete(req *router.Request) error {
 	params := req.Params.(*HandlerDeleteParams)
 
 	if !auth.IsPasswordValid(req.User.Password, params.CurrentPassword) {
-		req.Error(apierror.NewUnauthorized())
-		return
+		return apierror.NewUnauthorized()
 	}
 
 	var session auth.Session
 	stmt := "SELECT * FROM sessions WHERE id=$1 AND deleted_at IS NULL LIMIT 1"
 	err := db.Get(&session, stmt, params.Token)
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	// We always return a 404 in case of a user error to avoid brute-force
 	if session.ID == "" || session.UserID != req.User.ID {
-		req.Error(apierror.NewNotFound())
-		return
+		return apierror.NewNotFound()
 	}
 
 	if err := session.Delete(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.NoContent()
+	return nil
 }

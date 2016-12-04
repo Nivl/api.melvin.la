@@ -7,7 +7,7 @@ import (
 )
 
 // HandlerList represents a API handler to get a list of articles
-func HandlerList(req *router.Request) {
+func HandlerList(req *router.Request) error {
 	arts := Articles{}
 	stmt := `SELECT articles.*,
                   ` + auth.UserJoinSQL("users") + `,
@@ -20,9 +20,9 @@ func HandlerList(req *router.Request) {
 						AND content.is_current IS TRUE
 					ORDER BY articles.created_at`
 	if err := db.Con().Select(&arts, stmt); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Ok(arts.PublicExport())
+	return nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 // Session is a structure representing a session that can be saved in the database
-//go:generate api-cli generate model Session -t sessions -e SaveTx,CreateTx,Update,UpdateTx,doUpdate,JoinSQL
+//go:generate api-cli generate model Session -t sessions -e SaveTx,CreateTx,Update,UpdateTx,doUpdate,JoinSQL,Get
 type Session struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
