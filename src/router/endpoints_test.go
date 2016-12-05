@@ -17,8 +17,9 @@ import (
 // therefore does not tests details (like checking the params are parsed correctly)
 func TestEndpointExecution(t *testing.T) {
 	// Handler used for our request. We just need to know if it is called or not
-	hdlr := func(req *router.Request) {
+	hdlr := func(req *router.Request) error {
 		req.NoContent()
+		return nil
 	}
 
 	u, s := authtest.NewAuth(t)
