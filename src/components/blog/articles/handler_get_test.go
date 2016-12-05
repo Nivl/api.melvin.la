@@ -118,7 +118,7 @@ func TestHandlerGet(t *testing.T) {
 			rec := callHandlerGet(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusOK {
+			if testhelpers.Is2XX(rec.Code) {
 				var pld articles.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
 					t.Fatal(err)

@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/router"
-	"github.com/gorilla/mux"
 )
 
 type RequestAuth struct {
@@ -67,4 +67,9 @@ func NewRequest(info *RequestInfo) *httptest.ResponseRecorder {
 	rec := httptest.NewRecorder()
 	info.Router.ServeHTTP(rec, req)
 	return rec
+}
+
+// Is2XX returns a true if the HTTP code is a 2XX, false otherwise
+func Is2XX(code int) bool {
+	return code >= 200 && code < 300
 }

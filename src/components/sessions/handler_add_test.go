@@ -44,7 +44,7 @@ func TestHandlerAdd(t *testing.T) {
 			rec := callHandlerAdd(t, tc.params)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusCreated {
+			if testhelpers.Is2XX(rec.Code) {
 				var session sessions.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&session); err != nil {
 					t.Fatal(err)

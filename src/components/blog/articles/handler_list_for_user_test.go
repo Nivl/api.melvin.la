@@ -56,7 +56,7 @@ func TestHandlerListForUser(t *testing.T) {
 			rec := callHandlerListForUser(t, tc.authorID)
 			assert.Equal(t, tc.code, rec.Code, "Test %d", i)
 
-			if rec.Code == http.StatusOK {
+			if testhelpers.Is2XX(rec.Code) {
 				var body *articles.Payloads
 				if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
 					t.Fatal(err)

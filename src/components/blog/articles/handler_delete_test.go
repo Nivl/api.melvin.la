@@ -53,7 +53,7 @@ func TestHandlerDelete(t *testing.T) {
 			rec := callHandlerDelete(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusNoContent {
+			if testhelpers.Is2XX(rec.Code) {
 				exists, err := articles.Exists(tc.params.ID)
 				if err != nil {
 					t.Fatal(err)

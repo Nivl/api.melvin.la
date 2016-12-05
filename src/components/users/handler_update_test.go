@@ -77,7 +77,7 @@ func TestHandlerUpdate(t *testing.T) {
 			rec := callHandlerUpdate(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusOK {
+			if testhelpers.Is2XX(rec.Code) {
 				var u users.PrivatePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)

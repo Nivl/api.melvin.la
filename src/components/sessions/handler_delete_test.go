@@ -65,7 +65,7 @@ func TestHandlerDelete(t *testing.T) {
 			rec := callHandlerDelete(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusNoContent {
+			if testhelpers.Is2XX(rec.Code) {
 				// We check that the user is still in DB but is flagged for deletion
 				var session auth.Session
 				stmt := "SELECT * FROM sessions WHERE id=$1 LIMIT 1"

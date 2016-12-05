@@ -59,7 +59,7 @@ func TestHandlerDeleteDraft(t *testing.T) {
 			rec := callHandlerDeleteDraft(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusNoContent {
+			if testhelpers.Is2XX(rec.Code) {
 				a, err := articles.Get(tc.params.ID)
 				if err != nil {
 					t.Fatal(err)

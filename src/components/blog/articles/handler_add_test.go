@@ -67,7 +67,7 @@ func TestHandlerAdd(t *testing.T) {
 			rec := callHandlerAdd(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusCreated {
+			if testhelpers.Is2XX(rec.Code) {
 				var a articles.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&a); err != nil {
 					t.Fatal(err)
