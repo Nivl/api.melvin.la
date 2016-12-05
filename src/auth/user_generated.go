@@ -4,10 +4,10 @@ package auth
 
 import (
 	"errors"
-	
 
+
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -16,21 +16,32 @@ import (
 
 // Save creates or updates the user depending on the value of the id
 func (u *User) Save() error {
+	return u.SaveTx(db.Con())
+}
+
+// SaveTx creates or updates the article depending on the value of the id using
+// a transaction
+func (u *User) SaveTx(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
 
 	if u.ID == "" {
-		return u.Create()
+		return u.CreateTx(tx)
 	}
 
-	return u.Update()
+	return u.UpdateTx(tx)
+}
+
+// Create persists a user in the database
+func (u *User) Create() error {
+	return u.CreateTx(db.Con())
 }
 
 
 
-// doCreate persists an object in the database
-func (u *User) doCreate() error {
+// doCreate persists an object in the database using a Node
+func (u *User) doCreate(tx sqalx.Node) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
@@ -40,14 +51,21 @@ func (u *User) doCreate() error {
 	u.UpdatedAt = db.Now()
 
 	stmt := "INSERT INTO users (id, created_at, updated_at, deleted_at, name, email, password) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :email, :password)"
-	_, err := app.GetContext().SQL.NamedExec(stmt, u)
+	_, err := tx.NamedExec(stmt, u)
+
   return err
+}
+
+// Update updates most of the fields of a persisted user.
+// Excluded fields are id, created_at, deleted_at, etc.
+func (u *User) Update() error {
+	return u.UpdateTx(db.Con())
 }
 
 
 
-// doUpdate updates an object in the database
-func (u *User) doUpdate() error {
+// doUpdate updates an object in the database using an optional transaction
+func (u *User) doUpdate(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -58,13 +76,19 @@ func (u *User) doUpdate() error {
 
 	u.UpdatedAt = db.Now()
 
-	stmt := "UPDATE users SET id = $1, created_at = $2, updated_at = $3, deleted_at = $4, name = $5, email = $6, password = $7 WHERE id=$8"
-	_, err := app.GetContext().SQL.Exec(stmt, u.ID, u.CreatedAt, u.UpdatedAt, u.DeletedAt, u.Name, u.Email, u.Password, u.ID)
+	stmt := "UPDATE users SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, name=:name, email=:email, password=:password WHERE id=:id"
+	_, err := tx.NamedExec(stmt, u)
+
 	return err
 }
 
 // FullyDelete removes an object from the database
 func (u *User) FullyDelete() error {
+	return u.FullyDeleteTx(db.Con())
+}
+
+// FullyDeleteTx removes an object from the database using a transaction
+func (u *User) FullyDeleteTx(tx sqalx.Node) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
@@ -73,17 +97,24 @@ func (u *User) FullyDelete() error {
 		return errors.New("user has not been saved")
 	}
 
-	_, err := sql().Exec("DELETE FROM users WHERE id=$1", u.ID)
+	stmt := "DELETE FROM users WHERE id=$1"
+	_, err := tx.Exec(stmt, u.ID)
+
 	return err
 }
 
 // Delete soft delete an object.
 func (u *User) Delete() error {
-	return u.doDelete()
+	return u.DeleteTx(db.Con())
 }
 
-// doDelete performs a soft delete operation on an object
-func (u *User) doDelete() error {
+// DeleteTx soft delete an object using a transaction
+func (u *User) DeleteTx(tx sqalx.Node) error {
+	return u.doDelete(tx)
+}
+
+// doDelete performs a soft delete operation on an object using an optional transaction
+func (u *User) doDelete(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -95,7 +126,7 @@ func (u *User) doDelete() error {
 	u.DeletedAt = db.Now()
 
 	stmt := "UPDATE users SET deleted_at = $2 WHERE id=$1"
-	_, err := sql().Exec(stmt, u.ID, *u.DeletedAt)
+	_, err := tx.Exec(stmt, u.ID, u.DeletedAt)
 	return err
 }
 

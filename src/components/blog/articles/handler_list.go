@@ -2,31 +2,27 @@ package articles
 
 import (
 	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/db"
 	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
 // HandlerList represents a API handler to get a list of articles
-func HandlerList(req *router.Request) {
+func HandlerList(req *router.Request) error {
 	arts := Articles{}
-
-	// We want the published articles and the unpublished that we own
-	var args []interface{}
-	visibilityStmt := "articles.is_published IS TRUE"
-	if req.User != nil {
-		visibilityStmt += ` OR articles.user_id = $1`
-		args = append(args, req.User.ID)
-	}
-
-	stmt := `SELECT articles.*, ` + auth.UserJoinSQL("users") + `
+	stmt := `SELECT articles.*,
+                  ` + auth.UserJoinSQL("users") + `,
+                  ` + ContentJoinSQL("content") + `
 					FROM blog_articles articles
-					LEFT JOIN users ON users.id = articles.user_id
+					JOIN users ON users.id = articles.user_id
+					JOIN blog_article_contents content ON content.article_id = articles.id
 					WHERE articles.deleted_at IS NULL
-						AND ( ` + visibilityStmt + ` )
+						AND articles.published_at IS NOT NULL
+						AND content.is_current IS TRUE
 					ORDER BY articles.created_at`
-	if err := sql().Select(&arts, stmt, args...); err != nil {
-		req.Error(err)
-		return
+	if err := db.Con().Select(&arts, stmt); err != nil {
+		return err
 	}
 
-	req.Ok(arts.Export())
+	req.Ok(arts.PublicExport())
+	return nil
 }

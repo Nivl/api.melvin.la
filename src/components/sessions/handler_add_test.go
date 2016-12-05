@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -14,9 +15,7 @@ import (
 
 func TestHandlerAdd(t *testing.T) {
 	defer testhelpers.PurgeModels(t)
-
-	u1 := auth.NewTestUser(t, nil)
-	testhelpers.SaveModels(t, u1)
+	u1 := authtest.NewUser(t, nil)
 
 	tests := []struct {
 		description string
@@ -45,7 +44,7 @@ func TestHandlerAdd(t *testing.T) {
 			rec := callHandlerAdd(t, tc.params)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusCreated {
+			if testhelpers.Is2XX(rec.Code) {
 				var session sessions.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&session); err != nil {
 					t.Fatal(err)
@@ -65,7 +64,7 @@ func callHandlerAdd(t *testing.T, params *sessions.HandlerAddParams) *httptest.R
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: sessions.Endpoints[sessions.EndpointAdd],
-		URI:      "/sessions/",
+		URI:      "/sessions",
 		Params:   params,
 	}
 

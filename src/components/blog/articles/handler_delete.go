@@ -1,31 +1,31 @@
 package articles
 
-import "github.com/melvin-laplanche/ml-api/src/router"
+import (
+	"github.com/melvin-laplanche/ml-api/src/apierror"
+	"github.com/melvin-laplanche/ml-api/src/router"
+)
 
-// HandlerDelete represents a API handler to delete an article
-func HandlerDelete(req *router.Request) {
-	//appCtx := app.GetContext()
-	//doc := appCtx.DB.C("article")
-	//article := Article{
-	//	ID:        bson.NewObjectId(),
-	//	CreatedAt: time.Now(),
-	//}
-	//
-	//if err := gin.Bind(&article); err != nil {
-	//	req.BadRequest(err)
-	//	return
-	//}
-	//
-	//if err := doc.Insert(article); err != nil {
-	//	if mgo.IsDup(err) {
-	//		req.Conflict("The slug %s already exists in the database", article.Slug)
-	//		return
-	//	}
-	//
-	//	req.ServerError(err)
-	//	return
-	//}
+// HandlerDeleteParams lists the params allowed by HandlerDelete
+type HandlerDeleteParams struct {
+	ID string `from:"url" json:"id" params:"uuid"`
+}
 
-	//httpResponse.Ok(gin, httpResponse.Resource{article})
+// HandlerDelete represents a API handler to soft delete a single article
+func HandlerDelete(req *router.Request) error {
+	params := req.Params.(*HandlerDeleteParams)
+
+	a, err := Get(params.ID)
+	if err != nil {
+		return err
+	}
+	if a.IsZero() || req.User.ID != a.UserID {
+		return apierror.NewNotFound()
+	}
+
+	if err := a.Delete(); err != nil {
+		return err
+	}
+
 	req.NoContent()
+	return nil
 }

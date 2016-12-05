@@ -43,7 +43,7 @@ func TestHandlerAdd(t *testing.T) {
 			rec := callHandlerAdd(t, tc.params)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusCreated {
+			if testhelpers.Is2XX(rec.Code) {
 				var u users.PrivatePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
@@ -61,7 +61,7 @@ func callHandlerAdd(t *testing.T, params *users.HandlerAddParams) *httptest.Resp
 	ri := &testhelpers.RequestInfo{
 		Test:     t,
 		Endpoint: users.Endpoints[users.EndpointAdd],
-		URI:      "/users/",
+		URI:      "/users",
 		Params:   params,
 	}
 

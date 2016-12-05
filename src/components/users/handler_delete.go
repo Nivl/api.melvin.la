@@ -13,24 +13,22 @@ type HandlerDeleteParams struct {
 }
 
 // HandlerDelete represent an API handler to remove a user
-func HandlerDelete(req *router.Request) {
+func HandlerDelete(req *router.Request) error {
 	params := req.Params.(*HandlerDeleteParams)
 	user := req.User
 
 	if params.ID != user.ID {
-		req.Error(apierror.NewForbidden())
-		return
+		return apierror.NewForbidden()
 	}
 
 	if !auth.IsPasswordValid(user.Password, params.CurrentPassword) {
-		req.Error(apierror.NewUnauthorized())
-		return
+		return apierror.NewUnauthorized()
 	}
 
 	if err := user.Delete(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.NoContent()
+	return nil
 }

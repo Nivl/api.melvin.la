@@ -33,18 +33,18 @@ func NewError(code int, message string, args ...interface{}) error {
 
 // NewServerError returns an Internal Error.
 func NewServerError(message string, args ...interface{}) error {
-	return NewError(http.StatusInternalServerError, message, args)
+	return NewError(http.StatusInternalServerError, message, args...)
 }
 
 // NewBadRequest returns an error caused by a user. Example: A missing param
 func NewBadRequest(message string, args ...interface{}) error {
-	return NewError(http.StatusBadRequest, message, args)
+	return NewError(http.StatusBadRequest, message, args...)
 }
 
 // NewConflict returns an error caused by a conflict with the current state
 // of the app. Example: A duplicate slug
 func NewConflict(message string, args ...interface{}) error {
-	return NewError(http.StatusConflict, message, args)
+	return NewError(http.StatusConflict, message, args...)
 }
 
 // NewUnauthorized returns an error caused by a anonymous user trying to access
@@ -62,5 +62,11 @@ func NewForbidden() error {
 // NewNotFound returns an error caused by a user trying to access
 // a resource that does not exists
 func NewNotFound() error {
-	return NewError(http.StatusNotFound, "")
+	return NewNotFoundR("")
+}
+
+// NewNotFoundR returns an error caused by a user trying to access
+// a resource that does not exists. A reason is sent back to the user
+func NewNotFoundR(reason string) error {
+	return NewError(http.StatusNotFound, reason)
 }

@@ -1,46 +1,83 @@
 package articles
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/router"
 	"github.com/gorilla/mux"
+	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
+// Indexes of all different endpoints
 const (
-	EndpointList = iota
+	EndpointAdd = iota
+	EndpointList
 	EndpointGet
-	EndpointAdd
 	EndpointUpdate
+	EndpointUpdateDraft
+	EndpointDelete
+	EndpointDeleteDraft
+	EndpointUserList
 )
 
+// Endpoints contains the list of endpoints for this component
 var Endpoints = router.Endpoints{
+	EndpointAdd: {
+		Verb:    "POST",
+		Path:    "/articles",
+		Handler: HandlerAdd,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerAddParams{},
+	},
 	EndpointList: {
 		Verb:    "GET",
-		Path:    "/",
+		Path:    "/articles",
 		Handler: HandlerList,
 		Auth:    nil,
 	},
 	EndpointGet: {
 		Verb:    "GET",
-		Path:    "/{id}",
+		Path:    "/articles/{id}",
 		Handler: HandlerGet,
 		Auth:    nil,
-	},
-	EndpointAdd: {
-		Verb:    "POST",
-		Path:    "/",
-		Handler: HandlerAdd,
-		Auth:    router.LoggedUser,
-		Params:  &HandlerAddParams{},
+		Params:  &HandlerGetParams{},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",
-		Path:    "/{id}",
+		Path:    "/articles/{id}",
 		Handler: HandlerUpdate,
 		Auth:    router.LoggedUser,
+		Params:  &HandlerUpdateParams{},
+	},
+	EndpointDelete: {
+		Verb:    "DELETE",
+		Path:    "/articles/{id}",
+		Handler: HandlerDelete,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerDeleteParams{},
+	},
+	EndpointUpdateDraft: {
+		Verb:    "PATCH",
+		Path:    "/articles/{id}/draft",
+		Handler: HandlerUpdateDraft,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerUpdateDraftParams{},
+	},
+	EndpointDeleteDraft: {
+		Verb:    "DELETE",
+		Path:    "/articles/{id}/draft",
+		Handler: HandlerDeleteDraft,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerDeleteDraftParams{},
+	},
+	EndpointUserList: {
+		Verb:    "GET",
+		Prefix:  "/users/{user_id}",
+		Path:    "/articles",
+		Handler: HandlerListForUser,
+		Auth:    nil,
+		Params:  &HandlerListForUserParams{},
 	},
 }
 
 // SetRoutes is used to set all the routes of the article
-func SetRoutes(r *mux.Router) {
-	Endpoints.Activate(r)
+func SetRoutes(baseURI string, r *mux.Router) {
+	Endpoints.Activate(baseURI, r)
 }

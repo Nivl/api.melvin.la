@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/Nivl/sqalx"
 	"github.com/bsphere/le_go"
 	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
@@ -19,7 +20,7 @@ type Args struct {
 
 // Context represent the global context of the app
 type Context struct {
-	SQL        *sqlx.DB
+	SQL        sqalx.Node
 	Params     Args
 	LogEntries *le_go.Logger
 }
@@ -33,13 +34,17 @@ func InitContext() *Context {
 	}
 
 	_context = new(Context)
-	if err := envconfig.Process("api", &_context.Params); err != nil {
+	if err := envconfig.Process("", &_context.Params); err != nil {
 		panic(err)
 	}
 
-	var err error
 	// Setup database
-	_context.SQL, err = sqlx.Connect("postgres", _context.Params.PostgresURI)
+	db, err := sqlx.Connect("postgres", _context.Params.PostgresURI)
+	if err != nil {
+		panic(err)
+	}
+
+	_context.SQL, err = sqalx.New(db, sqalx.SavePoint(true))
 	if err != nil {
 		panic(err)
 	}

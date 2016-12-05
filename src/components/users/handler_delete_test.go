@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/db"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
@@ -17,9 +18,8 @@ import (
 func TestHandlerDelete(t *testing.T) {
 	defer testhelpers.PurgeModels(t)
 
-	u1, s1 := auth.NewTestAuth(t)
-	u2, s2 := auth.NewTestAuth(t)
-	testhelpers.SaveModels(t, u1, s1, u2, s2)
+	u1, s1 := authtest.NewAuth(t)
+	u2, s2 := authtest.NewAuth(t)
 
 	tests := []struct {
 		description string
@@ -59,7 +59,7 @@ func TestHandlerDelete(t *testing.T) {
 			rec := callHandlerDelete(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if rec.Code == http.StatusNoContent {
+			if testhelpers.Is2XX(rec.Code) {
 				// We check that the user is still in DB but is flagged for deletion
 				var user auth.User
 				stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"

@@ -12,23 +12,22 @@ type HandlerGetParams struct {
 }
 
 // HandlerGet represent an API handler to get a user
-func HandlerGet(req *router.Request) {
+func HandlerGet(req *router.Request) error {
 	params := req.Params.(*HandlerGetParams)
 
 	user, err := auth.GetUser(params.ID)
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 	if user == nil {
-		req.Error(apierror.NewNotFound())
-		return
+		return apierror.NewNotFound()
 	}
 
 	// if a user asks for their own data, we return as much as possible
 	if req.User != nil && req.User.ID == user.ID {
 		req.Ok(NewPrivatePayload(user))
-		return
+		return nil
 	}
 	req.Ok(NewPublicPayload(user))
+	return nil
 }

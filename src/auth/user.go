@@ -2,17 +2,16 @@ package auth
 
 import (
 	"fmt"
-	"testing"
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/dchest/uniuri"
+	"github.com/Nivl/sqalx"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/db"
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate api-cli generate model User -t users -e Create,Update,JoinSQL
+//go:generate api-cli generate model User -t users -e CreateTx,UpdateTx,Get,JoinSQL
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -44,7 +43,7 @@ func UserJoinSQL(prefix string) string {
 // GetUser finds and returns an active user by ID
 func GetUser(id string) (*User, error) {
 	user := &User{}
-	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL"
+	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
 	err := db.Get(user, stmt, id)
 	// We want to return nil if a user is not found
 	if user.ID == "" {
@@ -69,8 +68,8 @@ func IsPasswordValid(hash string, raw string) bool {
 	return err == nil
 }
 
-// Create persists a user in the database
-func (u *User) Create() error {
+// CreateTx persists a user in the database
+func (u *User) CreateTx(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -79,7 +78,7 @@ func (u *User) Create() error {
 		return apierror.NewServerError("cannot persist a user that already has a ID")
 	}
 
-	err := u.doCreate()
+	err := u.doCreate(tx)
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
@@ -87,9 +86,9 @@ func (u *User) Create() error {
 	return err
 }
 
-// Update updates most of the fields of a persisted user.
+// UpdateTx updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (u *User) Update() error {
+func (u *User) UpdateTx(tx sqalx.Node) error {
 	if u == nil {
 		return apierror.NewServerError("user is not instanced")
 	}
@@ -98,38 +97,10 @@ func (u *User) Update() error {
 		return apierror.NewServerError("cannot update a non-persisted user")
 	}
 
-	err := u.doUpdate()
+	err := u.doUpdate(tx)
 	if err != nil && db.SQLIsDup(err) {
 		return apierror.NewConflict("email address already in use")
 	}
 
 	return err
-}
-
-// NewTestUser creates a new user with "fake" as password
-func NewTestUser(t *testing.T, u *User) *User {
-	if u == nil {
-		u = &User{}
-	}
-
-	if u.Email == "" {
-		u.Email = fmt.Sprintf("fake+%s@melvin.la", uniuri.New())
-	}
-
-	if u.Name == "" {
-		u.Name = "Fake Account"
-	}
-
-	if u.Password == "" {
-		var err error
-		u.Password, err = CryptPassword("fake")
-		if err != nil {
-			t.Fatalf("failed to create password: %s", err)
-		}
-	}
-
-	if err := u.Create(); err != nil {
-		t.Fatalf("failed to create user: %s", err)
-	}
-	return u
 }

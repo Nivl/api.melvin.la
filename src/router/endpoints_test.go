@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/melvin-laplanche/ml-api/src/auth"
+	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
 	"github.com/melvin-laplanche/ml-api/src/router"
 	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
@@ -17,12 +17,12 @@ import (
 // therefore does not tests details (like checking the params are parsed correctly)
 func TestEndpointExecution(t *testing.T) {
 	// Handler used for our request. We just need to know if it is called or not
-	hdlr := func(req *router.Request) {
+	hdlr := func(req *router.Request) error {
 		req.NoContent()
+		return nil
 	}
 
-	u, s := auth.NewTestAuth(t)
-	testhelpers.SaveModels(t, u, s)
+	u, s := authtest.NewAuth(t)
 	defer testhelpers.PurgeModels(t)
 
 	tests := []struct {

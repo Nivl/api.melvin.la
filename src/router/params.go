@@ -32,6 +32,10 @@ type ParamOptions struct {
 	// ValidateUUID means the field should contain a valid UUIDv4
 	// params:"uuid"
 	ValidateUUID bool
+
+	// ValidateOptionalBool means the field should either be empty or contain a bool
+	// params:"bool"
+	ValidateOptionalBool bool
 }
 
 // Validate checks the given value passes the options set
@@ -42,7 +46,13 @@ func (opts *ParamOptions) Validate(value string) error {
 
 	if value != "" {
 		if opts.ValidateUUID && !validators.IsValidUUID(value) {
-			return apierror.NewBadRequest("not a valid format: %s - %s", opts.Name, value)
+			return apierror.NewBadRequest("not a valid uuid: %s - %s", opts.Name, value)
+		}
+
+		if opts.ValidateOptionalBool {
+			if _, err := strconv.ParseBool(value); err != nil {
+				return apierror.NewBadRequest("not a valid bool: %s - %s", opts.Name, value)
+			}
 		}
 	}
 
@@ -82,6 +92,8 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 			output.Trim = true
 		case "uuid":
 			output.ValidateUUID = true
+		case "bool":
+			output.ValidateOptionalBool = true
 		}
 	}
 
@@ -113,14 +125,18 @@ func (r *Request) ParseParams() error {
 
 		// We make sure we can update the value of field
 		if !param.CanSet() {
-			return apierror.NewServerError("Field %s could not be set", paramInfo.Name)
+			return apierror.NewServerError("field [%s] could not be set", paramInfo.Name)
 		}
 
-		// We control the type of
+		// We control the source of the param. If nothing is provided, we take from the URL
 		paramLocation := strings.ToLower(tags.Get("from"))
+		if paramLocation == "" {
+			paramLocation = "url"
+		}
+
 		source, found := sources[paramLocation]
 		if !found {
-			source = sources["url"]
+			return apierror.NewServerError("source [%s] for field [%s] does not exists", paramLocation, paramInfo.Name)
 		}
 
 		args := &setParamValueArgs{

@@ -3,13 +3,14 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/logger"
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -18,11 +19,11 @@ const (
 )
 
 type Request struct {
-	ID           string              `json:"req_id"`
-	Response     http.ResponseWriter `json:"-"`
-	Request      *http.Request       `json:"-"`
-	Params       interface{}         `json:"-"`
-	User         *auth.User          `json:"-"`
+	ID           string
+	Response     http.ResponseWriter
+	Request      *http.Request
+	Params       interface{}
+	User         *auth.User
 	_contentType string
 }
 
@@ -31,13 +32,14 @@ func (req *Request) String() string {
 		return ""
 	}
 
-	dump, err := json.Marshal(req)
-	if err != nil {
-		logger.Errorf(err.Error())
-		return "failed to parse the request"
+	user := "anonymous"
+	userID := "0"
+	if req.User != nil {
+		user = req.User.Name
+		userID = req.User.ID
 	}
 
-	return string(dump)
+	return fmt.Sprintf(`req_id: "%s", user: "%s", user_id: "%s", params: %#v`, req.ID, user, userID, req.Params)
 }
 
 // ContentType returns the content type of the current request
@@ -75,7 +77,7 @@ func (req *Request) MuxVariables() url.Values {
 	return output
 }
 
-// MuxVariables parses and returns the body of the request
+// JSONBody parses and returns the body of the request
 func (req *Request) JSONBody() (url.Values, error) {
 	output := url.Values{}
 
@@ -83,13 +85,13 @@ func (req *Request) JSONBody() (url.Values, error) {
 		return output, nil
 	}
 
-	vars := map[string]string{}
-	if err := json.NewDecoder(req.Request.Body).Decode(&vars); err != nil {
+	vars := map[string]interface{}{}
+	if err := json.NewDecoder(req.Request.Body).Decode(&vars); err != nil && err != io.EOF {
 		return nil, err
 	}
 
 	for k, v := range vars {
-		output.Set(k, v)
+		output.Set(k, fmt.Sprintf("%v", v))
 	}
 
 	return output, nil

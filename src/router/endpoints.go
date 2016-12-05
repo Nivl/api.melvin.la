@@ -4,19 +4,27 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 )
 
+// Endpoints represents a list of endpoint
 type Endpoints []*Endpoint
 
-func (endpoints Endpoints) Activate(router *mux.Router) {
+// Activate adds the endpoints to the router
+func (endpoints Endpoints) Activate(basePath string, router *mux.Router) {
 	for _, endpoint := range endpoints {
+		// Get the full path
+		fullPath := basePath + endpoint.Path
+		if endpoint.Prefix != "" {
+			fullPath = endpoint.Prefix + fullPath
+		}
+
 		router.
 			Methods(endpoint.Verb).
-			Path(endpoint.Path).
+			Path(fullPath).
 			Handler(Handler(endpoint))
 	}
 }
@@ -73,7 +81,12 @@ func Handler(e *Endpoint) http.Handler {
 			request.Error(apierror.NewUnauthorized())
 			return
 		}
-		e.Handler(request)
+
+		// Execute the actual route handler
+		err := e.Handler(request)
+		if err != nil {
+			request.Error(err)
+		}
 	}
 
 	return http.HandlerFunc(HTTPHandler)

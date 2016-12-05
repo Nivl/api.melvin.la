@@ -14,29 +14,27 @@ type HandlerAddParams struct {
 }
 
 // HandlerAdd represents an API handler to create a new user session
-func HandlerAdd(req *router.Request) {
+func HandlerAdd(req *router.Request) error {
 	params := req.Params.(*HandlerAddParams)
 
 	var user auth.User
 	stmt := "SELECT * FROM users WHERE email=$1 LIMIT 1"
 	err := db.Get(&user, stmt, params.Email)
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	if user.ID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
-		req.Error(apierror.NewBadRequest("Bad email/password"))
-		return
+		return apierror.NewBadRequest("Bad email/password")
 	}
 
 	s := &auth.Session{
 		UserID: user.ID,
 	}
 	if err := s.Save(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Created(NewPayloadFromModel(s))
+	return nil
 }

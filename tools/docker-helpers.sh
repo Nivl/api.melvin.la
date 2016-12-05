@@ -7,7 +7,7 @@ alias ddc-stop="ML_BUILD_ENV=test docker-compose stop" # Stops the running servi
 # Execute any command in the container
 function ml-exec {
   CMD="cd /go/src/github.com/melvin-laplanche/ml-api && $@"
-  docker exec -i -t ml_api /bin/bash -ic $CMD
+  docker-compose exec api /bin/bash -ic $CMD
 }
 
 # Open a bash session
@@ -28,9 +28,14 @@ function ml-go {
 # Remove and rebuild the containers
 function ml-reset {
   export ML_BUILD_ENV=test
+  source config/api-common.env
+  source config/api-${ML_BUILD_ENV}.env
+
   ddc-rm
-  ddc-build
+  # ddc-build
   ddc-up
+
+  until docker-compose exec database psql "$API_POSTGRES_URI_STR" -c "select 1" > /dev/null 2>&1; do sleep 2; done
   ml-make "migration"
 }
 
@@ -38,7 +43,7 @@ function ml-reset {
 function ml-test {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  ddc-build &> /dev/null
+  # ddc-build &> /dev/null
   ddc-up &> /dev/null
 
   echo "Update database"
@@ -52,7 +57,7 @@ function ml-test {
 function ml-tests {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  ddc-build &> /dev/null
+  # ddc-build &> /dev/null
   ddc-up &> /dev/null
 
   echo "Update database"

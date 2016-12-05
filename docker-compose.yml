@@ -13,11 +13,12 @@ services:
       - ./config/database-common.env
       - ./config/api-${ML_BUILD_ENV}.env
     container_name: ml_api
+    entrypoint: /go/src/github.com/melvin-laplanche/ml-api/wait-for-database.sh
 
   database:
     image: postgres:9.6
     ports:
-      - "5432:5432"
+      - "5432"
     env_file:
       - ./config/database-common.env
     container_name: ml_api_postgres

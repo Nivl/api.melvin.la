@@ -9,13 +9,12 @@ type HandlerAddParams struct {
 	Password string `from:"form" json:"password" params:"required,trim"`
 }
 
-func HandlerAdd(req *router.Request) {
+func HandlerAdd(req *router.Request) error {
 	params := req.Params.(*HandlerAddParams)
 
 	encryptedPassword, err := auth.CryptPassword(params.Password)
 	if err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	user := &auth.User{
@@ -25,9 +24,9 @@ func HandlerAdd(req *router.Request) {
 	}
 
 	if err := user.Save(); err != nil {
-		req.Error(err)
-		return
+		return err
 	}
 
 	req.Created(NewPrivatePayload(user))
+	return nil
 }
