@@ -7,7 +7,7 @@ import (
 )
 
 // Content is a structure representing an article content that can be saved in the database
-//go:generate api-cli generate model Content -t blog_article_contents -e JoinSQL,Get,Exists
+//go:generate api-cli generate model Content -t blog_article_contents -e JoinSQL,Get,Exists,Delete,DeleteTx,FullyDelete,FullyDeleteTx
 type Content struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`

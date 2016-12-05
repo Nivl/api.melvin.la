@@ -109,36 +109,13 @@ func (c *Content) doUpdate(tx sqalx.Node) error {
 	return err
 }
 
-// FullyDelete removes a content from the database
-func (c *Content) FullyDelete() error {
-	return c.FullyDeleteTx(db.Con())
-}
 
-// FullyDeleteTx removes a content from the database using a transaction
-func (c *Content) FullyDeleteTx(tx sqalx.Node) error {
-	if c == nil {
-		return errors.New("content not instanced")
-	}
 
-	if c.ID == "" {
-		return errors.New("content has not been saved")
-	}
 
-	stmt := "DELETE FROM blog_article_contents WHERE id=$1"
-	_, err := tx.Exec(stmt, c.ID)
 
-	return err
-}
 
-// Delete soft delete a content.
-func (c *Content) Delete() error {
-	return c.DeleteTx(db.Con())
-}
 
-// DeleteTx soft delete a content using a transaction
-func (c *Content) DeleteTx(tx sqalx.Node) error {
-	return c.doDelete(tx)
-}
+
 
 // doDelete performs a soft delete operation on a content using an optional transaction
 func (c *Content) doDelete(tx sqalx.Node) error {

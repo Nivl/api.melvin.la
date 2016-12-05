@@ -13,6 +13,7 @@ const (
 	EndpointUpdate
 	EndpointUpdateDraft
 	EndpointDelete
+	EndpointDeleteDraft
 	EndpointUserList
 )
 
@@ -58,6 +59,13 @@ var Endpoints = router.Endpoints{
 		Handler: HandlerUpdateDraft,
 		Auth:    router.LoggedUser,
 		Params:  &HandlerUpdateDraftParams{},
+	},
+	EndpointDeleteDraft: {
+		Verb:    "DELETE",
+		Path:    "/articles/{id}/draft",
+		Handler: HandlerDeleteDraft,
+		Auth:    router.LoggedUser,
+		Params:  &HandlerDeleteDraftParams{},
 	},
 	EndpointUserList: {
 		Verb:    "GET",

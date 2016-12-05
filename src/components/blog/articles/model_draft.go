@@ -1,6 +1,12 @@
 package articles
 
-import "github.com/Nivl/sqalx"
+import (
+	"errors"
+
+	"github.com/Nivl/sqalx"
+	"github.com/melvin-laplanche/ml-api/src/apierror"
+	"github.com/melvin-laplanche/ml-api/src/db"
+)
 
 // Draft Represents an article draft
 type Draft Content
@@ -43,24 +49,53 @@ func (d *Draft) Save() error {
 	return d.ToContent().Save()
 }
 
-// FullyDeleteTx removes an object from the database using a transaction
-func (d *Draft) FullyDeleteTx(tx sqalx.Node) error {
-	return d.ToContent().FullyDeleteTx(tx)
-}
-
-// FullyDelete removes an object from the database
+// FullyDelete removes a content from the database
 func (d *Draft) FullyDelete() error {
-	return d.ToContent().FullyDelete()
+	return d.FullyDeleteTx(db.Con())
 }
 
-// DeleteTx soft delete an object using a transaction
-func (d *Draft) DeleteTx(tx sqalx.Node) error {
-	return d.ToContent().DeleteTx(tx)
+// FullyDeleteTx removes a content from the database using a transaction
+func (d *Draft) FullyDeleteTx(tx sqalx.Node) error {
+	if d == nil {
+		return errors.New("content not instanced")
+	}
+
+	if d.ID == "" {
+		return errors.New("content has not been saved")
+	}
+
+	stmt := "DELETE FROM blog_article_contents WHERE id=$1"
+	_, err := tx.Exec(stmt, d.ID)
+
+	return err
 }
 
-// Delete soft delete an object
+// Delete soft delete a draft.
 func (d *Draft) Delete() error {
-	return d.ToContent().Delete()
+	return d.DeleteTx(db.Con())
+}
+
+// DeleteTx soft delete a draft using a transaction
+func (d *Draft) DeleteTx(tx sqalx.Node) error {
+	return d.doDelete(tx)
+}
+
+// doDelete performs a soft delete operation on a draft using an optional transaction
+func (d *Draft) doDelete(tx sqalx.Node) error {
+	if d == nil {
+		return apierror.NewServerError("draft is not instanced")
+	}
+
+	if d.ID == "" {
+		return apierror.NewServerError("cannot delete a non-persisted draft")
+	}
+
+	d.DeletedAt = db.Now()
+	d.IsDraft = nil
+
+	stmt := "UPDATE blog_article_contents SET deleted_at=:deleted_at WHERE id=:id"
+	_, err := tx.NamedExec(stmt, d)
+	return err
 }
 
 // IsZero checks if the object is either nil or don't have an ID
