@@ -16,9 +16,9 @@ script:
   && go test ./..."
 deploy:
   - provider: heroku
-      app: melvin-laplanche
-      api_key:
-        secure: aXn1Xk+NLD+nqh5OFEfqmPsMN8n3+Q23kUdITkRY5vkxI7qp7W6Ov6MR4szoiJMEFh8FY8bBPzNmnmrUi5kr9xHb83aG+0JQXA6RxoExQ6OYOhVUETtzIUWVWUHQ/ltnXUwhTFJmBj9dYWbyelpILV9D0Wqu8EU2K0MXYz2Yf6M=
-      on: staging
-      run: "cd /go/src/github.com/melvin-laplanche/ml-api && goose up"
-      script: heroku container:push web
+    app: melvin-laplanche
+    api_key:
+      secure: aXn1Xk+NLD+nqh5OFEfqmPsMN8n3+Q23kUdITkRY5vkxI7qp7W6Ov6MR4szoiJMEFh8FY8bBPzNmnmrUi5kr9xHb83aG+0JQXA6RxoExQ6OYOhVUETtzIUWVWUHQ/ltnXUwhTFJmBj9dYWbyelpILV9D0Wqu8EU2K0MXYz2Yf6M=
+    on: staging
+    run: "cd /go/src/github.com/melvin-laplanche/ml-api && goose up"
+    script: heroku container:push web
