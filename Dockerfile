@@ -10,6 +10,6 @@ ADD . /go/src/github.com/melvin-laplanche/ml-api
 RUN cd /go/src/github.com/melvin-laplanche/ml-api && make install
 
 # Set binary as entrypoint
-ENTRYPOINT /go/bin/ml-api
+CMD /go/bin/ml-api
 
 EXPOSE 5000

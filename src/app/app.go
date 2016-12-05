@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/bsphere/le_go"
 	"github.com/Nivl/sqalx"
+	"github.com/bsphere/le_go"
 	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
 
@@ -34,7 +34,7 @@ func InitContext() *Context {
 	}
 
 	_context = new(Context)
-	if err := envconfig.Process("api", &_context.Params); err != nil {
+	if err := envconfig.Process("", &_context.Params); err != nil {
 		panic(err)
 	}
 
