@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/Nivl/cors"
 	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/components/api"
 )
@@ -13,5 +14,13 @@ func main() {
 
 	r := api.GetRouter()
 	port := ":" + app.GetContext().Params.Port
-	http.ListenAndServe(port, r)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: api.AllowedOrigins,
+		AllowedMethods: api.AllowedMethods,
+		AllowedHeaders: api.AllowedHeaders,
+	})
+
+	handler := c.Handler(r)
+	http.ListenAndServe(port, handler)
 }
