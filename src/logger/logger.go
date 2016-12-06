@@ -12,7 +12,7 @@ func logg(msg string) {
 	context := app.GetContext()
 
 	if context != nil && context.LogEntries != nil {
-		context.LogEntries.Println(msg)
+		go context.LogEntries.Println(msg)
 	}
 
 	log.Println(msg)

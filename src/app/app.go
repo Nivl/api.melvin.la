@@ -14,7 +14,7 @@ import (
 type Args struct {
 	Port            string `default:"5000"`
 	PostgresURI     string `required:"true" envconfig:"postgres_uri"`
-	LogEntriesToken string `envconfig:"mongo_uri" envconfig:"logentries_token"`
+	LogEntriesToken string `envconfig:"logentries_token"`
 	Debug           bool   `default:"false"`
 }
 
