@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/logger"
 )
 
@@ -22,20 +21,17 @@ func (req *Request) Error(e error) {
 
 	switch err.Code() {
 	case http.StatusInternalServerError:
-		logger.Errorf("%s - %s", err.Error(), req)
 		http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
 	default:
 		// Some errors do not need a body
 		if err.Error() == "" {
 			req.Response.WriteHeader(err.Code())
 		} else {
-			if app.GetContext().Params.Debug {
-				logger.Errorf("message: \"%s\", %s", err.Error(), req)
-			}
-
 			http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
 		}
 	}
+
+	logger.Errorf("message: \"%s\", %s", err.Error(), req)
 }
 
 func (req *Request) NoContent() {
