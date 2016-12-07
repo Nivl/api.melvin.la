@@ -39,6 +39,9 @@ func Handler(e *Endpoint) http.Handler {
 		}
 		defer request.handlePanic()
 
+		// We set some response data
+		request.Response.Header().Set("X-Request-Id", request.ID)
+
 		// We Parse the request params
 		if e.Params != nil {
 			// We give request.Params the same type as e.Params
@@ -72,9 +75,6 @@ func Handler(e *Endpoint) http.Handler {
 				return
 			}
 		}
-
-		// We set some response data
-		request.Response.Header().Set("X-Request-Id", request.ID)
 
 		accessGranted := e.Auth == nil || e.Auth(request)
 		if !accessGranted {

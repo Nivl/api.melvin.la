@@ -7,6 +7,7 @@ import (
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
 	"github.com/melvin-laplanche/ml-api/src/logger"
+	"github.com/melvin-laplanche/ml-api/src/mlhttp"
 )
 
 func (req *Request) Error(e error) {
@@ -21,13 +22,13 @@ func (req *Request) Error(e error) {
 
 	switch err.Code() {
 	case http.StatusInternalServerError:
-		http.Error(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
+		mlhttp.ErrorJSON(req.Response, `{"error":"Something went wrong"}`, http.StatusInternalServerError)
 	default:
 		// Some errors do not need a body
 		if err.Error() == "" {
 			req.Response.WriteHeader(err.Code())
 		} else {
-			http.Error(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
+			mlhttp.ErrorJSON(req.Response, fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
 		}
 	}
 
@@ -59,12 +60,11 @@ func (req *Request) Ok(obj interface{}) {
 }
 
 func (req *Request) RenderJSON(code int, obj interface{}) {
-	req.Response.WriteHeader(code)
+	mlhttp.SetJSON(req.Response, code)
 
 	if obj != nil {
 		if err := json.NewEncoder(req.Response).Encode(obj); err != nil {
-			req.Response.WriteHeader(http.StatusInternalServerError)
-			logger.Errorf("Could not write JSON response: %s", err.Error())
+			req.Error(fmt.Errorf("Could not write JSON response: %s", err.Error()))
 		}
 	}
 }
