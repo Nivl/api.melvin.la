@@ -32,7 +32,7 @@ func (req *Request) Error(e error) {
 		}
 	}
 
-	logger.Errorf("message: \"%s\", %s", err.Error(), req)
+	logger.Errorf("code: %d, message: \"%s\", %s", err.Code(), err.Error(), req)
 }
 
 func (req *Request) NoContent() {
