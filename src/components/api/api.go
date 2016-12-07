@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,7 +13,9 @@ import (
 
 func notFound(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	mlhttp.ErrorJSON(w, `{"error":"not found"}`, http.StatusNotFound)
+
+	err := fmt.Sprintf(`{"error":"%s"}`, http.StatusText(http.StatusNotFound))
+	mlhttp.ErrorJSON(w, err, http.StatusNotFound)
 }
 
 // GetRouter return the api router with all the routes
