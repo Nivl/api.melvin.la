@@ -5,6 +5,7 @@ import (
 	"github.com/bsphere/le_go"
 	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/melvin-laplanche/ml-api/src/mailer"
 
 	// Required to connect to postgres
 	_ "github.com/lib/pq"
@@ -15,6 +16,9 @@ type Args struct {
 	Port            string `default:"5000"`
 	PostgresURI     string `required:"true" envconfig:"postgres_uri"`
 	LogEntriesToken string `envconfig:"logentries_token"`
+	EmailAPIKey     string `envconfig:"email_api_key"`
+	EmailFrom       string `envconfig:"email_default_from"`
+	EmailTo         string `envconfig:"email_default_to"`
 	Debug           bool   `default:"false"`
 }
 
@@ -23,6 +27,7 @@ type Context struct {
 	SQL        sqalx.Node
 	Params     Args
 	LogEntries *le_go.Logger
+	Mailer     *mailer.Mailer
 }
 
 var _context *Context
@@ -55,6 +60,11 @@ func InitContext() *Context {
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	// Sendgrid
+	if _context.Params.EmailAPIKey != "" {
+		_context.Mailer = mailer.NewMailer(_context.Params.EmailAPIKey, _context.Params.EmailFrom, _context.Params.EmailTo)
 	}
 
 	return _context

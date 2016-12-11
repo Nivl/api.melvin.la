@@ -6,18 +6,23 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"runtime/debug"
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/auth"
 	"github.com/melvin-laplanche/ml-api/src/logger"
 )
 
 const (
-	ContentTypeJSON          = "application/json"
+	// ContentTypeJSON represents the content type of a JSON request
+	ContentTypeJSON = "application/json"
+	// ContentTypeMultipartForm represents the content type of a multipart request
 	ContentTypeMultipartForm = "multipart/form-data"
 )
 
+// Request represent a client request
 type Request struct {
 	ID           string
 	Response     http.ResponseWriter
@@ -27,6 +32,7 @@ type Request struct {
 	_contentType string
 }
 
+// String return a printable version of the object
 func (req *Request) String() string {
 	if req == nil {
 		return ""
@@ -39,7 +45,7 @@ func (req *Request) String() string {
 		userID = req.User.ID
 	}
 
-	return fmt.Sprintf(`req_id: "%s", user: "%s", user_id: "%s", params: %#v`, req.ID, user, userID, req.Params)
+	return fmt.Sprintf(`req_id: "%s", user: "%s", user_id: "%s", endpoint: "%s", params: %#v`, req.ID, user, userID, req.Endpoint(), req.Params)
 }
 
 // ContentType returns the content type of the current request
@@ -114,10 +120,17 @@ func (req *Request) ParamsBySource() (map[string]url.Values, error) {
 	return params, nil
 }
 
+// Endpoint returns the verb and the URI of the request
+func (req *Request) Endpoint() string {
+	return fmt.Sprintf("%s %s", req.Request.Method, req.Request.RequestURI)
+}
+
+// handlePanic will recover a panic an log what happen
 func (req *Request) handlePanic() {
 	if rec := recover(); rec != nil {
 		req.Response.WriteHeader(http.StatusInternalServerError)
 		req.Response.Write([]byte(`{"error":"Something went wrong"}`))
+
 		// The recovered panic may not be an error
 		var err error
 		switch val := rec.(type) {
@@ -127,7 +140,20 @@ func (req *Request) handlePanic() {
 			err = fmt.Errorf("%v", val)
 		}
 		err = fmt.Errorf("panic: %v", err)
-		// TODO send an email
-		logger.Error(err.Error())
+
+		logger.Errorf(`message: "%s", %s`, err.Error(), req)
+
+		// Send an email async
+		context := app.GetContext()
+		if context != nil && context.Mailer != nil {
+			sendEmail := func(stacktrace []byte) {
+				err := context.Mailer.SendStackTrace(stacktrace, req.Endpoint(), err.Error(), req.ID)
+				if err != nil {
+					logger.Error(err.Error())
+				}
+			}
+
+			go sendEmail(debug.Stack())
+		}
 	}
 }

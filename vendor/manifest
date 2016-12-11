@@ -114,6 +114,22 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/sendgrid/rest",
+			"repository": "https://github.com/sendgrid/rest",
+			"vcs": "git",
+			"revision": "3ec51b4f1754e13e92409355851a0a82e9a06461",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sendgrid/sendgrid-go",
+			"repository": "https://github.com/sendgrid/sendgrid-go",
+			"vcs": "git",
+			"revision": "d087004b4d47c2a378ade9eb3957571114b91493",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/stretchr/testify",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",

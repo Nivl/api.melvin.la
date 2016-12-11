@@ -3,7 +3,6 @@ package logger
 import (
 	"fmt"
 	"log"
-	"runtime/debug"
 
 	"github.com/melvin-laplanche/ml-api/src/app"
 )
@@ -18,12 +17,14 @@ func logg(msg string) {
 	log.Println(msg)
 }
 
+// Errorf logs a formated error message
 func Errorf(msg string, args ...interface{}) {
-	fullMessage := fmt.Sprintf("%s | \"level\": \"ERROR\", %s", debug.Stack(), fmt.Sprintf(msg, args...))
+	fullMessage := fmt.Sprintf(`level: "ERROR", %s"`, fmt.Sprintf(msg, args...))
 	logg(fullMessage)
 }
 
+// Error logs an single error message
 func Error(msg string) {
-	fullMessage := fmt.Sprintf("%s | \"level\": \"ERROR\", %s", debug.Stack(), msg)
+	fullMessage := fmt.Sprintf(`level: "ERROR", %s`, msg)
 	logg(fullMessage)
 }
