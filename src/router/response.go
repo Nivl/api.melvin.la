@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/melvin-laplanche/ml-api/src/apierror"
+	"github.com/melvin-laplanche/ml-api/src/app"
 	"github.com/melvin-laplanche/ml-api/src/logger"
 	"github.com/melvin-laplanche/ml-api/src/mlhttp"
 )
@@ -32,7 +34,23 @@ func (req *Request) Error(e error) {
 		}
 	}
 
-	logger.Errorf("code: %d, message: \"%s\", %s", err.Code(), err.Error(), req)
+	logger.Errorf(`code: "%d", message: "%s", %s`, err.Code(), err.Error(), req)
+
+	// We send an email for all server error
+	if err.Code() == 500 {
+		context := app.GetContext()
+
+		if context != nil && context.Mailer != nil {
+			sendEmail := func(stacktrace []byte) {
+				err := context.Mailer.SendStackTrace(stacktrace, req.Endpoint(), err.Error(), req.ID)
+				if err != nil {
+					logger.Error(err.Error())
+				}
+			}
+
+			go sendEmail(debug.Stack())
+		}
+	}
 }
 
 func (req *Request) NoContent() {
