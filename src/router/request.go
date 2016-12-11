@@ -16,10 +16,13 @@ import (
 )
 
 const (
-	ContentTypeJSON          = "application/json"
+	// ContentTypeJSON represents the content type of a JSON request
+	ContentTypeJSON = "application/json"
+	// ContentTypeMultipartForm represents the content type of a multipart request
 	ContentTypeMultipartForm = "multipart/form-data"
 )
 
+// Request represent a client request
 type Request struct {
 	ID           string
 	Response     http.ResponseWriter
@@ -29,6 +32,7 @@ type Request struct {
 	_contentType string
 }
 
+// String return a printable version of the object
 func (req *Request) String() string {
 	if req == nil {
 		return ""
@@ -121,6 +125,7 @@ func (req *Request) Endpoint() string {
 	return fmt.Sprintf("%s %s", req.Request.Method, req.Request.RequestURI)
 }
 
+// handlePanic will recover a panic an log what happen
 func (req *Request) handlePanic() {
 	if rec := recover(); rec != nil {
 		req.Response.WriteHeader(http.StatusInternalServerError)

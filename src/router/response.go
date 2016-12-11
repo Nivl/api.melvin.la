@@ -12,6 +12,9 @@ import (
 	"github.com/melvin-laplanche/ml-api/src/mlhttp"
 )
 
+// Error sends an error to the client
+// If the error is an instance of ApiError, the returned code will
+// match ApiError.Code(). It returns a 500 if no code has been set.
 func (req *Request) Error(e error) {
 	if req == nil {
 		return
@@ -53,6 +56,8 @@ func (req *Request) Error(e error) {
 	}
 }
 
+// NoContent sends a http.StatusNoContent response
+// It should be used for successful DELETE requests
 func (req *Request) NoContent() {
 	if req == nil {
 		return
@@ -61,6 +66,8 @@ func (req *Request) NoContent() {
 	req.Response.WriteHeader(http.StatusNoContent)
 }
 
+// Created sends a http.StatusCreated response with a JSON object attached
+// It should be used for successful POST requests
 func (req *Request) Created(obj interface{}) {
 	if req == nil {
 		return
@@ -69,6 +76,8 @@ func (req *Request) Created(obj interface{}) {
 	req.RenderJSON(http.StatusCreated, obj)
 }
 
+// Ok sends a http.StatusOK response with a JSON object attached
+// It should be used for successful GET, PATCH, and PUR requests
 func (req *Request) Ok(obj interface{}) {
 	if req == nil {
 		return
@@ -77,6 +86,7 @@ func (req *Request) Ok(obj interface{}) {
 	req.RenderJSON(http.StatusOK, obj)
 }
 
+// RenderJSON attaches a json object to the response
 func (req *Request) RenderJSON(code int, obj interface{}) {
 	mlhttp.SetJSON(req.Response, code)
 
