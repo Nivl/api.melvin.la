@@ -10,7 +10,7 @@ type Payload struct {
 
 	CreatedAt   db.Time              `json:"created_at"`
 	UpdatedAt   db.Time              `json:"updated_at"`
-	PublishedAt *db.Time             `json:"is_published,omitempty"`
+	PublishedAt *db.Time             `json:"published_at,omitempty"`
 	User        *users.PublicPayload `json:"user"`
 	Content     *ContentPayload      `json:"content"`
 	Draft       *ContentPayload      `json:"draft,omitempty"`

@@ -90,6 +90,7 @@ func TestHandlerUpdateDraft(t *testing.T) {
 				if tc.params.Promote {
 					require.Nil(t, pld.Draft)
 					require.NotNil(t, pld.Content)
+					require.NotNil(t, pld.PublishedAt)
 					toTest = pld.Content
 				}
 
