@@ -1,8 +1,9 @@
 #!/bin/bash
-alias ddc-build="ML_BUILD_ENV=test docker-compose build" # builds the services
-alias ddc-up="ML_BUILD_ENV=test docker-compose up -d" # starts the services
-alias ddc-rm="ML_BUILD_ENV=test docker-compose stop && ML_BUILD_ENV=test docker-compose rm -f" # Removes the services
-alias ddc-stop="ML_BUILD_ENV=test docker-compose stop" # Stops the running services
+
+alias ddc-build="docker-compose build" # builds the services
+alias ddc-up="docker-compose up -d" # starts the services
+alias ddc-rm="docker-compose stop && docker-compose rm -f" # Removes the services
+alias ddc-stop="docker-compose stop" # Stops the running services
 
 # Execute any command in the container
 function ml-exec {
@@ -27,9 +28,7 @@ function ml-go {
 
 # Remove and rebuild the containers
 function ml-reset {
-  export ML_BUILD_ENV=test
-  source config/api-common.env
-  source config/api-${ML_BUILD_ENV}.env
+  source config/api.env
 
   ddc-rm
   # ddc-build
