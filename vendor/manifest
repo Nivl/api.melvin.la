@@ -1,0 +1,95 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/Nivl/go-rest-tools",
+			"repository": "https://github.com/Nivl/go-rest-tools",
+			"vcs": "git",
+			"revision": "286251da5f0855b37d637e8a261a8487b9e6b239",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/bsphere/le_go",
+			"repository": "https://github.com/bsphere/le_go",
+			"vcs": "git",
+			"revision": "7a984a84b5492ae539b79b62fb4a10afc63c7bcf",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/context",
+			"repository": "https://github.com/gorilla/context",
+			"vcs": "git",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/mux",
+			"repository": "https://github.com/gorilla/mux",
+			"vcs": "git",
+			"revision": "599cba5e7b6137d46ddf58fb1765f5d928e69604",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/jmoiron/sqlx",
+			"repository": "https://github.com/jmoiron/sqlx",
+			"vcs": "git",
+			"revision": "8ed836a8adb659e8492bcaa49e0880bb84075fe2",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/lib/pq",
+			"repository": "https://github.com/lib/pq",
+			"vcs": "git",
+			"revision": "2704adc878c21e1329f46f6e56a1c387d788ff94",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/satori/go.uuid",
+			"repository": "https://github.com/satori/go.uuid",
+			"vcs": "git",
+			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sendgrid/rest",
+			"repository": "https://github.com/sendgrid/rest",
+			"vcs": "git",
+			"revision": "3ec51b4f1754e13e92409355851a0a82e9a06461",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sendgrid/sendgrid-go",
+			"repository": "https://github.com/sendgrid/sendgrid-go",
+			"vcs": "git",
+			"revision": "c9346883d091e887eb59e75f272209229742e347",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/bcrypt",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "88915ccf7aeb91e9324fe7cf3eddd1531ced61ea",
+			"branch": "master",
+			"path": "/bcrypt",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/blowfish",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "88915ccf7aeb91e9324fe7cf3eddd1531ced61ea",
+			"branch": "master",
+			"path": "blowfish",
+			"notests": true
+		}
+	]
+}
