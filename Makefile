@@ -11,5 +11,8 @@ install:
 migration:
 	goose up
 
+generate:
+	go install $(LDFLAGS) github.com/melvin-laplanche/ml-api/cmd/ml-api-cli
+
 .PHONY:
 	install
