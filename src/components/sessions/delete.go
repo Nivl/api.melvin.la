@@ -7,15 +7,15 @@ import (
 	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
-// HandlerDeleteParams represent the request params accepted by HandlerDelete
-type HandlerDeleteParams struct {
+// DeleteParams represent the request params accepted by HandlerDelete
+type DeleteParams struct {
 	Token           string `from:"url" json:"token" params:"uuid"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
 }
 
-// HandlerDelete represent an API handler to remove a session
-func HandlerDelete(req *router.Request) error {
-	params := req.Params.(*HandlerDeleteParams)
+// Delete represent an API handler to remove a session
+func Delete(req *router.Request) error {
+	params := req.Params.(*DeleteParams)
 
 	if !auth.IsPasswordValid(req.User.Password, params.CurrentPassword) {
 		return httperr.NewUnauthorized()

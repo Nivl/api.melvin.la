@@ -16,14 +16,14 @@ var Endpoints = router.Endpoints{
 	EndpointAdd: {
 		Verb:    "POST",
 		Path:    "/sessions",
-		Handler: HandlerAdd,
-		Params:  &HandlerAddParams{},
+		Handler: Add,
+		Params:  &AddParams{},
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
 		Path:    "/sessions/{token}",
-		Handler: HandlerDelete,
-		Params:  &HandlerDeleteParams{},
+		Handler: Delete,
+		Params:  &DeleteParams{},
 		Auth:    router.LoggedUserAccess,
 	},
 }

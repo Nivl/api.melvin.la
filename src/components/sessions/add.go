@@ -7,15 +7,15 @@ import (
 	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
-// HandlerAddParams represent the request params accepted by HandlerAdd
-type HandlerAddParams struct {
+// AddParams represent the request params accepted by HandlerAdd
+type AddParams struct {
 	Email    string `from:"form" json:"email" params:"required,trim"`
 	Password string `from:"form" json:"password" params:"required,trim"`
 }
 
-// HandlerAdd represents an API handler to create a new user session
-func HandlerAdd(req *router.Request) error {
-	params := req.Params.(*HandlerAddParams)
+// Add represents an API handler to create a new user session
+func Add(req *router.Request) error {
+	params := req.Params.(*AddParams)
 
 	var user auth.User
 	stmt := "SELECT * FROM users WHERE email=$1 LIMIT 1"
@@ -35,6 +35,6 @@ func HandlerAdd(req *router.Request) error {
 		return err
 	}
 
-	req.Created(NewPayloadFromModel(s))
+	req.Created(NewPayload(s))
 	return nil
 }

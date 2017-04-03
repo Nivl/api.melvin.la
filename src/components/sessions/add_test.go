@@ -14,35 +14,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandlerAdd(t *testing.T) {
+func TestAdd(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 	u1 := testdata.NewUser(t, nil)
 
 	tests := []struct {
 		description string
 		code        int
-		params      *sessions.HandlerAddParams
+		params      *sessions.AddParams
 	}{
 		{
 			"Invalid email",
 			http.StatusBadRequest,
-			&sessions.HandlerAddParams{Email: "invalid@fake.com", Password: "fake"},
+			&sessions.AddParams{Email: "invalid@fake.com", Password: "fake"},
 		},
 		{
 			"Invalid password",
 			http.StatusBadRequest,
-			&sessions.HandlerAddParams{Email: u1.Email, Password: "invalid"},
+			&sessions.AddParams{Email: u1.Email, Password: "invalid"},
 		},
 		{
 			"Valid Request",
 			http.StatusCreated,
-			&sessions.HandlerAddParams{Email: u1.Email, Password: "fake"},
+			&sessions.AddParams{Email: u1.Email, Password: "fake"},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerAdd(t, tc.params)
+			rec := callAdd(t, tc.params)
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
@@ -61,7 +61,7 @@ func TestHandlerAdd(t *testing.T) {
 	}
 }
 
-func callHandlerAdd(t *testing.T, params *sessions.HandlerAddParams) *httptest.ResponseRecorder {
+func callAdd(t *testing.T, params *sessions.AddParams) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: sessions.Endpoints[sessions.EndpointAdd],
 		Params:   params,

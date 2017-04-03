@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandlerDelete(t *testing.T) {
+func TestDelete(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
 	u1, s1 := testdata.NewAuth(t)
@@ -23,45 +23,45 @@ func TestHandlerDelete(t *testing.T) {
 	tests := []struct {
 		description string
 		code        int
-		params      *sessions.HandlerDeleteParams
+		params      *sessions.DeleteParams
 		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&sessions.HandlerDeleteParams{Token: s1.ID},
+			&sessions.DeleteParams{Token: s1.ID},
 			nil,
 		},
 		{
 			"Deleting an other user sessions",
 			http.StatusNotFound,
-			&sessions.HandlerDeleteParams{Token: s1.ID, CurrentPassword: "fake"},
+			&sessions.DeleteParams{Token: s1.ID, CurrentPassword: "fake"},
 			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Deleting an invalid ID",
 			http.StatusBadRequest,
-			&sessions.HandlerDeleteParams{Token: "invalid", CurrentPassword: "fake"},
+			&sessions.DeleteParams{Token: "invalid", CurrentPassword: "fake"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
-			&sessions.HandlerDeleteParams{Token: s1.ID},
+			&sessions.DeleteParams{Token: s1.ID},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it deletes the session
 		{
 			"Deleting session",
 			http.StatusNoContent,
-			&sessions.HandlerDeleteParams{Token: s1.ID, CurrentPassword: "fake"},
+			&sessions.DeleteParams{Token: s1.ID, CurrentPassword: "fake"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerDelete(t, tc.params, tc.auth)
+			rec := callDelete(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusNoContent {
@@ -81,7 +81,7 @@ func TestHandlerDelete(t *testing.T) {
 	}
 }
 
-func callHandlerDelete(t *testing.T, params *sessions.HandlerDeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callDelete(t *testing.T, params *sessions.DeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: sessions.Endpoints[sessions.EndpointDelete],
 		Params:   params,
