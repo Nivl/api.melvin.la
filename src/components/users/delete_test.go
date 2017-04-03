@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandlerDelete(t *testing.T) {
+func TestDelete(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
 	u1, s1 := testdata.NewAuth(t)
@@ -23,39 +23,39 @@ func TestHandlerDelete(t *testing.T) {
 	tests := []struct {
 		description string
 		code        int
-		params      *users.HandlerDeleteParams
+		params      *users.DeleteParams
 		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&users.HandlerDeleteParams{ID: u1.ID},
+			&users.DeleteParams{ID: u1.ID},
 			nil,
 		},
 		{
 			"Deleting an other user",
 			http.StatusForbidden,
-			&users.HandlerDeleteParams{ID: u1.ID},
+			&users.DeleteParams{ID: u1.ID},
 			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
-			&users.HandlerDeleteParams{ID: u1.ID},
+			&users.DeleteParams{ID: u1.ID},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it deletes the user
 		{
 			"Deleting user",
 			http.StatusNoContent,
-			&users.HandlerDeleteParams{ID: u1.ID, CurrentPassword: "fake"},
+			&users.DeleteParams{ID: u1.ID, CurrentPassword: "fake"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerDelete(t, tc.params, tc.auth)
+			rec := callDelete(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusNoContent {
@@ -75,7 +75,7 @@ func TestHandlerDelete(t *testing.T) {
 	}
 }
 
-func callHandlerDelete(t *testing.T, params *users.HandlerDeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callDelete(t *testing.T, params *users.DeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointDelete],
 		Params:   params,

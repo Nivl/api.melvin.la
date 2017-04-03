@@ -13,29 +13,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandlerAdd(t *testing.T) {
+func TestAdd(t *testing.T) {
 	globalT := t
 	defer lifecycle.PurgeModels(t)
 
 	tests := []struct {
 		description string
 		code        int
-		params      *users.HandlerAddParams
+		params      *users.AddParams
 	}{
 		{
 			"Empty User",
 			http.StatusBadRequest,
-			&users.HandlerAddParams{},
+			&users.AddParams{},
 		},
 		{
 			"Valid User",
 			http.StatusCreated,
-			&users.HandlerAddParams{Name: "Name", Email: "email+TestHandlerAdd@fake.com", Password: "password"},
+			&users.AddParams{Name: "Name", Email: "email+TestAdd@fake.com", Password: "password"},
 		},
 		{
 			"Duplicate Email",
 			http.StatusConflict,
-			&users.HandlerAddParams{Name: "Name", Email: "email+TestHandlerAdd@fake.com", Password: "password"},
+			&users.AddParams{Name: "Name", Email: "email+TestAdd@fake.com", Password: "password"},
 		},
 	}
 
@@ -45,7 +45,7 @@ func TestHandlerAdd(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
-				var u users.PrivatePayload
+				var u users.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
 				}
@@ -58,7 +58,7 @@ func TestHandlerAdd(t *testing.T) {
 	}
 }
 
-func callHandlerAdd(t *testing.T, params *users.HandlerAddParams) *httptest.ResponseRecorder {
+func callHandlerAdd(t *testing.T, params *users.AddParams) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointAdd],
 		Params:   params,

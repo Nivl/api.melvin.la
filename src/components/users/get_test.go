@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandlerGet(t *testing.T) {
+func TestGet(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
 	u1, s1 := testdata.NewAuth(t)
@@ -22,48 +22,48 @@ func TestHandlerGet(t *testing.T) {
 	tests := []struct {
 		description string
 		code        int
-		params      *users.HandlerGetParams
+		params      *users.GetParams
 		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
 			http.StatusOK,
-			&users.HandlerGetParams{ID: u1.ID},
+			&users.GetParams{ID: u1.ID},
 			nil,
 		},
 		{
 			"Getting an other user",
 			http.StatusOK,
-			&users.HandlerGetParams{ID: u1.ID},
+			&users.GetParams{ID: u1.ID},
 			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Getting own data",
 			http.StatusOK,
-			&users.HandlerGetParams{ID: u1.ID},
+			&users.GetParams{ID: u1.ID},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Getting un-existing user with valid ID",
 			http.StatusNotFound,
-			&users.HandlerGetParams{ID: "f76700e7-988c-4ae9-9f02-ac3f9d7cd88e"},
+			&users.GetParams{ID: "f76700e7-988c-4ae9-9f02-ac3f9d7cd88e"},
 			nil,
 		},
 		{
 			"Getting un-existing user with invalid ID",
 			http.StatusBadRequest,
-			&users.HandlerGetParams{ID: "invalidID"},
+			&users.GetParams{ID: "invalidID"},
 			nil,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerGet(t, tc.params, tc.auth)
+			rec := callGet(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				var u users.PrivatePayload
+				var u users.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
 				}
@@ -81,7 +81,7 @@ func TestHandlerGet(t *testing.T) {
 	}
 }
 
-func callHandlerGet(t *testing.T, params *users.HandlerGetParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callGet(t *testing.T, params *users.GetParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointGet],
 		Params:   params,

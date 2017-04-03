@@ -6,14 +6,14 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
-// HandlerGetParams represent the request params accepted by HandlerGet
-type HandlerGetParams struct {
+// GetParams represent the request params accepted by HandlerGet
+type GetParams struct {
 	ID string `from:"url" json:"id" params:"uuid"`
 }
 
-// HandlerGet represent an API handler to get a user
-func HandlerGet(req *router.Request) error {
-	params := req.Params.(*HandlerGetParams)
+// Get represent an API handler to get a user
+func Get(req *router.Request) error {
+	params := req.Params.(*GetParams)
 
 	user, err := auth.GetUser(params.ID)
 	if err != nil {
@@ -28,6 +28,6 @@ func HandlerGet(req *router.Request) error {
 		req.Ok(NewPrivatePayload(user))
 		return nil
 	}
-	req.Ok(NewPublicPayload(user))
+	req.Ok(NewPayload(user))
 	return nil
 }

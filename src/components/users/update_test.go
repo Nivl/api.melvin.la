@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandlerUpdate(t *testing.T) {
+func TestUpdate(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
 	u1, s1 := testdata.NewAuth(t)
@@ -23,61 +23,61 @@ func TestHandlerUpdate(t *testing.T) {
 	tests := []struct {
 		description string
 		code        int
-		params      *users.HandlerUpdateParams
+		params      *users.UpdateParams
 		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&users.HandlerUpdateParams{ID: u1.ID},
+			&users.UpdateParams{ID: u1.ID},
 			nil,
 		},
 		{
 			"Updating an other user",
 			http.StatusForbidden,
-			&users.HandlerUpdateParams{ID: u1.ID},
+			&users.UpdateParams{ID: u1.ID},
 			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Updating email without providing password",
 			http.StatusUnauthorized,
-			&users.HandlerUpdateParams{ID: u1.ID, Email: "melvin@fake.io"},
+			&users.UpdateParams{ID: u1.ID, Email: "melvin@fake.io"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating password without providing current Password",
 			http.StatusUnauthorized,
-			&users.HandlerUpdateParams{ID: u1.ID, NewPassword: "TestUpdateUser"},
+			&users.UpdateParams{ID: u1.ID, NewPassword: "TestUpdateUser"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating regular field",
 			http.StatusOK,
-			&users.HandlerUpdateParams{ID: u1.ID, Name: "Melvin"},
+			&users.UpdateParams{ID: u1.ID, Name: "Melvin"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating email to a used one",
 			http.StatusConflict,
-			&users.HandlerUpdateParams{ID: u1.ID, CurrentPassword: "fake", Email: u2.Email},
+			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", Email: u2.Email},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it changes the password
 		{
 			"Updating password",
 			http.StatusOK,
-			&users.HandlerUpdateParams{ID: u1.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
+			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
 			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerUpdate(t, tc.params, tc.auth)
+			rec := callUpdate(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				var u users.PrivatePayload
+				var u users.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
 				}
@@ -106,7 +106,7 @@ func TestHandlerUpdate(t *testing.T) {
 	}
 }
 
-func callHandlerUpdate(t *testing.T, params *users.HandlerUpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callUpdate(t *testing.T, params *users.UpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointUpdate],
 		Params:   params,

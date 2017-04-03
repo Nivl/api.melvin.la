@@ -6,15 +6,15 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
-// HandlerDeleteParams represent the request params accepted by HandlerDelete
-type HandlerDeleteParams struct {
+// DeleteParams represent the request params accepted by HandlerDelete
+type DeleteParams struct {
 	ID              string `from:"url" json:"id" params:"uuid"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
 }
 
-// HandlerDelete represent an API handler to remove a user
-func HandlerDelete(req *router.Request) error {
-	params := req.Params.(*HandlerDeleteParams)
+// Delete represent an API handler to remove a user
+func Delete(req *router.Request) error {
+	params := req.Params.(*DeleteParams)
 	user := req.User
 
 	if params.ID != user.ID {

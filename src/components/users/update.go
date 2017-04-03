@@ -6,7 +6,8 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
-type HandlerUpdateParams struct {
+// UpdateParams represents the params accepted Update to update a user
+type UpdateParams struct {
 	ID              string `from:"url" json:"id"  params:"uuid"`
 	Name            string `from:"form" json:"name" params:"trim"`
 	Email           string `from:"form" json:"email" params:"trim"`
@@ -14,8 +15,9 @@ type HandlerUpdateParams struct {
 	NewPassword     string `from:"form" json:"new_password" params:"trim"`
 }
 
-func HandlerUpdate(req *router.Request) error {
-	params := req.Params.(*HandlerUpdateParams)
+// Update is a HTTP handler used to update a user
+func Update(req *router.Request) error {
+	params := req.Params.(*UpdateParams)
 	user := req.User
 
 	if params.ID != user.ID {
