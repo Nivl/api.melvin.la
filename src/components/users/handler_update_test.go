@@ -6,26 +6,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"fmt"
-
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
+	"github.com/Nivl/go-rest-tools/network/http/httptests"
+	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/security/auth/testdata"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
-	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerUpdate(t *testing.T) {
-	defer testhelpers.PurgeModels(t)
+	defer lifecycle.PurgeModels(t)
 
-	u1, s1 := authtest.NewAuth(t)
-	u2, s2 := authtest.NewAuth(t)
+	u1, s1 := testdata.NewAuth(t)
+	u2, s2 := testdata.NewAuth(t)
 
 	tests := []struct {
 		description string
 		code        int
 		params      *users.HandlerUpdateParams
-		auth        *testhelpers.RequestAuth
+		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
@@ -37,38 +36,38 @@ func TestHandlerUpdate(t *testing.T) {
 			"Updating an other user",
 			http.StatusForbidden,
 			&users.HandlerUpdateParams{ID: u1.ID},
-			testhelpers.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Updating email without providing password",
 			http.StatusUnauthorized,
 			&users.HandlerUpdateParams{ID: u1.ID, Email: "melvin@fake.io"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating password without providing current Password",
 			http.StatusUnauthorized,
 			&users.HandlerUpdateParams{ID: u1.ID, NewPassword: "TestUpdateUser"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating regular field",
 			http.StatusOK,
 			&users.HandlerUpdateParams{ID: u1.ID, Name: "Melvin"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Updating email to a used one",
 			http.StatusConflict,
 			&users.HandlerUpdateParams{ID: u1.ID, CurrentPassword: "fake", Email: u2.Email},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it changes the password
 		{
 			"Updating password",
 			http.StatusOK,
 			&users.HandlerUpdateParams{ID: u1.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
@@ -77,7 +76,7 @@ func TestHandlerUpdate(t *testing.T) {
 			rec := callHandlerUpdate(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if testhelpers.Is2XX(rec.Code) {
+			if rec.Code == http.StatusOK {
 				var u users.PrivatePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
@@ -107,14 +106,12 @@ func TestHandlerUpdate(t *testing.T) {
 	}
 }
 
-func callHandlerUpdate(t *testing.T, params *users.HandlerUpdateParams, auth *testhelpers.RequestAuth) *httptest.ResponseRecorder {
-	ri := &testhelpers.RequestInfo{
-		Test:     t,
+func callHandlerUpdate(t *testing.T, params *users.HandlerUpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointUpdate],
-		URI:      fmt.Sprintf("/users/%s", params.ID),
 		Params:   params,
 		Auth:     auth,
 	}
 
-	return testhelpers.NewRequest(ri)
+	return httptests.NewRequest(t, ri)
 }

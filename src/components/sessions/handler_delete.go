@@ -1,10 +1,10 @@
 package sessions
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/db"
-	"github.com/melvin-laplanche/ml-api/src/router"
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
 // HandlerDeleteParams represent the request params accepted by HandlerDelete
@@ -18,7 +18,7 @@ func HandlerDelete(req *router.Request) error {
 	params := req.Params.(*HandlerDeleteParams)
 
 	if !auth.IsPasswordValid(req.User.Password, params.CurrentPassword) {
-		return apierror.NewUnauthorized()
+		return httperr.NewUnauthorized()
 	}
 
 	var session auth.Session
@@ -30,7 +30,7 @@ func HandlerDelete(req *router.Request) error {
 
 	// We always return a 404 in case of a user error to avoid brute-force
 	if session.ID == "" || session.UserID != req.User.ID {
-		return apierror.NewNotFound()
+		return httperr.NewNotFound()
 	}
 
 	if err := session.Delete(); err != nil {

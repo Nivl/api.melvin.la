@@ -1,6 +1,6 @@
 package users
 
-import "github.com/melvin-laplanche/ml-api/src/auth"
+import "github.com/Nivl/go-rest-tools/security/auth"
 
 // PrivatePayload represents a user payload with non public field
 type PrivatePayload struct {

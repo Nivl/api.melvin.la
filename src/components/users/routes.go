@@ -1,8 +1,8 @@
 package users
 
 import (
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/gorilla/mux"
-	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
 // Contains the index of all Endpoints
@@ -25,14 +25,14 @@ var Endpoints = router.Endpoints{
 	EndpointUpdate: {
 		Verb:    "PATCH",
 		Path:    "/users/{id}",
-		Auth:    router.LoggedUser,
+		Auth:    router.LoggedUserAccess,
 		Handler: HandlerUpdate,
 		Params:  &HandlerUpdateParams{},
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
 		Path:    "/users/{id}",
-		Auth:    router.LoggedUser,
+		Auth:    router.LoggedUserAccess,
 		Handler: HandlerDelete,
 		Params:  &HandlerDeleteParams{},
 	},
@@ -46,6 +46,6 @@ var Endpoints = router.Endpoints{
 }
 
 // SetRoutes is used to set all the routes of the article
-func SetRoutes(baseURI string, r *mux.Router) {
-	Endpoints.Activate(baseURI, r)
+func SetRoutes(r *mux.Router) {
+	Endpoints.Activate(r)
 }

@@ -1,8 +1,6 @@
 package articles
 
-import (
-	"github.com/melvin-laplanche/ml-api/src/db"
-)
+import "github.com/Nivl/go-rest-tools/storage/db"
 
 // Version is a structure representing a version of an article
 //go:generate api-cli generate model Version -t blog_article_versions

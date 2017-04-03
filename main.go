@@ -3,24 +3,18 @@ package main
 import (
 	"net/http"
 
-	"github.com/Nivl/cors"
-	"github.com/melvin-laplanche/ml-api/src/app"
+	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/gorilla/handlers"
 	"github.com/melvin-laplanche/ml-api/src/components/api"
 )
 
 func main() {
-	app.InitContext()
-	defer app.GetContext().Destroy()
+	args := api.Setup()
+	defer db.Writer.Close()
 
 	r := api.GetRouter()
-	port := ":" + app.GetContext().Params.Port
+	port := ":" + args.Port
 
-	c := cors.New(cors.Options{
-		AllowedOrigins: api.AllowedOrigins,
-		AllowedMethods: api.AllowedMethods,
-		AllowedHeaders: api.AllowedHeaders,
-	})
-
-	handler := c.Handler(r)
-	http.ListenAndServe(port, handler)
+	handler := handlers.CORS(api.AllowedOrigins, api.AllowedMethods, api.AllowedHeaders)
+	http.ListenAndServe(port, handler(r))
 }

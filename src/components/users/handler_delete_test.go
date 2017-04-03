@@ -5,27 +5,26 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"fmt"
-
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
+	"github.com/Nivl/go-rest-tools/network/http/httptests"
+	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/security/auth/testdata"
+	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
-	"github.com/melvin-laplanche/ml-api/src/db"
-	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerDelete(t *testing.T) {
-	defer testhelpers.PurgeModels(t)
+	defer lifecycle.PurgeModels(t)
 
-	u1, s1 := authtest.NewAuth(t)
-	u2, s2 := authtest.NewAuth(t)
+	u1, s1 := testdata.NewAuth(t)
+	u2, s2 := testdata.NewAuth(t)
 
 	tests := []struct {
 		description string
 		code        int
 		params      *users.HandlerDeleteParams
-		auth        *testhelpers.RequestAuth
+		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
@@ -37,20 +36,20 @@ func TestHandlerDelete(t *testing.T) {
 			"Deleting an other user",
 			http.StatusForbidden,
 			&users.HandlerDeleteParams{ID: u1.ID},
-			testhelpers.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
 			&users.HandlerDeleteParams{ID: u1.ID},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		// Keep this one last for u1 as it deletes the user
 		{
 			"Deleting user",
 			http.StatusNoContent,
 			&users.HandlerDeleteParams{ID: u1.ID, CurrentPassword: "fake"},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 	}
 
@@ -59,7 +58,7 @@ func TestHandlerDelete(t *testing.T) {
 			rec := callHandlerDelete(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if testhelpers.Is2XX(rec.Code) {
+			if rec.Code == http.StatusNoContent {
 				// We check that the user is still in DB but is flagged for deletion
 				var user auth.User
 				stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"
@@ -76,14 +75,12 @@ func TestHandlerDelete(t *testing.T) {
 	}
 }
 
-func callHandlerDelete(t *testing.T, params *users.HandlerDeleteParams, auth *testhelpers.RequestAuth) *httptest.ResponseRecorder {
-	ri := &testhelpers.RequestInfo{
-		Test:     t,
+func callHandlerDelete(t *testing.T, params *users.HandlerDeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointDelete],
-		URI:      fmt.Sprintf("/users/%s", params.ID),
 		Params:   params,
 		Auth:     auth,
 	}
 
-	return testhelpers.NewRequest(ri)
+	return httptests.NewRequest(t, ri)
 }

@@ -6,16 +6,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
+	"github.com/Nivl/go-rest-tools/network/http/httptests"
+	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/security/auth/testdata"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
-	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerAdd(t *testing.T) {
-	defer testhelpers.PurgeModels(t)
-	u1 := authtest.NewUser(t, nil)
+	defer lifecycle.PurgeModels(t)
+	u1 := testdata.NewUser(t, nil)
 
 	tests := []struct {
 		description string
@@ -44,7 +45,7 @@ func TestHandlerAdd(t *testing.T) {
 			rec := callHandlerAdd(t, tc.params)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if testhelpers.Is2XX(rec.Code) {
+			if rec.Code == http.StatusCreated {
 				var session sessions.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&session); err != nil {
 					t.Fatal(err)
@@ -61,12 +62,10 @@ func TestHandlerAdd(t *testing.T) {
 }
 
 func callHandlerAdd(t *testing.T, params *sessions.HandlerAddParams) *httptest.ResponseRecorder {
-	ri := &testhelpers.RequestInfo{
-		Test:     t,
+	ri := &httptests.RequestInfo{
 		Endpoint: sessions.Endpoints[sessions.EndpointAdd],
-		URI:      "/sessions",
 		Params:   params,
 	}
 
-	return testhelpers.NewRequest(ri)
+	return httptests.NewRequest(t, ri)
 }

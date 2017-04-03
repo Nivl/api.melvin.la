@@ -1,9 +1,9 @@
 package users
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/router"
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
 // HandlerGetParams represent the request params accepted by HandlerGet
@@ -20,7 +20,7 @@ func HandlerGet(req *router.Request) error {
 		return err
 	}
 	if user == nil {
-		return apierror.NewNotFound()
+		return httperr.NewNotFound()
 	}
 
 	// if a user asks for their own data, we return as much as possible

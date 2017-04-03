@@ -1,7 +1,9 @@
 package users
 
-import "github.com/melvin-laplanche/ml-api/src/router"
-import "github.com/melvin-laplanche/ml-api/src/auth"
+import (
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
+)
 
 type HandlerAddParams struct {
 	Name     string `from:"form" json:"name" params:"required,trim"`

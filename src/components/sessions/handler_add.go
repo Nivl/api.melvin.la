@@ -1,10 +1,10 @@
 package sessions
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/db"
-	"github.com/melvin-laplanche/ml-api/src/router"
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
 // HandlerAddParams represent the request params accepted by HandlerAdd
@@ -25,7 +25,7 @@ func HandlerAdd(req *router.Request) error {
 	}
 
 	if user.ID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
-		return apierror.NewBadRequest("Bad email/password")
+		return httperr.NewBadRequest("Bad email/password")
 	}
 
 	s := &auth.Session{

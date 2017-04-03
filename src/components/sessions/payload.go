@@ -1,6 +1,6 @@
 package sessions
 
-import "github.com/melvin-laplanche/ml-api/src/auth"
+import "github.com/Nivl/go-rest-tools/security/auth"
 
 // Payload represents a Session that can be safely returned by the API
 type Payload struct {

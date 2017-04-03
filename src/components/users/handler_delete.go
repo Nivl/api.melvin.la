@@ -1,9 +1,9 @@
 package users
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/router"
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
 // HandlerDeleteParams represent the request params accepted by HandlerDelete
@@ -18,11 +18,11 @@ func HandlerDelete(req *router.Request) error {
 	user := req.User
 
 	if params.ID != user.ID {
-		return apierror.NewForbidden()
+		return httperr.NewForbidden()
 	}
 
 	if !auth.IsPasswordValid(user.Password, params.CurrentPassword) {
-		return apierror.NewUnauthorized()
+		return httperr.NewUnauthorized()
 	}
 
 	if err := user.Delete(); err != nil {

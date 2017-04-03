@@ -6,25 +6,24 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"fmt"
-
-	"github.com/melvin-laplanche/ml-api/src/auth/authtest"
+	"github.com/Nivl/go-rest-tools/network/http/httptests"
+	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/security/auth/testdata"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
-	"github.com/melvin-laplanche/ml-api/src/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerGet(t *testing.T) {
-	defer testhelpers.PurgeModels(t)
+	defer lifecycle.PurgeModels(t)
 
-	u1, s1 := authtest.NewAuth(t)
-	u2, s2 := authtest.NewAuth(t)
+	u1, s1 := testdata.NewAuth(t)
+	u2, s2 := testdata.NewAuth(t)
 
 	tests := []struct {
 		description string
 		code        int
 		params      *users.HandlerGetParams
-		auth        *testhelpers.RequestAuth
+		auth        *httptests.RequestAuth
 	}{
 		{
 			"Not logged",
@@ -36,13 +35,13 @@ func TestHandlerGet(t *testing.T) {
 			"Getting an other user",
 			http.StatusOK,
 			&users.HandlerGetParams{ID: u1.ID},
-			testhelpers.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2.ID, u2.ID),
 		},
 		{
 			"Getting own data",
 			http.StatusOK,
 			&users.HandlerGetParams{ID: u1.ID},
-			testhelpers.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1.ID, u1.ID),
 		},
 		{
 			"Getting un-existing user with valid ID",
@@ -63,7 +62,7 @@ func TestHandlerGet(t *testing.T) {
 			rec := callHandlerGet(t, tc.params, tc.auth)
 			assert.Equal(t, tc.code, rec.Code)
 
-			if testhelpers.Is2XX(rec.Code) {
+			if rec.Code == http.StatusOK {
 				var u users.PrivatePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
@@ -82,14 +81,12 @@ func TestHandlerGet(t *testing.T) {
 	}
 }
 
-func callHandlerGet(t *testing.T, params *users.HandlerGetParams, auth *testhelpers.RequestAuth) *httptest.ResponseRecorder {
-	ri := &testhelpers.RequestInfo{
-		Test:     t,
+func callHandlerGet(t *testing.T, params *users.HandlerGetParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointGet],
-		URI:      fmt.Sprintf("/users/%s", params.ID),
 		Params:   params,
 		Auth:     auth,
 	}
 
-	return testhelpers.NewRequest(ri)
+	return httptests.NewRequest(t, ri)
 }

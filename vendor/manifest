@@ -6,8 +6,7 @@
 			"repository": "https://github.com/Nivl/go-rest-tools",
 			"vcs": "git",
 			"revision": "286251da5f0855b37d637e8a261a8487b9e6b239",
-			"branch": "master",
-			"notests": true
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/bsphere/le_go",
@@ -18,10 +17,25 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/dchest/uniuri",
+			"repository": "https://github.com/dchest/uniuri",
+			"vcs": "git",
+			"revision": "8902c56451e9b58ff940bbe5fec35d5f9c04584a",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/gorilla/context",
 			"repository": "https://github.com/gorilla/context",
 			"vcs": "git",
 			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/handlers",
+			"repository": "https://github.com/gorilla/handlers",
+			"vcs": "git",
+			"revision": "13d73096a474cac93275c679c7b8a2dc17ddba82",
 			"branch": "master",
 			"notests": true
 		},
@@ -38,6 +52,14 @@
 			"repository": "https://github.com/jmoiron/sqlx",
 			"vcs": "git",
 			"revision": "8ed836a8adb659e8492bcaa49e0880bb84075fe2",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/kelseyhightower/envconfig",
+			"repository": "https://github.com/kelseyhightower/envconfig",
+			"vcs": "git",
+			"revision": "8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4",
 			"branch": "master",
 			"notests": true
 		},
@@ -71,6 +93,33 @@
 			"vcs": "git",
 			"revision": "c9346883d091e887eb59e75f272209229742e347",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/assert",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"branch": "master",
+			"path": "/assert",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"branch": "master",
+			"path": "vendor/github.com/davecgh/go-spew/spew",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"branch": "master",
+			"path": "vendor/github.com/pmezard/go-difflib/difflib",
 			"notests": true
 		},
 		{

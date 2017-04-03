@@ -1,9 +1,9 @@
 package users
 
 import (
-	"github.com/melvin-laplanche/ml-api/src/apierror"
-	"github.com/melvin-laplanche/ml-api/src/auth"
-	"github.com/melvin-laplanche/ml-api/src/router"
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
 type HandlerUpdateParams struct {
@@ -19,13 +19,13 @@ func HandlerUpdate(req *router.Request) error {
 	user := req.User
 
 	if params.ID != user.ID {
-		return apierror.NewForbidden()
+		return httperr.NewForbidden()
 	}
 
 	// To change the email or the password we require the current password
 	if params.NewPassword != "" || params.Email != "" {
 		if !auth.IsPasswordValid(user.Password, params.CurrentPassword) {
-			return apierror.NewUnauthorized()
+			return httperr.NewUnauthorized()
 		}
 	}
 

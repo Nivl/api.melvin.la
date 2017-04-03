@@ -1,8 +1,6 @@
 package articles
 
-import (
-	"github.com/melvin-laplanche/ml-api/src/db"
-)
+import "github.com/Nivl/go-rest-tools/storage/db"
 
 // Article is a structure representing an article that can be saved in the database
 //go:generate api-cli generate model Article -t blog_articles -e CreateTx,UpdateTx
