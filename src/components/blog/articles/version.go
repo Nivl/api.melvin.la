@@ -3,7 +3,7 @@ package articles
 import "github.com/Nivl/go-rest-tools/storage/db"
 
 // Version is a structure representing a version of an article
-//go:generate api-cli generate model Version -t blog_article_versions
+//go:generate api-cli generate model Version -t blog_article_versions --single=false
 type Version struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`

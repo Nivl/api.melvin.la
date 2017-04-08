@@ -48,6 +48,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/gosimple/slug",
+			"repository": "https://github.com/gosimple/slug",
+			"vcs": "git",
+			"revision": "dfb5bc66af5ea2fadd6bd1a02ea9eca9bc25f14f",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/jmoiron/sqlx",
 			"repository": "https://github.com/jmoiron/sqlx",
 			"vcs": "git",
@@ -68,6 +76,14 @@
 			"repository": "https://github.com/lib/pq",
 			"vcs": "git",
 			"revision": "2704adc878c21e1329f46f6e56a1c387d788ff94",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rainycape/unidecode",
+			"repository": "https://github.com/rainycape/unidecode",
+			"vcs": "git",
+			"revision": "cb7f23ec59bec0d61b19c56cd88cee3d0cc1870c",
 			"branch": "master",
 			"notests": true
 		},

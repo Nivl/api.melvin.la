@@ -7,7 +7,7 @@ import (
 )
 
 // Writer represents an open connection to the database
-var Writer Queryable
+var Writer Transactionable
 
 // Queryable represent a global interface for transactions, prepared statement,
 // etc.
@@ -25,4 +25,10 @@ type Queryable interface {
 	Preparex(query string) (*sqlx.Stmt, error)
 	Rebind(query string) string
 	Select(dest interface{}, query string, args ...interface{}) error
+}
+
+// Transactionable represent a global interface to create transaction
+type Transactionable interface {
+	Queryable
+	Beginx() (*sqlx.Tx, error)
 }

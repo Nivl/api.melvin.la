@@ -12,7 +12,7 @@ migration:
 	goose up
 
 generate:
-	go install $(LDFLAGS) github.com/melvin-laplanche/ml-api/cmd/ml-api-cli
+	go install $(LDFLAGS) github.com/Nivl/api-cli
 
 .PHONY:
 	install

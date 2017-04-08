@@ -3,8 +3,6 @@
 -- SQL in section 'Up' is executed when this migration is applied
 DROP TABLE blog_article_contents;
 
-ALTER TABLE blog_articles ADD COLUMN current_version UUID REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE;
-
 CREATE TABLE blog_article_versions
 (
   id UUID NOT NULL,
@@ -21,6 +19,8 @@ CREATE TABLE blog_article_versions
 
   PRIMARY KEY (id)
 );
+
+ALTER TABLE blog_articles ADD COLUMN current_version UUID REFERENCES blog_article_versions (id) ON DELETE CASCADE ON UPDATE CASCADE DEFAULT NULL;
 
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
