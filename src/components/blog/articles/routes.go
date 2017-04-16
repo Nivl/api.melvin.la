@@ -23,7 +23,7 @@ var Endpoints = router.Endpoints{
 		Verb:    "POST",
 		Path:    "/blog/articles",
 		Handler: Add,
-		Auth:    router.LoggedUserAccess,
+		Auth:    router.AdminAccess,
 		Params:  &AddParams{},
 	},
 	EndpointList: {
