@@ -35,13 +35,13 @@ func TestGet(t *testing.T) {
 			"Getting an other user",
 			http.StatusOK,
 			&users.GetParams{ID: u1.ID},
-			httptests.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2),
 		},
 		{
 			"Getting own data",
 			http.StatusOK,
 			&users.GetParams{ID: u1.ID},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		{
 			"Getting un-existing user with valid ID",

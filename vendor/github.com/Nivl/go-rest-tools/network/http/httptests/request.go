@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/gorilla/mux"
 )
 
@@ -35,11 +36,11 @@ func (ra *RequestAuth) ToBasicAuth() string {
 	return "basic " + encoded
 }
 
-// NewRequestAuth creates a new
-func NewRequestAuth(sessionID string, userID string) *RequestAuth {
+// NewRequestAuth creates a new request auth
+func NewRequestAuth(s *auth.Session) *RequestAuth {
 	return &RequestAuth{
-		SessionID: sessionID,
-		UserID:    userID,
+		SessionID: s.ID,
+		UserID:    s.UserID,
 	}
 }
 
@@ -198,6 +199,9 @@ func NewRequest(t *testing.T, info *RequestInfo) *httptest.ResponseRecorder {
 
 	// If no router is provided we assume that we want to execute a regular endpoint
 	if info.Router == nil {
+		if DefaultRouter == nil {
+			t.Fatalf("no router provided and DefaultRouter not set")
+		}
 		info.Router = DefaultRouter
 	}
 

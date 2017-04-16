@@ -17,8 +17,8 @@ import (
 func TestDelete(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
-	u1, s1 := testdata.NewAuth(t)
-	u2, s2 := testdata.NewAuth(t)
+	_, s1 := testdata.NewAuth(t)
+	_, s2 := testdata.NewAuth(t)
 
 	tests := []struct {
 		description string
@@ -36,26 +36,26 @@ func TestDelete(t *testing.T) {
 			"Deleting an other user sessions",
 			http.StatusNotFound,
 			&sessions.DeleteParams{Token: s1.ID, CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2),
 		},
 		{
 			"Deleting an invalid ID",
 			http.StatusBadRequest,
 			&sessions.DeleteParams{Token: "invalid", CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
 			&sessions.DeleteParams{Token: s1.ID},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		// Keep this one last for u1 as it deletes the session
 		{
 			"Deleting session",
 			http.StatusNoContent,
 			&sessions.DeleteParams{Token: s1.ID, CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 	}
 

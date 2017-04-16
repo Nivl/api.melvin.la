@@ -28,9 +28,7 @@ func NewArticle(t *testing.T, a *articles.Article) (*articles.Article, *auth.Use
 	var session *auth.Session
 
 	if a.UserID == "" {
-		user, session = testdata.NewAuth(t)
-		user.IsAdmin = true
-		user.Update()
+		user, session = testdata.NewAdminAuth(t)
 		a.User = user
 		a.UserID = user.ID
 	}

@@ -37,8 +37,8 @@ func updateVersion(t *testing.T) {
 	t.Parallel()
 	defer lifecycle.PurgeModels(t)
 
-	a1, u1, s1 := articletestdata.NewArticle(t, nil)
-	auth := httptests.NewRequestAuth(s1.ID, u1.ID)
+	a1, _, s1 := articletestdata.NewArticle(t, nil)
+	auth := httptests.NewRequestAuth(s1)
 
 	newVersion := articletestdata.NewVersion(t, a1, &articles.Version{
 		Title:       "New title",
@@ -90,8 +90,8 @@ func accessData(t *testing.T) {
 	t.Parallel()
 	defer lifecycle.PurgeModels(t)
 
-	randomUser, randomUserSession := testdata.NewAuth(t)
-	a1, u1, s1 := articletestdata.NewArticle(t, nil)
+	_, randomUserSession := testdata.NewAuth(t)
+	a1, _, s1 := articletestdata.NewArticle(t, nil)
 
 	t.Run("parallel", func(t *testing.T) {
 		testCases := []struct {
@@ -111,21 +111,21 @@ func accessData(t *testing.T) {
 			{
 				"As logged user",
 				http.StatusUnauthorized,
-				httptests.NewRequestAuth(randomUserSession.ID, randomUser.ID),
+				httptests.NewRequestAuth(randomUserSession),
 				&articles.UpdateParams{ID: a1.ID},
 				a1,
 			},
 			{
 				"Un-existing article",
 				http.StatusNotFound,
-				httptests.NewRequestAuth(s1.ID, u1.ID),
+				httptests.NewRequestAuth(s1),
 				&articles.UpdateParams{ID: "1228f726-54b0-4b28-ad8b-fa7d3c1c37b7"},
 				nil,
 			},
 			{
 				"Invalid article uuid",
 				http.StatusBadRequest,
-				httptests.NewRequestAuth(s1.ID, u1.ID),
+				httptests.NewRequestAuth(s1),
 				&articles.UpdateParams{ID: "invalid data"},
 				nil,
 			},
@@ -152,7 +152,7 @@ func updatePublish(t *testing.T) {
 	aToPublish, _, _ := articletestdata.NewArticle(t, &articles.Article{User: u, PublishedAt: nil})
 	aToStayUnPublished, _, _ := articletestdata.NewArticle(t, &articles.Article{User: u, PublishedAt: nil})
 
-	auth := httptests.NewRequestAuth(s.ID, u.ID)
+	auth := httptests.NewRequestAuth(s)
 
 	t.Run("parallel", func(t *testing.T) {
 		testCases := []struct {

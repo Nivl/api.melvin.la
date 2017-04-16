@@ -36,20 +36,20 @@ func TestDelete(t *testing.T) {
 			"Deleting an other user",
 			http.StatusForbidden,
 			&users.DeleteParams{ID: u1.ID},
-			httptests.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2),
 		},
 		{
 			"Deleting without providing password",
 			http.StatusUnauthorized,
 			&users.DeleteParams{ID: u1.ID},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		// Keep this one last for u1 as it deletes the user
 		{
 			"Deleting user",
 			http.StatusNoContent,
 			&users.DeleteParams{ID: u1.ID, CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 	}
 

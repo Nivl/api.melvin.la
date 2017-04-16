@@ -34,8 +34,8 @@ func addInvalidTitle(t *testing.T) {
 	t.Parallel()
 	defer lifecycle.PurgeModels(t)
 
-	u, s := testdata.NewAuth(t)
-	auth := httptests.NewRequestAuth(s.ID, u.ID)
+	_, s := testdata.NewAuth(t)
+	auth := httptests.NewRequestAuth(s)
 
 	t.Run("parallel", func(t *testing.T) {
 		testCases := []struct {
@@ -72,8 +72,8 @@ func addValid(t *testing.T) {
 	globalT := t
 	defer lifecycle.PurgeModels(globalT)
 
-	u, s := testdata.NewAuth(t)
-	auth := httptests.NewRequestAuth(s.ID, u.ID)
+	_, s := testdata.NewAdminAuth(t)
+	auth := httptests.NewRequestAuth(s)
 
 	t.Run("parallel", func(t *testing.T) {
 		testCases := []struct {
@@ -130,6 +130,9 @@ func addAccessData(t *testing.T) {
 	t.Parallel()
 	defer lifecycle.PurgeModels(t)
 
+	_, userSession := testdata.NewAuth(t)
+	userAuth := httptests.NewRequestAuth(userSession)
+
 	t.Run("parallel", func(t *testing.T) {
 		testCases := []struct {
 			description string
@@ -141,6 +144,12 @@ func addAccessData(t *testing.T) {
 				"As anonymous",
 				http.StatusUnauthorized,
 				nil,
+				&articles.AddParams{Title: "Title"},
+			},
+			{
+				"As logged user",
+				http.StatusUnauthorized,
+				userAuth,
 				&articles.AddParams{Title: "Title"},
 			},
 		}

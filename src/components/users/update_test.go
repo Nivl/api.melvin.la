@@ -36,38 +36,38 @@ func TestUpdate(t *testing.T) {
 			"Updating an other user",
 			http.StatusForbidden,
 			&users.UpdateParams{ID: u1.ID},
-			httptests.NewRequestAuth(s2.ID, u2.ID),
+			httptests.NewRequestAuth(s2),
 		},
 		{
 			"Updating email without providing password",
 			http.StatusUnauthorized,
 			&users.UpdateParams{ID: u1.ID, Email: "melvin@fake.io"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		{
 			"Updating password without providing current Password",
 			http.StatusUnauthorized,
 			&users.UpdateParams{ID: u1.ID, NewPassword: "TestUpdateUser"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		{
 			"Updating regular field",
 			http.StatusOK,
 			&users.UpdateParams{ID: u1.ID, Name: "Melvin"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		{
 			"Updating email to a used one",
 			http.StatusConflict,
 			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", Email: u2.Email},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 		// Keep this one last for u1 as it changes the password
 		{
 			"Updating password",
 			http.StatusOK,
 			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
-			httptests.NewRequestAuth(s1.ID, u1.ID),
+			httptests.NewRequestAuth(s1),
 		},
 	}
 
