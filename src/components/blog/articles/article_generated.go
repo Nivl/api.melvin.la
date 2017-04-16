@@ -28,18 +28,6 @@ func JoinSQL(prefix string) string {
 	return output
 }
 
-// GetByID finds and returns an active article by ID
-func GetByID(id string) (*Article, error) {
-	a := &Article{}
-	stmt := "SELECT * from blog_articles WHERE id=$1 and deleted_at IS NULL LIMIT 1"
-	err := db.Get(a, stmt, id)
-	// We want to return nil if a article is not found
-	if a.ID == "" {
-		return nil, err
-	}
-	return a, err
-}
-
 // Exists checks if a article exists for a specific ID
 func Exists(id string) (bool, error) {
 	exists := false
