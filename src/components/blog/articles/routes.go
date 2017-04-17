@@ -33,11 +33,11 @@ var Endpoints = router.Endpoints{
 		Auth: nil,
 	},
 	EndpointGet: {
-		Verb: "GET",
-		Path: "/articles/{id}",
-		// Handler: HandlerGet,
-		Auth: nil,
-		// Params: &HandlerGetParams{},
+		Verb:    "GET",
+		Path:    "/articles/{id}",
+		Handler: Get,
+		Auth:    nil,
+		Params:  &GetParams{},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",
