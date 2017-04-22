@@ -9,8 +9,10 @@ import (
 const (
 	EndpointAdd = iota
 	EndpointGet
+	// EndpointList
 	EndpointUpdate
 	EndpointDelete
+	EndpointVersionUpdate
 )
 
 // Endpoints contains the list of endpoints for this component
@@ -24,7 +26,7 @@ var Endpoints = router.Endpoints{
 	},
 	EndpointGet: {
 		Verb:    "GET",
-		Path:    "/articles/{id}",
+		Path:    "/blog/articles/{id}",
 		Handler: Get,
 		Auth:    nil,
 		Params:  &GetParams{},
@@ -38,10 +40,17 @@ var Endpoints = router.Endpoints{
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
-		Path:    "/articles/{id}",
+		Path:    "/blog/articles/{id}",
 		Handler: Delete,
 		Auth:    router.AdminAccess,
 		Params:  &DeleteParams{},
+	},
+	EndpointVersionUpdate: {
+		Verb:    "PATCH",
+		Path:    "/blog/articles/{article_id}/versions/{id}",
+		Handler: UpdateVersion,
+		Auth:    router.AdminAccess,
+		Params:  &UpdateVersionParams{},
 	},
 	// EndpointList: {
 	// 	Verb: "GET",
