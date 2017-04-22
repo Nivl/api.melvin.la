@@ -13,6 +13,7 @@ const (
 	EndpointUpdate
 	EndpointDelete
 	EndpointVersionUpdate
+	EndpointVersionDelete
 )
 
 // Endpoints contains the list of endpoints for this component
@@ -52,6 +53,13 @@ var Endpoints = router.Endpoints{
 		Auth:    router.AdminAccess,
 		Params:  &UpdateVersionParams{},
 	},
+	EndpointVersionDelete: {
+		Verb:    "DELETE",
+		Path:    "/blog/articles/{article_id}/versions/{id}",
+		Handler: DeleteVersion,
+		Auth:    router.AdminAccess,
+		Params:  &DeleteVersionParams{},
+	},
 	// EndpointList: {
 	// 	Verb: "GET",
 	// 	Path: "/articles",
@@ -64,13 +72,6 @@ var Endpoints = router.Endpoints{
 	// 	Handler: HandlerUpdateDraft,
 	// 	Auth:    router.LoggedUser,
 	// 	Params:  &HandlerUpdateDraftParams{},
-	// },
-	// EndpointDeleteDraft: {
-	// 	Verb:    "DELETE",
-	// 	Path:    "/articles/{id}/draft",
-	// 	Handler: HandlerDeleteDraft,
-	// 	Auth:    router.LoggedUser,
-	// 	Params:  &HandlerDeleteDraftParams{},
 	// },
 	// EndpointUserList: {
 	// 	Verb:    "GET",
