@@ -46,3 +46,8 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	t.Time, err = time.Parse(`"`+ISO8601+`"`, string(data))
 	return
 }
+
+// Equal check if the given date is equal to the current one
+func (t *Time) Equal(u *Time) bool {
+	return t.Time.Equal(u.Time)
+}
