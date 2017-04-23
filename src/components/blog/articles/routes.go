@@ -12,6 +12,7 @@ const (
 	// EndpointList
 	EndpointUpdate
 	EndpointDelete
+	EndpointVersionAdd
 	EndpointVersionList
 	EndpointVersionUpdate
 	EndpointVersionDelete
@@ -47,6 +48,13 @@ var Endpoints = router.Endpoints{
 		Auth:    router.AdminAccess,
 		Params:  &DeleteParams{},
 	},
+	EndpointVersionAdd: {
+		Verb:    "POST",
+		Path:    "/blog/articles/{article_id}/versions",
+		Handler: AddVersion,
+		Auth:    router.AdminAccess,
+		Params:  &AddVersionParams{},
+	},
 	EndpointVersionList: {
 		Verb:    "GET",
 		Path:    "/blog/articles/{article_id}/versions",
@@ -73,21 +81,6 @@ var Endpoints = router.Endpoints{
 	// 	Path: "/articles",
 	// 	//Handler: HandlerList,
 	// 	Auth: nil,
-	// },
-	// EndpointUpdateDraft: {
-	// 	Verb:    "PATCH",
-	// 	Path:    "/articles/{id}/draft",
-	// 	Handler: HandlerUpdateDraft,
-	// 	Auth:    router.LoggedUser,
-	// 	Params:  &HandlerUpdateDraftParams{},
-	// },
-	// EndpointUserList: {
-	// 	Verb:    "GET",
-	// 	Prefix:  "/users/{user_id}",
-	// 	Path:    "/articles",
-	// 	Handler: HandlerListForUser,
-	// 	Auth:    nil,
-	// 	Params:  &HandlerListForUserParams{},
 	// },
 }
 
