@@ -12,6 +12,7 @@ const (
 	// EndpointList
 	EndpointUpdate
 	EndpointDelete
+	EndpointVersionList
 	EndpointVersionUpdate
 	EndpointVersionDelete
 )
@@ -45,6 +46,13 @@ var Endpoints = router.Endpoints{
 		Handler: Delete,
 		Auth:    router.AdminAccess,
 		Params:  &DeleteParams{},
+	},
+	EndpointVersionList: {
+		Verb:    "GET",
+		Path:    "/blog/articles/{article_id}/versions",
+		Handler: ListVersion,
+		Auth:    router.AdminAccess,
+		Params:  &ListVersionParams{},
 	},
 	EndpointVersionUpdate: {
 		Verb:    "PATCH",
