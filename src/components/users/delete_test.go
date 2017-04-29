@@ -18,7 +18,7 @@ func TestDelete(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
 	u1, s1 := testdata.NewAuth(t)
-	u2, s2 := testdata.NewAuth(t)
+	_, s2 := testdata.NewAuth(t)
 
 	tests := []struct {
 		description string
