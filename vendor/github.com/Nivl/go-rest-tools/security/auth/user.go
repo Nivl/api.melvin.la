@@ -104,3 +104,15 @@ func (u *User) UpdateQ(q db.Queryable) error {
 
 	return err
 }
+
+// IsLogged checks if the user object belong to a logged in user
+// Works on nil object
+func (u *User) IsLogged() bool {
+	return u != nil
+}
+
+// IsAdm checks if the user object belong to a logged in admin
+// Works on nil object
+func (u *User) IsAdm() bool {
+	return u.IsLogged() && u.IsAdmin
+}

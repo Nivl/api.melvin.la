@@ -45,7 +45,7 @@ func New(page int, perPage int) *Paginator {
 
 // IsValid checks if the paginator is valid
 func (p *Paginator) IsValid() bool {
-	return p.CurrentPage > 0 && p.PerPage <= p.MaxPerPage
+	return (p.CurrentPage > 0) && (p.PerPage <= p.MaxPerPage) && (p.PerPage > 0)
 }
 
 // Offset returns a valid SQL offset value
