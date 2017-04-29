@@ -1,83 +1,91 @@
 package articles
 
 import (
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/gorilla/mux"
-	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
 // Indexes of all different endpoints
 const (
 	EndpointAdd = iota
-	EndpointList
 	EndpointGet
+	EndpointSearch
 	EndpointUpdate
-	EndpointUpdateDraft
 	EndpointDelete
-	EndpointDeleteDraft
-	EndpointUserList
+	EndpointVersionAdd
+	EndpointVersionList
+	EndpointVersionUpdate
+	EndpointVersionDelete
 )
 
 // Endpoints contains the list of endpoints for this component
 var Endpoints = router.Endpoints{
 	EndpointAdd: {
 		Verb:    "POST",
-		Path:    "/articles",
-		Handler: HandlerAdd,
-		Auth:    router.LoggedUser,
-		Params:  &HandlerAddParams{},
-	},
-	EndpointList: {
-		Verb:    "GET",
-		Path:    "/articles",
-		Handler: HandlerList,
-		Auth:    nil,
+		Path:    "/blog/articles",
+		Handler: Add,
+		Auth:    router.AdminAccess,
+		Params:  &AddParams{},
 	},
 	EndpointGet: {
 		Verb:    "GET",
-		Path:    "/articles/{id}",
-		Handler: HandlerGet,
+		Path:    "/blog/articles/{id}",
+		Handler: Get,
 		Auth:    nil,
-		Params:  &HandlerGetParams{},
+		Params:  &GetParams{},
+	},
+	EndpointSearch: {
+		Verb:    "GET",
+		Path:    "/blog/articles",
+		Handler: Search,
+		Auth:    nil,
+		Params:  &SearchParams{},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",
-		Path:    "/articles/{id}",
-		Handler: HandlerUpdate,
-		Auth:    router.LoggedUser,
-		Params:  &HandlerUpdateParams{},
+		Path:    "/blog/articles/{id}",
+		Handler: Update,
+		Auth:    router.AdminAccess,
+		Params:  &UpdateParams{},
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
-		Path:    "/articles/{id}",
-		Handler: HandlerDelete,
-		Auth:    router.LoggedUser,
-		Params:  &HandlerDeleteParams{},
+		Path:    "/blog/articles/{id}",
+		Handler: Delete,
+		Auth:    router.AdminAccess,
+		Params:  &DeleteParams{},
 	},
-	EndpointUpdateDraft: {
-		Verb:    "PATCH",
-		Path:    "/articles/{id}/draft",
-		Handler: HandlerUpdateDraft,
-		Auth:    router.LoggedUser,
-		Params:  &HandlerUpdateDraftParams{},
+	EndpointVersionAdd: {
+		Verb:    "POST",
+		Path:    "/blog/articles/{article_id}/versions",
+		Handler: AddVersion,
+		Auth:    router.AdminAccess,
+		Params:  &AddVersionParams{},
 	},
-	EndpointDeleteDraft: {
-		Verb:    "DELETE",
-		Path:    "/articles/{id}/draft",
-		Handler: HandlerDeleteDraft,
-		Auth:    router.LoggedUser,
-		Params:  &HandlerDeleteDraftParams{},
-	},
-	EndpointUserList: {
+	EndpointVersionList: {
 		Verb:    "GET",
-		Prefix:  "/users/{user_id}",
-		Path:    "/articles",
-		Handler: HandlerListForUser,
-		Auth:    nil,
-		Params:  &HandlerListForUserParams{},
+		Path:    "/blog/articles/{article_id}/versions",
+		Handler: ListVersion,
+		Auth:    router.AdminAccess,
+		Params:  &ListVersionParams{},
+	},
+	EndpointVersionUpdate: {
+		Verb:    "PATCH",
+		Path:    "/blog/articles/{article_id}/versions/{id}",
+		Handler: UpdateVersion,
+		Auth:    router.AdminAccess,
+		Params:  &UpdateVersionParams{},
+	},
+	EndpointVersionDelete: {
+		Verb:    "DELETE",
+		Path:    "/blog/articles/{article_id}/versions/{id}",
+		Handler: DeleteVersion,
+		Auth:    router.AdminAccess,
+		Params:  &DeleteVersionParams{},
 	},
 }
 
 // SetRoutes is used to set all the routes of the article
-func SetRoutes(baseURI string, r *mux.Router) {
-	Endpoints.Activate(baseURI, r)
+func SetRoutes(r *mux.Router) {
+	Endpoints.Activate(r)
 }

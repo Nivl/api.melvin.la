@@ -1,8 +1,8 @@
 package sessions
 
 import (
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/gorilla/mux"
-	"github.com/melvin-laplanche/ml-api/src/router"
 )
 
 // Contains the index of all Endpoints
@@ -16,19 +16,19 @@ var Endpoints = router.Endpoints{
 	EndpointAdd: {
 		Verb:    "POST",
 		Path:    "/sessions",
-		Handler: HandlerAdd,
-		Params:  &HandlerAddParams{},
+		Handler: Add,
+		Params:  &AddParams{},
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
 		Path:    "/sessions/{token}",
-		Handler: HandlerDelete,
-		Params:  &HandlerDeleteParams{},
-		Auth:    router.LoggedUser,
+		Handler: Delete,
+		Params:  &DeleteParams{},
+		Auth:    router.LoggedUserAccess,
 	},
 }
 
 // SetRoutes is used to set all the routes of the article
-func SetRoutes(baseURI string, r *mux.Router) {
-	Endpoints.Activate(baseURI, r)
+func SetRoutes(r *mux.Router) {
+	Endpoints.Activate(r)
 }

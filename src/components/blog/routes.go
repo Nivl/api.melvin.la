@@ -6,7 +6,6 @@ import (
 )
 
 // SetRoutes is used to set all the routes of the blog
-func SetRoutes(baseURI string, r *mux.Router) {
-	baseURI += "/blog"
-	articles.SetRoutes(baseURI, r)
+func SetRoutes(r *mux.Router) {
+	articles.SetRoutes(r)
 }

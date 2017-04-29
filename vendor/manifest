@@ -2,26 +2,17 @@
 	"version": 0,
 	"dependencies": [
 		{
-			"importpath": "github.com/Nivl/cors",
-			"repository": "https://github.com/Nivl/cors",
+			"importpath": "github.com/Nivl/go-rest-tools",
+			"repository": "https://github.com/Nivl/go-rest-tools",
 			"vcs": "git",
-			"revision": "5f6923ae701f8e2ef1c556f3edffd52a83dc5c13",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/Nivl/sqalx",
-			"repository": "https://github.com/Nivl/sqalx",
-			"vcs": "git",
-			"revision": "500f95fee557f4f7a30e3bd6105acbf1a052174f",
-			"branch": "master",
-			"notests": true
+			"revision": "94c143465720b4fcf2e0d02004710e36893fe4c3",
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/bsphere/le_go",
 			"repository": "https://github.com/bsphere/le_go",
 			"vcs": "git",
-			"revision": "6af7ccea48c75ec07b9540c9bb553eb6825fc0e3",
+			"revision": "7a984a84b5492ae539b79b62fb4a10afc63c7bcf",
 			"branch": "master",
 			"notests": true
 		},
@@ -30,8 +21,7 @@
 			"repository": "https://github.com/dchest/uniuri",
 			"vcs": "git",
 			"revision": "8902c56451e9b58ff940bbe5fec35d5f9c04584a",
-			"branch": "master",
-			"notests": true
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/gorilla/context",
@@ -42,10 +32,18 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/gorilla/handlers",
+			"repository": "https://github.com/gorilla/handlers",
+			"vcs": "git",
+			"revision": "13d73096a474cac93275c679c7b8a2dc17ddba82",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/gorilla/mux",
 			"repository": "https://github.com/gorilla/mux",
 			"vcs": "git",
-			"revision": "0b13a922203ebdbfd236c818efcd5ed46097d690",
+			"revision": "599cba5e7b6137d46ddf58fb1765f5d928e69604",
 			"branch": "master",
 			"notests": true
 		},
@@ -53,15 +51,7 @@
 			"importpath": "github.com/gosimple/slug",
 			"repository": "https://github.com/gosimple/slug",
 			"vcs": "git",
-			"revision": "501a9cc9964313c1711c9796f98ac0b340f68b81",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/imdario/mergo",
-			"repository": "https://github.com/imdario/mergo",
-			"vcs": "git",
-			"revision": "50d4dbd4eb0e84778abe37cefef140271d96fade",
+			"revision": "dfb5bc66af5ea2fadd6bd1a02ea9eca9bc25f14f",
 			"branch": "master",
 			"notests": true
 		},
@@ -69,7 +59,7 @@
 			"importpath": "github.com/jmoiron/sqlx",
 			"repository": "https://github.com/jmoiron/sqlx",
 			"vcs": "git",
-			"revision": "5f97679e23f75f42b265fec8d3bdb1c8de90b79d",
+			"revision": "8ed836a8adb659e8492bcaa49e0880bb84075fe2",
 			"branch": "master",
 			"notests": true
 		},
@@ -77,7 +67,7 @@
 			"importpath": "github.com/kelseyhightower/envconfig",
 			"repository": "https://github.com/kelseyhightower/envconfig",
 			"vcs": "git",
-			"revision": "13674b2d056fb658a00ba3f36e78043ced07c924",
+			"revision": "8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4",
 			"branch": "master",
 			"notests": true
 		},
@@ -85,7 +75,7 @@
 			"importpath": "github.com/lib/pq",
 			"repository": "https://github.com/lib/pq",
 			"vcs": "git",
-			"revision": "d8eeeb8bae8896dd8e1b7e514ab0d396c4f12a1b",
+			"revision": "2704adc878c21e1329f46f6e56a1c387d788ff94",
 			"branch": "master",
 			"notests": true
 		},
@@ -98,18 +88,10 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/rs/xhandler",
-			"repository": "https://github.com/rs/xhandler",
-			"vcs": "git",
-			"revision": "ed27b6fd65218132ee50cd95f38474a3d8a2cd12",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/satori/go.uuid",
 			"repository": "https://github.com/satori/go.uuid",
 			"vcs": "git",
-			"revision": "0aa62d5ddceb50dbcb909d790b5345affd3669b6",
+			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
 			"branch": "master",
 			"notests": true
 		},
@@ -125,7 +107,7 @@
 			"importpath": "github.com/sendgrid/sendgrid-go",
 			"repository": "https://github.com/sendgrid/sendgrid-go",
 			"vcs": "git",
-			"revision": "d087004b4d47c2a378ade9eb3957571114b91493",
+			"revision": "c9346883d091e887eb59e75f272209229742e347",
 			"branch": "master",
 			"notests": true
 		},
@@ -133,7 +115,7 @@
 			"importpath": "github.com/stretchr/testify",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",
-			"revision": "69483b4bd14f5845b5a1e55bca19e954e827f1d0",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
 			"branch": "master",
 			"notests": true
 		},
@@ -141,7 +123,7 @@
 			"importpath": "golang.org/x/crypto/bcrypt",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "3ded668c5379f6951fb0de06174442072e5447d3",
+			"revision": "88915ccf7aeb91e9324fe7cf3eddd1531ced61ea",
 			"branch": "master",
 			"path": "/bcrypt",
 			"notests": true
@@ -150,26 +132,9 @@
 			"importpath": "golang.org/x/crypto/blowfish",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "3ded668c5379f6951fb0de06174442072e5447d3",
+			"revision": "88915ccf7aeb91e9324fe7cf3eddd1531ced61ea",
 			"branch": "master",
 			"path": "blowfish",
-			"notests": true
-		},
-		{
-			"importpath": "golang.org/x/net/context",
-			"repository": "https://go.googlesource.com/net",
-			"vcs": "git",
-			"revision": "4a1c855a052c2bad0e019ccfe8193a33d77adf5e",
-			"branch": "master",
-			"path": "/context",
-			"notests": true
-		},
-		{
-			"importpath": "gopkg.in/tomb.v2",
-			"repository": "https://gopkg.in/tomb.v2",
-			"vcs": "git",
-			"revision": "14b3d72120e8d10ea6e6b7f87f7175734b1faab8",
-			"branch": "v2",
 			"notests": true
 		}
 	]

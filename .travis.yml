@@ -3,10 +3,11 @@ services:
 - docker
 env:
   global:
-    - secure: "LmmicCMTmZlkJ/+M8xeZl8WQwFnSzwOtnOPpRrIa9te9Qu1WKv9jpwHy9ZD1DALItNkDygA5cawMAtgEusSyff3fvzOK0rqQfrqL3tGVXEfrWGRy/tV/YlrcQS6cAtUUUvFmYHWIGABFR0wED4eG35fn40ddxsh1cFMlfuAR1iA=" # Heroku
-    - ML_BUILD_ENV=test
     - POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
+    - secure: "CP5hpihwZsv60Dcn6N2+TiP9CMpTaNX0tMM9AudsRLt50QPsZkcAVDiMhsegW+vfAAkM4cw4IvdKqgkv/9JYt+HCAd3pErTzh+MRLxr5HkagfV8aZfeU/fLrXAo9vGpnc/v23tbWoPRh8pWyOJ78gnxsPZHgKRsNNSJ2AYW5ApU="
 install:
+- cp config/api-common.env config/api.env
+- cp config/database-common.env config/database.env
 - docker-compose build
 - docker-compose up -d
 script:
@@ -21,3 +22,9 @@ deploy:
     on: staging
     skip_cleanup: true
     script: ./deploy_staging.sh
+notifications:
+  email:
+    recipients:
+      secure: OalMK7QSZmKRoGckdxnc71XoB8hSw2kzncuAsBkaa3tMGNsBUP/NRTNAOTVu7krXdyh9kze+nlxULnLAkK82OaBkLEbsTecZ7jixwgRt/A2TXswxWxFdMUw+z6xVi7tieyXETQsUpjCrhweV+pdZxlvN0RAvg9yHluX/vq9u/ScH1qqWT4v/L6oDRnPD2FBPQIl4hr12nFCupcDjNIm8Lx6UfXANOmjSlXl5GGE5LxqjRinkbeYNIRhjFctjHUH6s9g4WlM0+/9iM/d3reCWs7emYzVvxZHIVf8GmbDXXhv425wPS97C5cpwo0MHxh3EAAbCFVkLPD3LYivULR4ZGFn0F/GzGP51F19bSeDwwFTRjD3hf5FCZ7nLXAKbuqQuvGbz8DMxw+xhwBTElRfph88K0MAqAlvjh8s919FnYJ93iDvyVSPcvoSV8+ilBxB5oejGxb2cIBigIIXNVr6FaSI5IkFDzCWfnwlD/qjUYmR1N0qYKca5xK7VpLU2VcERH/kMQSFCQFOVqkxmxF+/YPAkK0myYonPspKy5F+2t7aywdhv0jA79/ezUHKeK1MkmPmxjmNZFIESR0zKHGGh8eTYZPG/wp2TahxIGk6fMNQ7R6+cUqskgt5r/CPBl3SDAHMMlZuiuDvxlXKVSNuISPw/OZ41qi39tksQtNho+Sk=
+    on_success: change
+    on_failure: always
