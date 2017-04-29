@@ -9,7 +9,7 @@ import (
 const (
 	EndpointAdd = iota
 	EndpointGet
-	// EndpointList
+	EndpointSearch
 	EndpointUpdate
 	EndpointDelete
 	EndpointVersionAdd
@@ -33,6 +33,13 @@ var Endpoints = router.Endpoints{
 		Handler: Get,
 		Auth:    nil,
 		Params:  &GetParams{},
+	},
+	EndpointSearch: {
+		Verb:    "GET",
+		Path:    "/blog/articles",
+		Handler: Search,
+		Auth:    nil,
+		Params:  &SearchParams{},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",
@@ -76,12 +83,6 @@ var Endpoints = router.Endpoints{
 		Auth:    router.AdminAccess,
 		Params:  &DeleteVersionParams{},
 	},
-	// EndpointList: {
-	// 	Verb: "GET",
-	// 	Path: "/articles",
-	// 	//Handler: HandlerList,
-	// 	Auth: nil,
-	// },
 }
 
 // SetRoutes is used to set all the routes of the article

@@ -22,7 +22,7 @@ type Article struct {
 }
 
 // Articles represents a list of Articles
-type Articles []Article
+type Articles []*Article
 
 // GetByID finds and returns an active article by ID
 func GetByID(id string) (*Article, error) {

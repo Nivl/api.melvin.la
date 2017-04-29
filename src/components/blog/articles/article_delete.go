@@ -25,6 +25,7 @@ func Delete(req *router.Request) error {
 		return httperr.NewConflict("You cannot delete a published article")
 	}
 
+	a.PublishedAt = nil
 	if err := a.Delete(); err != nil {
 		return err
 	}
