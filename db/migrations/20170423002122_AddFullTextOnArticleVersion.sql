@@ -2,19 +2,18 @@
 -- +goose Up
 -- SQL in section 'Up' is executed when this migration is applied
 
-ALTER TABLE blog_article_versions ADD COLUMN content_vector tsvector;
-CREATE INDEX blog_article_versions_tsv_content_idx ON blog_article_versions USING gin(content_vector);
-CREATE INDEX blog_article_versions_content_idx ON blog_article_versions (content);
+ALTER TABLE blog_article_versions ADD COLUMN search_data_vector tsvector;
+CREATE INDEX blog_article_versions_tsv_search_data_idx ON blog_article_versions USING gin(search_data_vector);
 
 -- +goose StatementBegin
 CREATE OR REPLACE FUNCTION blog_article_versions_vector_update() RETURNS trigger AS $blog_article_versions_vector_update$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-        NEW.content_vector = to_tsvector('pg_catalog.english', COALESCE(NEW.content, ''));
+        NEW.search_data_vector = to_tsvector('pg_catalog.english', NEW.title || ' ' || NEW.content);
     END IF;
     IF TG_OP = 'UPDATE' THEN
-        IF NEW.content <> OLD.content THEN
-            NEW.content_vector = to_tsvector('pg_catalog.english', COALESCE(NEW.content, ''));
+        IF NEW.content <> OLD.content OR NEW.title <> OLD.title THEN
+            NEW.search_data_vector = to_tsvector('pg_catalog.english', NEW.title || ' ' || NEW.content);
         END IF;
     END IF;
     RETURN NEW;

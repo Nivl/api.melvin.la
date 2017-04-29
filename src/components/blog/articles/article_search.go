@@ -52,9 +52,9 @@ func Search(req *router.Request) error {
 
 	// Full text search on the content
 	if params.Query != "" {
-		selct += ", ts_rank(version.content_vector, keywords, 1) AS rank"
+		selct += ", ts_rank(version.search_data_vector, keywords, 1) AS rank"
 		join += "CROSS JOIN plainto_tsquery(:search_query) keywords"
-		where = sqlSetComma(where, "keywords @@ version.content_vector")
+		where = sqlSetComma(where, "keywords @@ version.search_data_vector")
 		orderBy = "rank DESC"
 		args["search_query"] = params.Query
 	}

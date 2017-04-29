@@ -341,6 +341,12 @@ func searchFullText(t *testing.T) {
 		&articles.Article{PublishedAt: db.Now(), Version: &articles.Version{
 			Content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque  feugiat nisi a felis fermentum dapibus. Fusce eleifend arcu nec leo posuere, vel vestibulum nibh tincidunt. Curabitur sagittis sagittis dolor id dapibus. Aliquam erat volutpat. Maecenas in accumsan ligula. Morbi augue justo, dictum quis nisi sed, malesuada ornare neque. Praesent id vehicula sem. Integer in urna sagittis, pretium massa fringilla, vestibulum eros. Vivamus ullamcorper diam non dictum tincidunt. Nunc et pellentesque nibh, vitae rutrum dolor. Vivamus quis semper lectus. In tincidunt lorem ex. Mauris pharetra pharetra mauris eu luctus. Etiam mauris velit, ultrices vitae malesuada nec, tincidunt aliquet purus. Mauris gravida dui a ullamcorper Californication commodo. Vivamus eget dolor quis ipsum pellentesque bibendum.",
 		}},
+		&articles.Article{PublishedAt: db.Now(), Version: &articles.Version{
+			Title: "Californication",
+		}},
+		&articles.Article{PublishedAt: db.Now(), Version: &articles.Version{
+			Title: "Lorem ipsum dolor Californication sit amet",
+		}},
 	}
 	for _, a := range californication {
 		articletestdata.NewArticle(t, a)
