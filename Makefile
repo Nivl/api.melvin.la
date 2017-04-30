@@ -11,5 +11,8 @@ install:
 migration:
 	goose up
 
+generate:
+	go install $(LDFLAGS) github.com/Nivl/api-cli
+
 .PHONY:
 	install

@@ -9,9 +9,7 @@ services:
     depends_on:
       - database
     env_file:
-      - ./config/api-common.env
-      - ./config/database-common.env
-      - ./config/api-${ML_BUILD_ENV}.env
+      - ./config/api.env
     container_name: ml_api
     entrypoint: /go/src/github.com/melvin-laplanche/ml-api/wait-for-database.sh
 
@@ -20,5 +18,5 @@ services:
     ports:
       - "5432"
     env_file:
-      - ./config/database-common.env
+      - ./config/database.env
     container_name: ml_api_postgres
