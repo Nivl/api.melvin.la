@@ -6,7 +6,7 @@ import "github.com/gorilla/handlers"
 var AllowedOrigins = handlers.AllowedOrigins([]string{
 	"http://www.melvin.la",         // prod
 	"http://orchid.melvin.la",      // staging
-	"http://orchid.melvin.la:3000", // local
+	"http://orchid.melvin.la:4200", // local
 })
 
 // AllowedMethods is a list containing all HTTP verb accepted by the API
