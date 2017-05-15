@@ -36,7 +36,7 @@ func TestDelete(t *testing.T) {
 		},
 		{
 			"logged user",
-			http.StatusUnauthorized,
+			http.StatusForbidden,
 			&articles.DeleteParams{ID: published.ID},
 			httptests.NewRequestAuth(userSession),
 		},

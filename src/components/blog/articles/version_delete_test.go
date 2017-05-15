@@ -55,7 +55,7 @@ func deleteVersionFails(t *testing.T) {
 			},
 			{
 				"Logged user",
-				http.StatusUnauthorized,
+				http.StatusForbidden,
 				&articles.DeleteVersionParams{ID: v2.ID, ArticleID: a.ID},
 				userAuth,
 			},

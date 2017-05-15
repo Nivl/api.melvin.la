@@ -86,7 +86,7 @@ func listVersionAccess(t *testing.T) {
 			auth        *httptests.RequestAuth
 		}{
 			{"Anonymous", http.StatusUnauthorized, nil},
-			{"Logged user", http.StatusUnauthorized, userAuth},
+			{"Logged user", http.StatusForbidden, userAuth},
 			{"Admin", http.StatusOK, adminAuth},
 		}
 

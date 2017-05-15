@@ -148,7 +148,7 @@ func addAccessData(t *testing.T) {
 			},
 			{
 				"As logged user",
-				http.StatusUnauthorized,
+				http.StatusForbidden,
 				userAuth,
 				&articles.AddParams{Title: "Title"},
 			},

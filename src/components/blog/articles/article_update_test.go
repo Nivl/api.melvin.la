@@ -110,7 +110,7 @@ func accessData(t *testing.T) {
 			},
 			{
 				"As logged user",
-				http.StatusUnauthorized,
+				http.StatusForbidden,
 				httptests.NewRequestAuth(randomUserSession),
 				&articles.UpdateParams{ID: a1.ID},
 				a1,

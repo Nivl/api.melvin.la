@@ -56,7 +56,7 @@ func updateVersionAccess(t *testing.T) {
 			},
 			{
 				"As logged user",
-				http.StatusUnauthorized,
+				http.StatusForbidden,
 				userAuth,
 				&articles.UpdateVersionParams{ID: a.Version.ID, ArticleID: a.ID},
 				a,
