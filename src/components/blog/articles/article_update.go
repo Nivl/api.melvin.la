@@ -9,10 +9,10 @@ import (
 
 // UpdateParams lists the params allowed by Update
 type UpdateParams struct {
-	ID             string `from:"url" json:"id" params:"uuid"`
-	Slug           string `from:"form" json:"slug" params:"trim"`
-	CurrentVersion string `from:"form" json:"current_version" params:"uuid"`
-	Publish        *bool  `from:"form" json:"publish"`
+	ID      string `from:"url" json:"id" params:"uuid"`
+	Slug    string `from:"form" json:"slug" params:"trim"`
+	Version string `from:"form" json:"current_version" params:"uuid"`
+	Publish *bool  `from:"form" json:"publish"`
 }
 
 // Update represents a API handler to update a single article
@@ -28,8 +28,8 @@ func Update(req *router.Request) error {
 	}
 
 	// Update the new version
-	if params.CurrentVersion != "" && params.CurrentVersion != *a.CurrentVersion {
-		v, err := GetVersionByID(params.CurrentVersion)
+	if params.Version != "" && params.Version != *a.CurrentVersion {
+		v, err := GetVersionByID(params.Version)
 		if err != nil {
 			return err
 		}

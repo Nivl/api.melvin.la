@@ -63,8 +63,8 @@ func updateVersion(t *testing.T) {
 				t.Parallel()
 
 				params := &articles.UpdateParams{
-					ID:             tc.article.ID,
-					CurrentVersion: tc.newVersion.ID,
+					ID:      tc.article.ID,
+					Version: tc.newVersion.ID,
 				}
 				rec := callUpdate(t, params, auth)
 				assert.Equal(t, tc.code, rec.Code)
