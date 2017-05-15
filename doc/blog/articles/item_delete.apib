@@ -1,0 +1,66 @@
+### Delete an article [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + current_password (required, string) - Current user password
+
++ Response 204 (application/json)
+
+    The article has been deleted
+
+    + Body
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Body
+
+            {
+                "error": "[reason]"
+            }
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to access this resource.
+
+    + Body
+
+            {
+                "error": "Unauthorized"
+            }
+
++ Response 404 (application/json)
+
+    The article does not exists.
+
+    + Body
+
+            {
+                "error": "Not Found"
+            }
+
++ Response 409 (application/json)
+
+    The article is currently published.
+
+    + Body
+
+            {
+                "error": "[reason]"
+            }
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Body
+
+            {
+                "error": "something went wrong"
+            }

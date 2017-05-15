@@ -1,0 +1,57 @@
+### Delete a session [DELETE]
+
++ Request (application/json)
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + current_password (required, string) - Current user password
+
++ Response 204 (application/json)
+
+    The session has been deleted
+
+    + Body
+
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Body
+
+            {
+                "error": "[reason]"
+            }
+
++ Response 401 (application/json)
+
+    The `current_password` does not match the user's password
+
+    + Body
+
+            {
+                "error": "Unauthorized"
+            }
+
++ Response 404 (application/json)
+
+    The session does not exist or the requester is trying to access someone
+    else's session.
+
+    + Body
+
+            {
+                "error": "Unauthorized"
+            }
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Body
+
+            {
+                "error": "something went wrong"
+            }

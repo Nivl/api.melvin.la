@@ -1,0 +1,59 @@
+### Update a user [PATCH]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + current_password (required, string) - Current user password. Required to update the email or the password
+        + name (string) - New Name to use
+        + email (string) - New Email address to use
+        + new_password (string) - New password to use
+
++ Response 200 (application/json)
+
+    The user has been updated
+
+    + Attributes (User)
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Body
+
+            {
+                "error": "[reason]"
+            }
+
++ Response 401 (application/json)
+
+    The `current_password` does not match the user's password
+
+    + Body
+
+            {
+                "error": "Unauthorized"
+            }
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource
+
+    + Body
+
+            {
+                "error": "Forbidden"
+            }
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Body
+
+            {
+                "error": "something went wrong"
+            }
