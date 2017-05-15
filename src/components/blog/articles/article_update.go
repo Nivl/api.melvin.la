@@ -11,7 +11,7 @@ import (
 type UpdateParams struct {
 	ID      string `from:"url" json:"id" params:"uuid"`
 	Slug    string `from:"form" json:"slug" params:"trim"`
-	Version string `from:"form" json:"current_version" params:"uuid"`
+	Version string `from:"form" json:"version" params:"uuid"`
 	Publish *bool  `from:"form" json:"publish"`
 }
 
