@@ -73,6 +73,7 @@ func Handler(e *Endpoint) http.Handler {
 					request.Error(httperr.NewBadRequest("user not found"))
 					return
 				}
+				request.SessionUsed = session
 			}
 		}
 

@@ -29,6 +29,7 @@ type Request struct {
 	Request      *http.Request
 	Params       interface{}
 	User         *auth.User
+	SessionUsed  *auth.Session
 	_contentType string
 }
 

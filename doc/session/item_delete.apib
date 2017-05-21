@@ -6,7 +6,7 @@
             Authorization: basic [base64encoded userID:access_token]
 
     + Attributes
-        + current_password (required, string) - Current user password
+        + current_password (string) - Current user password. Required to delete a token different than the one used in the `Authorization` header
 
 + Response 204 (application/json)
 

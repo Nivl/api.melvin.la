@@ -17,8 +17,12 @@ type DeleteParams struct {
 func Delete(req *router.Request) error {
 	params := req.Params.(*DeleteParams)
 
-	if !auth.IsPasswordValid(req.User.Password, params.CurrentPassword) {
-		return httperr.NewUnauthorized()
+	// If a user tries to delete their current session, then no need for the
+	// password (that's just a logout)
+	if params.Token != req.SessionUsed.ID {
+		if !auth.IsPasswordValid(req.User.Password, params.CurrentPassword) {
+			return httperr.NewUnauthorized()
+		}
 	}
 
 	var session auth.Session

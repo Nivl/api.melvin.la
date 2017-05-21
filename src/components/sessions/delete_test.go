@@ -17,8 +17,15 @@ import (
 func TestDelete(t *testing.T) {
 	defer lifecycle.PurgeModels(t)
 
-	_, s1 := testdata.NewAuth(t)
-	_, s2 := testdata.NewAuth(t)
+	// Do not delete safeSession
+	u1, safeSession := testdata.NewAuth(t)
+
+	// We create a couple of sessions for the same user
+	toDelete2 := testdata.NewSession(t, u1)
+	toDelete3 := testdata.NewSession(t, u1)
+
+	// We create a other session attached to an other user
+	_, randomSession := testdata.NewAuth(t)
 
 	tests := []struct {
 		description string
@@ -29,33 +36,38 @@ func TestDelete(t *testing.T) {
 		{
 			"Not logged",
 			http.StatusUnauthorized,
-			&sessions.DeleteParams{Token: s1.ID},
+			&sessions.DeleteParams{Token: safeSession.ID},
 			nil,
 		},
 		{
 			"Deleting an other user sessions",
 			http.StatusNotFound,
-			&sessions.DeleteParams{Token: s1.ID, CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s2),
+			&sessions.DeleteParams{Token: safeSession.ID, CurrentPassword: "fake"},
+			httptests.NewRequestAuth(randomSession),
 		},
 		{
 			"Deleting an invalid ID",
 			http.StatusBadRequest,
 			&sessions.DeleteParams{Token: "invalid", CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s1),
+			httptests.NewRequestAuth(safeSession),
 		},
 		{
-			"Deleting without providing password",
+			"Deleting a different session without providing password",
 			http.StatusUnauthorized,
-			&sessions.DeleteParams{Token: s1.ID},
-			httptests.NewRequestAuth(s1),
+			&sessions.DeleteParams{Token: toDelete2.ID},
+			httptests.NewRequestAuth(safeSession),
 		},
-		// Keep this one last for u1 as it deletes the session
 		{
-			"Deleting session",
+			"Deleting a different session",
 			http.StatusNoContent,
-			&sessions.DeleteParams{Token: s1.ID, CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s1),
+			&sessions.DeleteParams{Token: toDelete2.ID, CurrentPassword: "fake"},
+			httptests.NewRequestAuth(safeSession),
+		},
+		{
+			"Deleting current session",
+			http.StatusNoContent,
+			&sessions.DeleteParams{Token: toDelete3.ID},
+			httptests.NewRequestAuth(toDelete3),
 		},
 	}
 

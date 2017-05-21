@@ -36,3 +36,17 @@ func NewAdminAuth(t *testing.T) (*auth.User, *auth.Session) {
 	lifecycle.SaveModels(t, session)
 	return user, session
 }
+
+// NewAuth creates a new user and their session
+func NewSession(t *testing.T, user *auth.User) *auth.Session {
+	session := &auth.Session{
+		UserID: user.ID,
+	}
+
+	if err := session.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	lifecycle.SaveModels(t, session)
+	return session
+}
