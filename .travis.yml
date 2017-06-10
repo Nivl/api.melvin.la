@@ -25,6 +25,6 @@ deploy:
 notifications:
   email:
     recipients:
-      secure: OalMK7QSZmKRoGckdxnc71XoB8hSw2kzncuAsBkaa3tMGNsBUP/NRTNAOTVu7krXdyh9kze+nlxULnLAkK82OaBkLEbsTecZ7jixwgRt/A2TXswxWxFdMUw+z6xVi7tieyXETQsUpjCrhweV+pdZxlvN0RAvg9yHluX/vq9u/ScH1qqWT4v/L6oDRnPD2FBPQIl4hr12nFCupcDjNIm8Lx6UfXANOmjSlXl5GGE5LxqjRinkbeYNIRhjFctjHUH6s9g4WlM0+/9iM/d3reCWs7emYzVvxZHIVf8GmbDXXhv425wPS97C5cpwo0MHxh3EAAbCFVkLPD3LYivULR4ZGFn0F/GzGP51F19bSeDwwFTRjD3hf5FCZ7nLXAKbuqQuvGbz8DMxw+xhwBTElRfph88K0MAqAlvjh8s919FnYJ93iDvyVSPcvoSV8+ilBxB5oejGxb2cIBigIIXNVr6FaSI5IkFDzCWfnwlD/qjUYmR1N0qYKca5xK7VpLU2VcERH/kMQSFCQFOVqkxmxF+/YPAkK0myYonPspKy5F+2t7aywdhv0jA79/ezUHKeK1MkmPmxjmNZFIESR0zKHGGh8eTYZPG/wp2TahxIGk6fMNQ7R6+cUqskgt5r/CPBl3SDAHMMlZuiuDvxlXKVSNuISPw/OZ41qi39tksQtNho+Sk=
+      secure: "fjpT9Utz25ML9Z6ShtwSm3rn8aRBh7TiMEAFplTGqMJAglWb05tPrUA0186nim4K1fNUgVedVEqnhPF/htZsq88T3d1Hq3Fm9xI4vpA53O/p8mZTOr2iweqKei+YSsxddNTYs/+EoYTNViuRR3sb/M/BhWOlAwIgqeiLo8kNpe0="
     on_success: change
     on_failure: always
