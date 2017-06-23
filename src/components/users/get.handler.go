@@ -12,10 +12,10 @@ type GetParams struct {
 }
 
 // Get represent an API handler to get a user
-func Get(req *router.Request) error {
+func Get(req *router.Request, deps *router.Dependencies) error {
 	params := req.Params.(*GetParams)
 
-	user, err := auth.GetUser(params.ID)
+	user, err := auth.GetUser(deps.DB, params.ID)
 	if err != nil {
 		return err
 	}

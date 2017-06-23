@@ -16,7 +16,7 @@ type UpdateParams struct {
 }
 
 // Update is a HTTP handler used to update a user
-func Update(req *router.Request) error {
+func Update(req *router.Request, deps *router.Dependencies) error {
 	params := req.Params.(*UpdateParams)
 	user := req.User
 
@@ -47,7 +47,7 @@ func Update(req *router.Request) error {
 		user.Password = hashedPassword
 	}
 
-	if err := user.Save(); err != nil {
+	if err := user.Save(deps.DB); err != nil {
 		return err
 	}
 

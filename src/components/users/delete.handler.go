@@ -13,7 +13,7 @@ type DeleteParams struct {
 }
 
 // Delete represent an API handler to remove a user
-func Delete(req *router.Request) error {
+func Delete(req *router.Request, deps *router.Dependencies) error {
 	params := req.Params.(*DeleteParams)
 	user := req.User
 
@@ -25,7 +25,7 @@ func Delete(req *router.Request) error {
 		return httperr.NewUnauthorized()
 	}
 
-	if err := user.Delete(); err != nil {
+	if err := user.Delete(deps.DB); err != nil {
 		return err
 	}
 

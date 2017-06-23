@@ -63,5 +63,5 @@ function ml-tests {
   ml-make "migration"
 
   echo "Start testings"
-  ml-exec "cd src && go test ./..."
+  ml-exec "cd src && go test -tags=integration ./..."
 }
