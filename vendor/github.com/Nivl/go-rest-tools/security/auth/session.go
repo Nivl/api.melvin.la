@@ -5,10 +5,11 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/jmoiron/sqlx"
 )
 
 // Session is a structure representing a session that can be saved in the database
-//go:generate tv-api-cli generate model Session -t sessions -e SaveQ,CreateQ,Update,UpdateQ,doUpdate,JoinSQL,Get,Exists
+//go:generate api-cli generate model Session -t sessions -e Save,Create,Update,doUpdate,JoinSQL,Get,Exists
 type Session struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -19,7 +20,7 @@ type Session struct {
 }
 
 // Exists check if a session exists in the database
-func (s *Session) Exists() (bool, error) {
+func (s *Session) Exists(q *sqlx.DB) (bool, error) {
 	if s == nil {
 		return false, httperr.NewServerError("session is nil")
 	}
@@ -39,7 +40,7 @@ func (s *Session) Exists() (bool, error) {
 					WHERE deleted_at IS NULL
 						AND id = $1
 						AND user_id = $2`
-	err := db.Get(&count, stmt, s.ID, s.UserID)
+	err := db.Get(q, &count, stmt, s.ID, s.UserID)
 	return (count > 0), err
 }
 
@@ -60,17 +61,17 @@ func SessionJoinSQL(prefix string) string {
 	return output
 }
 
-// SaveQ is an alias for Create since sessions are not updatable
-func (s *Session) SaveQ(q db.Queryable) error {
+// Save is an alias for Create since sessions are not updatable
+func (s *Session) Save(q *sqlx.DB) error {
 	if s == nil {
 		return httperr.NewServerError("session is nil")
 	}
 
-	return s.CreateQ(q)
+	return s.Create(q)
 }
 
-// CreateQ persists a session in the database
-func (s *Session) CreateQ(q db.Queryable) error {
+// Create persists a session in the database
+func (s *Session) Create(q *sqlx.DB) error {
 	if s == nil {
 		return httperr.NewServerError("session is nil")
 	}

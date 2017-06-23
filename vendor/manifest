@@ -2,12 +2,19 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/DATA-DOG/go-sqlmock",
+			"repository": "https://github.com/DATA-DOG/go-sqlmock",
+			"vcs": "git",
+			"revision": "d335ff60c18d1c61e0e3d4a65fe908b3c84556a3",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Nivl/go-rest-tools",
 			"repository": "https://github.com/Nivl/go-rest-tools",
 			"vcs": "git",
-			"revision": "94c143465720b4fcf2e0d02004710e36893fe4c3",
-			"branch": "master",
-			"notests": true
+			"revision": "42c9ccf8608013fb1ef04fb07ba65f2d6ff83252",
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/bsphere/le_go",
@@ -69,6 +76,14 @@
 			"repository": "https://github.com/kelseyhightower/envconfig",
 			"vcs": "git",
 			"revision": "8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/kisielk/sqlstruct",
+			"repository": "https://github.com/kisielk/sqlstruct",
+			"vcs": "git",
+			"revision": "648daed35d49dac24a4bff253b190a80da3ab6a5",
 			"branch": "master",
 			"notests": true
 		},

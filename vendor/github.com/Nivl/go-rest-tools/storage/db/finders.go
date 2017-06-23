@@ -1,10 +1,12 @@
 package db
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 // Get is the same as sqlx.Get() but do not returns an error on empty results
-func Get(dest interface{}, query string, args ...interface{}) error {
-	err := Writer.Get(dest, query, args...)
+func Get(q *sqlx.DB, dest interface{}, query string, args ...interface{}) error {
+	err := q.Get(dest, query, args...)
 	if IsNotFound(err) {
 		return nil
 	}
@@ -12,8 +14,8 @@ func Get(dest interface{}, query string, args ...interface{}) error {
 }
 
 // NamedSelect is the same as sqlx.Select() but with named params
-func NamedSelect(dest interface{}, query string, args interface{}) error {
-	row, err := Writer.NamedQuery(query, args)
+func NamedSelect(q *sqlx.DB, dest interface{}, query string, args interface{}) error {
+	row, err := q.NamedQuery(query, args)
 	if err != nil {
 		return err
 	}

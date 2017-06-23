@@ -17,10 +17,10 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
-	defer lifecycle.PurgeModels(t)
+	defer lifecycle.PurgeModels(t, deps.DB)
 
-	u1, s1 := testdata.NewAuth(t)
-	u2, s2 := testdata.NewAuth(t)
+	u1, s1 := testdata.NewAuth(t, deps.DB)
+	u2, s2 := testdata.NewAuth(t, deps.DB)
 
 	tests := []struct {
 		description string
@@ -95,7 +95,7 @@ func TestUpdate(t *testing.T) {
 				if tc.params.NewPassword != "" {
 					// To check the password has been updated with need to get the
 					// encrypted version, and compare it to the raw one
-					updatedUser, err := auth.GetUser(tc.params.ID)
+					updatedUser, err := auth.GetUser(deps.DB, tc.params.ID)
 					if err != nil {
 						t.Fatal(err)
 					}

@@ -26,12 +26,8 @@ func Setup() *Args {
 	if err := dependencies.InitPostgres(params.PostgresURI); err != nil {
 		panic(err)
 	}
-	if err := dependencies.InitLogEntries(params.LogEntriesToken); err != nil {
-		panic(err)
-	}
-	if err := dependencies.InitSendgrid(params.EmailAPIKey, params.EmailFrom, params.EmailTo); err != nil {
-		panic(err)
-	}
+	dependencies.InitLogentries(params.LogEntriesToken)
+	dependencies.InitSendgrid(params.EmailAPIKey, params.EmailFrom, params.EmailTo)
 
 	return &params
 }

@@ -7,10 +7,11 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/jmoiron/sqlx"
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate tv-api-cli generate model User -t users -e CreateQ,UpdateQ,Get,JoinSQL
+//go:generate api-cli generate model User -t users -e Create,Update,Get,JoinSQL
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -41,10 +42,10 @@ func UserJoinSQL(prefix string) string {
 }
 
 // GetUser finds and returns an active user by ID
-func GetUser(id string) (*User, error) {
+func GetUser(q *sqlx.DB, id string) (*User, error) {
 	user := &User{}
 	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
-	err := db.Get(user, stmt, id)
+	err := db.Get(q, user, stmt, id)
 	// We want to return nil if a user is not found
 	if user.ID == "" {
 		return nil, err
@@ -68,8 +69,8 @@ func IsPasswordValid(hash string, raw string) bool {
 	return err == nil
 }
 
-// CreateQ persists a user in the database
-func (u *User) CreateQ(q db.Queryable) error {
+// Create persists a user in the database
+func (u *User) Create(q *sqlx.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
@@ -86,9 +87,9 @@ func (u *User) CreateQ(q db.Queryable) error {
 	return err
 }
 
-// UpdateQ updates most of the fields of a persisted user.
+// Update updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (u *User) UpdateQ(q db.Queryable) error {
+func (u *User) Update(q *sqlx.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}

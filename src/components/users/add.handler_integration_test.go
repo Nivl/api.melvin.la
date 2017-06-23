@@ -17,7 +17,7 @@ import (
 
 func TestAdd(t *testing.T) {
 	globalT := t
-	defer lifecycle.PurgeModels(t)
+	defer lifecycle.PurgeModels(t, deps.DB)
 
 	tests := []struct {
 		description string

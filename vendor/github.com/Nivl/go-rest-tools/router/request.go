@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/logger"
-	"github.com/Nivl/go-rest-tools/notifiers/mailer"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/gorilla/mux"
 )
@@ -30,6 +29,8 @@ type Request struct {
 	Params       interface{}
 	User         *auth.User
 	_contentType string
+	Logger       logger.Logger
+	deps         *Dependencies
 }
 
 // String return a printable version of the object
@@ -141,19 +142,17 @@ func (req *Request) handlePanic() {
 		}
 		err = fmt.Errorf("panic: %v", err)
 
-		logger.Errorf(`message: "%s", %s`, err.Error(), req)
-		logger.Errorf(string(debug.Stack()))
+		req.Logger.Errorf(`message: "%s", %s`, err.Error(), req)
+		req.Logger.Errorf(string(debug.Stack()))
 
 		// Send an email async
-		if mailer.Emailer != nil {
-			sendEmail := func(stacktrace []byte) {
-				err := mailer.Emailer.SendStackTrace(stacktrace, req.Endpoint(), err.Error(), req.ID)
-				if err != nil {
-					logger.Error(err.Error())
-				}
+		sendEmail := func(stacktrace []byte) {
+			err := req.deps.Mailer.SendStackTrace(stacktrace, req.Endpoint(), err.Error(), req.ID)
+			if err != nil {
+				req.Logger.Error(err.Error())
 			}
-
-			go sendEmail(debug.Stack())
 		}
+
+		go sendEmail(debug.Stack())
 	}
 }

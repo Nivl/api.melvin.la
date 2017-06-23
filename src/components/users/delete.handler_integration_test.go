@@ -17,10 +17,10 @@ import (
 )
 
 func TestDelete(t *testing.T) {
-	defer lifecycle.PurgeModels(t)
+	defer lifecycle.PurgeModels(t, deps.DB)
 
-	u1, s1 := testdata.NewAuth(t)
-	_, s2 := testdata.NewAuth(t)
+	u1, s1 := testdata.NewAuth(t, deps.DB)
+	_, s2 := testdata.NewAuth(t, deps.DB)
 
 	tests := []struct {
 		description string
@@ -61,17 +61,15 @@ func TestDelete(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusNoContent {
-				// We check that the user is still in DB but is flagged for deletion
+				// We check that the user has been deleted
 				var user auth.User
 				stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"
-				err := db.Get(&user, stmt, tc.params.ID)
+				err := db.Get(deps.DB, &user, stmt, tc.params.ID)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if assert.NotEmpty(t, user.ID, "User fully deleted") {
-					assert.NotNil(t, user.DeletedAt, "User not marked for deletion")
-				}
+				assert.Empty(t, user.ID, "User not deleted")
 			}
 		})
 	}

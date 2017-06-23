@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/primitives/models"
+	"github.com/jmoiron/sqlx"
 )
 
 var _models = &savedModels{
@@ -19,7 +20,7 @@ type savedModels struct {
 }
 
 // Push adds a new model to the list
-func (sm *savedModels) Push(t testing.TB, obj models.FullyDeletable) {
+func (sm *savedModels) Push(t testing.TB, obj models.Deletable) {
 	_models.Lock()
 	defer _models.Unlock()
 
@@ -31,7 +32,7 @@ func (sm *savedModels) Push(t testing.TB, obj models.FullyDeletable) {
 }
 
 // Push adds a new model to the list
-func (sm *savedModels) Purge(t testing.TB) {
+func (sm *savedModels) Purge(t testing.TB, q *sqlx.DB) {
 	sm.Lock()
 	defer sm.Unlock()
 
@@ -41,12 +42,12 @@ func (sm *savedModels) Purge(t testing.TB) {
 	}
 
 	for obj := range list {
-		deletable, ok := obj.(models.FullyDeletable)
+		deletable, ok := obj.(models.Deletable)
 		if !ok {
 			t.Fatalf("could not delete saved object")
 		}
 
-		if err := deletable.FullyDelete(); err != nil {
+		if err := deletable.Delete(q); err != nil {
 			t.Fatalf("could not delete saved object: %s", err)
 		}
 	}
@@ -55,13 +56,13 @@ func (sm *savedModels) Purge(t testing.TB) {
 }
 
 // SaveModels saves a list of models that can be purged using PurgeModels()
-func SaveModels(t testing.TB, models ...models.FullyDeletable) {
+func SaveModels(t testing.TB, models ...models.Deletable) {
 	for _, model := range models {
 		_models.Push(t, model)
 	}
 }
 
 // PurgeModels removes all models stored for the given test
-func PurgeModels(t testing.TB) {
-	_models.Purge(t)
+func PurgeModels(t testing.TB, q *sqlx.DB) {
+	_models.Purge(t, q)
 }

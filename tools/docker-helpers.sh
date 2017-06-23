@@ -49,7 +49,7 @@ function ml-test {
   ml-make "migration"
 
   echo "Start testings"
-  ml-exec "go test $@"
+  ml-exec "go test -tags=integration $@"
 }
 
 # Execute a test

@@ -6,10 +6,8 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/Nivl/go-rest-tools/logger"
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/network/http/httpres"
-	"github.com/Nivl/go-rest-tools/notifiers/mailer"
 )
 
 // Error sends an error to the client
@@ -37,21 +35,18 @@ func (req *Request) Error(e error) {
 		}
 	}
 
-	logger.Errorf(`code: "%d", message: "%s", %s`, err.Code(), err.Error(), req)
+	req.Logger.Errorf(`code: "%d", message: "%s", %s`, err.Code(), err.Error(), req)
 
 	// We send an email for all server error
 	if err.Code() == http.StatusInternalServerError {
-
-		if mailer.Emailer != nil {
-			sendEmail := func(stacktrace []byte) {
-				err := mailer.Emailer.SendStackTrace(stacktrace, req.Endpoint(), err.Error(), req.ID)
-				if err != nil {
-					logger.Error(err.Error())
-				}
+		sendEmail := func(stacktrace []byte) {
+			err := req.deps.Mailer.SendStackTrace(stacktrace, req.Endpoint(), err.Error(), req.ID)
+			if err != nil {
+				req.Logger.Error(err.Error())
 			}
-
-			go sendEmail(debug.Stack())
 		}
+
+		go sendEmail(debug.Stack())
 	}
 }
 

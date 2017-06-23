@@ -4,68 +4,64 @@ package auth
 
 import (
 	"errors"
+	
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
+	"github.com/jmoiron/sqlx"
 )
 
-// UserExists checks if a user exists for a specific ID
-func UserExists(id string) (bool, error) {
+
+
+
+
+// Exists checks if a user exists for a specific ID
+func Exists(q *sqlx.DB, id string) (bool, error) {
 	exists := false
 	stmt := "SELECT exists(SELECT 1 FROM users WHERE id=$1 and deleted_at IS NULL)"
-	err := db.Writer.Get(&exists, stmt, id)
+	err := db.Get(q, &exists, stmt, id)
 	return exists, err
 }
 
-// Save creates or updates the user depending on the value of the id
-func (u *User) Save() error {
-	return u.SaveQ(db.Writer)
-}
-
-// SaveQ creates or updates the article depending on the value of the id using
+// Save creates or updates the article depending on the value of the id using
 // a transaction
-func (u *User) SaveQ(q db.Queryable) error {
+func (u *User) Save(q *sqlx.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
 
 	if u.ID == "" {
-		return u.CreateQ(q)
+		return u.Create(q)
 	}
 
-	return u.UpdateQ(q)
+	return u.Update(q)
 }
 
-// Create persists a user in the database
-func (u *User) Create() error {
-	return u.CreateQ(db.Writer)
-}
+
 
 // doCreate persists a user in the database using a Node
-func (u *User) doCreate(q db.Queryable) error {
+func (u *User) doCreate(q *sqlx.DB) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
 
 	u.ID = uuid.NewV4().String()
-	u.CreatedAt = db.Now()
 	u.UpdatedAt = db.Now()
+	if u.CreatedAt == nil {
+		u.CreatedAt = db.Now()
+	}
 
 	stmt := "INSERT INTO users (id, created_at, updated_at, deleted_at, name, email, password, is_admin) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :email, :password, :is_admin)"
 	_, err := q.NamedExec(stmt, u)
 
-	return err
+  return err
 }
 
-// Update updates most of the fields of a persisted user.
-// Excluded fields are id, created_at, deleted_at, etc.
-func (u *User) Update() error {
-	return u.UpdateQ(db.Writer)
-}
+
 
 // doUpdate updates a user in the database using an optional transaction
-func (u *User) doUpdate(q db.Queryable) error {
+func (u *User) doUpdate(q *sqlx.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
@@ -82,13 +78,8 @@ func (u *User) doUpdate(q db.Queryable) error {
 	return err
 }
 
-// FullyDelete removes a user from the database
-func (u *User) FullyDelete() error {
-	return u.FullyDeleteQ(db.Writer)
-}
-
-// FullyDeleteQ removes a user from the database using a transaction
-func (u *User) FullyDeleteQ(q db.Queryable) error {
+// Delete removes a user from the database using a transaction
+func (u *User) Delete(q *sqlx.DB) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
@@ -103,24 +94,19 @@ func (u *User) FullyDeleteQ(q db.Queryable) error {
 	return err
 }
 
-// Delete soft delete a user.
-func (u *User) Delete() error {
-	return u.DeleteQ(db.Writer)
+// Trash soft delete a user using a transaction
+func (u *User) Trash(q *sqlx.DB) error {
+	return u.doTrash(q)
 }
 
-// DeleteQ soft delete a user using a transaction
-func (u *User) DeleteQ(q db.Queryable) error {
-	return u.doDelete(q)
-}
-
-// doDelete performs a soft delete operation on a user using an optional transaction
-func (u *User) doDelete(q db.Queryable) error {
+// doTrash performs a soft delete operation on a user using an optional transaction
+func (u *User) doTrash(q *sqlx.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
 
 	if u.ID == "" {
-		return httperr.NewServerError("cannot delete a non-persisted user")
+		return httperr.NewServerError("cannot trash a non-persisted user")
 	}
 
 	u.DeletedAt = db.Now()
