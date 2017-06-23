@@ -1,10 +1,7 @@
 package api
 
 import (
-	"github.com/Nivl/go-rest-tools/logger"
-	"github.com/Nivl/go-rest-tools/notifiers/mailer"
-	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/bsphere/le_go"
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -26,32 +23,15 @@ func Setup() *Args {
 		panic(err)
 	}
 
-	if err := db.Setup(params.PostgresURI); err != nil {
+	if err := dependencies.InitPostgres(params.PostgresURI); err != nil {
+		panic(err)
+	}
+	if err := dependencies.InitLogEntries(params.LogEntriesToken); err != nil {
+		panic(err)
+	}
+	if err := dependencies.InitSendgrid(params.EmailAPIKey, params.EmailFrom, params.EmailTo); err != nil {
 		panic(err)
 	}
 
-	// LogEntries
-	if params.LogEntriesToken != "" {
-		le, err := le_go.Connect(params.LogEntriesToken)
-		if err != nil {
-			panic(err)
-		}
-		logger.LogEntries = le
-	}
-
-	// Sendgrid
-	if params.EmailAPIKey != "" {
-		mailer.Emailer = mailer.NewMailer(params.EmailAPIKey, params.EmailFrom, params.EmailTo)
-	}
-
 	return &params
-}
-
-// SetupIfNeeded parses the env, and sets the app globals
-func SetupIfNeeded() {
-	if db.Writer != nil {
-		return
-	}
-
-	Setup()
 }
