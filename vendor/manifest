@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/Nivl/go-rest-tools",
+			"repository": "https://github.com/Nivl/go-rest-tools",
+			"vcs": "git",
+			"revision": "94c143465720b4fcf2e0d02004710e36893fe4c3",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/bsphere/le_go",
 			"repository": "https://github.com/bsphere/le_go",
 			"vcs": "git",
