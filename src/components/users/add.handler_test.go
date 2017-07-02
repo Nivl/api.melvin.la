@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestInvalidParams(t *testing.T) {
+func TestAddInvalidParams(t *testing.T) {
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -69,7 +69,7 @@ func TestInvalidParams(t *testing.T) {
 	}
 }
 
-func TestValidData(t *testing.T) {
+func TestAddValidData(t *testing.T) {
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",
@@ -111,7 +111,7 @@ func TestValidData(t *testing.T) {
 	res.AssertExpectations(t)
 }
 
-func TestConflict(t *testing.T) {
+func TestAddConflict(t *testing.T) {
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",
