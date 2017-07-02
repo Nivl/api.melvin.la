@@ -16,9 +16,9 @@ type UpdateParams struct {
 }
 
 // Update is a HTTP handler used to update a user
-func Update(req *router.Request, deps *router.Dependencies) error {
-	params := req.Params.(*UpdateParams)
-	user := req.User
+func Update(req router.HTTPRequest, deps *router.Dependencies) error {
+	params := req.Params().(*UpdateParams)
+	user := req.User()
 
 	if params.ID != user.ID {
 		return httperr.NewForbidden()
@@ -51,6 +51,5 @@ func Update(req *router.Request, deps *router.Dependencies) error {
 		return err
 	}
 
-	req.Ok(NewPrivatePayload(user))
-	return nil
+	return req.Response().Ok(NewPrivatePayload(user))
 }

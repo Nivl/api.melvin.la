@@ -13,8 +13,8 @@ type AddParams struct {
 }
 
 // Add is a HTTP handler used to add a new user
-func Add(req *router.Request, deps *router.Dependencies) error {
-	params := req.Params.(*AddParams)
+func Add(req router.HTTPRequest, deps *router.Dependencies) error {
+	params := req.Params().(*AddParams)
 
 	encryptedPassword, err := auth.CryptPassword(params.Password)
 	if err != nil {
@@ -27,10 +27,9 @@ func Add(req *router.Request, deps *router.Dependencies) error {
 		Password: encryptedPassword,
 	}
 
-	if err := user.Save(deps.DB); err != nil {
+	if err := user.Create(deps.DB); err != nil {
 		return err
 	}
 
-	req.Created(NewPrivatePayload(user))
-	return nil
+	return req.Response().Created(NewPrivatePayload(user))
 }

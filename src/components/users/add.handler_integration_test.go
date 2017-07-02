@@ -25,17 +25,17 @@ func TestAdd(t *testing.T) {
 		params      *users.AddParams
 	}{
 		{
-			"Empty User",
+			"It should fail to add an empty user",
 			http.StatusBadRequest,
 			&users.AddParams{},
 		},
 		{
-			"Valid User",
+			"It should add a valid user",
 			http.StatusCreated,
 			&users.AddParams{Name: "Name", Email: "email+TestAdd@fake.com", Password: "password"},
 		},
 		{
-			"Duplicate Email",
+			"It should fail adding a user with an email already taken",
 			http.StatusConflict,
 			&users.AddParams{Name: "Name", Email: "email+TestAdd@fake.com", Password: "password"},
 		},

@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/gorilla/mux"
 )
 
@@ -18,30 +19,36 @@ var Endpoints = router.Endpoints{
 	EndpointAdd: {
 		Verb:    "POST",
 		Path:    "/users",
-		Auth:    nil,
 		Handler: Add,
-		Params:  &AddParams{},
+		Guard: &guard.Guard{
+			ParamStruct: &AddParams{},
+		},
 	},
 	EndpointUpdate: {
 		Verb:    "PATCH",
 		Path:    "/users/{id}",
-		Auth:    router.LoggedUserAccess,
 		Handler: Update,
-		Params:  &UpdateParams{},
+		Guard: &guard.Guard{
+			ParamStruct: &UpdateParams{},
+			Auth:        guard.LoggedUserAccess,
+		},
 	},
 	EndpointDelete: {
 		Verb:    "DELETE",
 		Path:    "/users/{id}",
-		Auth:    router.LoggedUserAccess,
 		Handler: Delete,
-		Params:  &DeleteParams{},
+		Guard: &guard.Guard{
+			ParamStruct: &DeleteParams{},
+			Auth:        guard.LoggedUserAccess,
+		},
 	},
 	EndpointGet: {
 		Verb:    "GET",
 		Path:    "/users/{id}",
-		Auth:    nil,
 		Handler: Get,
-		Params:  &GetParams{},
+		Guard: &guard.Guard{
+			ParamStruct: &GetParams{},
+		},
 	},
 }
 

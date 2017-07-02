@@ -2,7 +2,6 @@ package router
 
 import (
 	"net/http"
-	"reflect"
 
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/logger"
@@ -32,28 +31,34 @@ func (endpoints Endpoints) Activate(router *mux.Router) {
 func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 	HTTPHandler := func(resWriter http.ResponseWriter, req *http.Request) {
 		request := &Request{
-			ID:       uuid.NewV4().String()[:8],
-			Request:  req,
-			Response: resWriter,
-			deps:     deps,
+			id:   uuid.NewV4().String()[:8],
+			http: req,
+			res:  NewResponse(resWriter, deps),
+			deps: deps,
 		}
 		defer request.handlePanic()
 
 		if dependencies.Logentries != nil {
-			request.Logger = logger.NewLogEntries(dependencies.Logentries)
+			request.logger = logger.NewLogEntries(dependencies.Logentries)
 		} else {
-			request.Logger = logger.NewBasicLogger()
+			request.logger = logger.NewBasicLogger()
 		}
 
 		// We set some response data
-		request.Response.Header().Set("X-Request-Id", request.ID)
+		request.res.Header().Set("X-Request-Id", request.id)
 
 		// We Parse the request params
-		if e.Params != nil {
-			// We give request.Params the same type as e.Params
-			request.Params = reflect.New(reflect.TypeOf(e.Params).Elem()).Interface()
-			if err := request.ParseParams(); err != nil {
-				request.Error(err)
+		if e.Guard != nil && e.Guard.ParamStruct != nil {
+			// Get the list of all http params provided by the client
+			sources, err := request.httpParamsBySource()
+			if err != nil {
+				request.res.Error(err, request)
+				return
+			}
+
+			request.params, err = e.Guard.ParseParams(sources)
+			if err != nil {
+				request.res.Error(err, request)
 				return
 			}
 		}
@@ -67,36 +72,35 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 			if session.ID != "" && session.UserID != "" {
 				exists, err := session.Exists(deps.DB)
 				if err != nil {
-					request.Error(err)
+					request.res.Error(err, request)
 					return
 				}
 				if !exists {
-					request.Error(httperr.NewBadRequest("invalid auth data"))
+					request.res.Error(httperr.NewBadRequest("invalid auth data"), request)
 					return
 				}
 				// we get the user and make sure it (still) exists
-				request.User, err = auth.GetUser(deps.DB, session.UserID)
+				request.user, err = auth.GetUser(deps.DB, session.UserID)
 				if err != nil {
-					request.Error(err)
+					request.res.Error(err, request)
 					return
 				}
-				if request.User == nil {
-					request.Error(httperr.NewBadRequest("user not found"))
+				if request.user == nil {
+					request.res.Error(httperr.NewBadRequest("user not found"), request)
 					return
 				}
 			}
 		}
 
-		accessGranted := e.Auth == nil || e.Auth(request)
-		if !accessGranted {
-			request.Error(httperr.NewUnauthorized())
+		if allowed, err := e.Guard.HasAccess(request.user); !allowed {
+			request.res.Error(err, request)
 			return
 		}
 
 		// Execute the actual route handler
 		err := e.Handler(request, deps)
 		if err != nil {
-			request.Error(err)
+			request.res.Error(err, request)
 		}
 	}
 

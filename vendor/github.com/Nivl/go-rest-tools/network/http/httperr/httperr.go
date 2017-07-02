@@ -12,6 +12,16 @@ type Error interface {
 	Code() int
 }
 
+// Convert takes an error an turns it into an HTTPError
+func Convert(e error) *HTTPError {
+	err, casted := e.(*HTTPError)
+	if !casted {
+		err = NewServerError(e.Error()).(*HTTPError)
+	}
+
+	return err
+}
+
 // HTTPError represents an error with an HTTP code
 type HTTPError struct {
 	error

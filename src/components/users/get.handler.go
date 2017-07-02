@@ -12,8 +12,8 @@ type GetParams struct {
 }
 
 // Get represent an API handler to get a user
-func Get(req *router.Request, deps *router.Dependencies) error {
-	params := req.Params.(*GetParams)
+func Get(req router.HTTPRequest, deps *router.Dependencies) error {
+	params := req.Params().(*GetParams)
 
 	user, err := auth.GetUser(deps.DB, params.ID)
 	if err != nil {
@@ -24,10 +24,8 @@ func Get(req *router.Request, deps *router.Dependencies) error {
 	}
 
 	// if a user asks for their own data, we return as much as possible
-	if req.User != nil && req.User.ID == user.ID {
-		req.Ok(NewPrivatePayload(user))
-		return nil
+	if req.User() != nil && req.User().ID == user.ID {
+		return req.Response().Ok(NewPrivatePayload(user))
 	}
-	req.Ok(NewPayload(user))
-	return nil
+	return req.Response().Ok(NewPayload(user))
 }
