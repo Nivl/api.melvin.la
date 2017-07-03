@@ -8,7 +8,7 @@ import (
 
 // UpdateParams represents the params accepted Update to update a user
 type UpdateParams struct {
-	ID              string `from:"url" json:"id"  params:"uuid"`
+	ID              string `from:"url" json:"id"  params:"uuid,required"`
 	Name            string `from:"form" json:"name" params:"trim"`
 	Email           string `from:"form" json:"email" params:"trim"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
