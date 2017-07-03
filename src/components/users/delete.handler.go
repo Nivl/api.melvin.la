@@ -9,7 +9,7 @@ import (
 // DeleteParams represent the request params accepted by HandlerDelete
 type DeleteParams struct {
 	ID              string `from:"url" json:"id" params:"uuid"`
-	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
+	CurrentPassword string `from:"form" json:"current_password" params:"required,trim"`
 }
 
 // Delete represent an API handler to remove a user
