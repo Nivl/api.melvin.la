@@ -12,7 +12,7 @@
 			"importpath": "github.com/Nivl/go-rest-tools",
 			"repository": "https://github.com/Nivl/go-rest-tools",
 			"vcs": "git",
-			"revision": "5dc2caab6e00425f86cbdd204e4370ef61f33094",
+			"revision": "cd82e6d3561cedd4b640546f8e7a391f0158633b",
 			"branch": "master",
 			"notests": true
 		},

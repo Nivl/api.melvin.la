@@ -6,10 +6,10 @@ import (
 )
 
 // RouteAuth represents a middleware used to allow/block the access to an endpoint
-type RouteAuth func(*auth.User) error
+type RouteAuth func(*auth.User) httperr.Error
 
 // LoggedUserAccess is a auth middleware that filters out anonymous users
-func LoggedUserAccess(u *auth.User) error {
+func LoggedUserAccess(u *auth.User) httperr.Error {
 	if u == nil || u.ID == "" {
 		return httperr.NewUnauthorized()
 	}
@@ -17,7 +17,7 @@ func LoggedUserAccess(u *auth.User) error {
 }
 
 // AdminAccess is a auth middleware that filters out non admin users
-func AdminAccess(u *auth.User) error {
+func AdminAccess(u *auth.User) httperr.Error {
 	if err := LoggedUserAccess(u); err != nil {
 		return httperr.NewUnauthorized()
 	}

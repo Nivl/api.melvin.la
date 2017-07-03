@@ -101,7 +101,7 @@ func TestDeleteAccess(t *testing.T) {
 			_, err := endpts.Guard.HasAccess(tc.user)
 			if tc.errCode > 0 {
 				assert.Error(t, err)
-				assert.Equal(t, tc.errCode, httperr.Convert(err).Code())
+				assert.Equal(t, tc.errCode, err.Code())
 			} else {
 				assert.NoError(t, err)
 			}
