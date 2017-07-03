@@ -34,7 +34,6 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 			id:   uuid.NewV4().String()[:8],
 			http: req,
 			res:  NewResponse(resWriter, deps),
-			deps: deps,
 		}
 		defer request.handlePanic()
 

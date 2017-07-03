@@ -28,19 +28,17 @@ var Logentries *le_go.Logger
 
 // InitLogentries inits the connection to logentries
 func InitLogentries(token string) {
-	if token != "" {
-		le, err := le_go.Connect(token)
-		if err != nil {
-			panic(err)
-		}
-		Logentries = le
+	le, err := le_go.Connect(token)
+	if err != nil {
+		panic(err)
 	}
+	Logentries = le
 }
 
 // Sendgrid is a sendgrid email client
 var Sendgrid *mailer.Sendgrid
 
 // InitSendgrid creates a mailer that uses Sendgrid
-func InitSendgrid(api, from, to string) {
-	Sendgrid = mailer.NewSendgrid(api, from, to)
+func InitSendgrid(api, from, to, stacktraceUUID string) {
+	Sendgrid = mailer.NewSendgrid(api, from, to, stacktraceUUID)
 }

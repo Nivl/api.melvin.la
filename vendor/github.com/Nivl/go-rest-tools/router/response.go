@@ -24,7 +24,6 @@ type HTTPResponse interface {
 
 // Response is a basic implementation of the HTTPResponse that uses a ResponseWriter
 type Response struct {
-	header http.Header
 	writer http.ResponseWriter
 	deps   *Dependencies
 }
@@ -37,9 +36,9 @@ func NewResponse(writer http.ResponseWriter, deps *Dependencies) *Response {
 	}
 }
 
-// Header sends a http.StatusNoContent response
+// Header returns the header object of the response
 func (res *Response) Header() http.Header {
-	return res.header
+	return res.writer.Header()
 }
 
 // NoContent sends a http.StatusNoContent response

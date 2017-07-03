@@ -10,7 +10,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
-	"github.com/Nivl/go-rest-tools/security/auth/testdata"
+	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,8 +18,8 @@ import (
 func TestGet(t *testing.T) {
 	defer lifecycle.PurgeModels(t, deps.DB)
 
-	u1, s1 := testdata.NewAuth(t, deps.DB)
-	_, s2 := testdata.NewAuth(t, deps.DB)
+	u1, s1 := testauth.NewAuth(t, deps.DB)
+	_, s2 := testauth.NewAuth(t, deps.DB)
 
 	tests := []struct {
 		description string

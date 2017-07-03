@@ -1,19 +1,18 @@
 package api
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
-	"github.com/Nivl/go-rest-tools/network/http/httpres"
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 )
 
-func notFound(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	err := fmt.Sprintf(`{"error":"%s"}`, http.StatusText(http.StatusNotFound))
-	httpres.ErrorJSON(w, err, http.StatusNotFound)
+var notFoundEndpoint = &router.Endpoint{
+	Handler: func(req router.HTTPRequest, deps *router.Dependencies) error {
+		return errors.New(http.StatusText(http.StatusNotFound))
+	},
 }
 
 // GetRouter return the api router with all the routes
@@ -22,7 +21,7 @@ func GetRouter() *mux.Router {
 	// blog.SetRoutes(r)
 	users.SetRoutes(r)
 	// sessions.SetRoutes(r)
-	r.NotFoundHandler = http.HandlerFunc(notFound)
+	r.NotFoundHandler = router.Handler(notFoundEndpoint, router.NewDefaultDependencies())
 
 	return r
 }

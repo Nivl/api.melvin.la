@@ -53,7 +53,6 @@ type Request struct {
 	user         *auth.User
 	_contentType string
 	logger       logger.Logger
-	deps         *Dependencies
 }
 
 // User returns the user that made the request
