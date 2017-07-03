@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/primitives/models"
-	"github.com/jmoiron/sqlx"
+	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
 var _models = &savedModels{
@@ -32,7 +32,7 @@ func (sm *savedModels) Push(t testing.TB, obj models.Deletable) {
 }
 
 // Push adds a new model to the list
-func (sm *savedModels) Purge(t testing.TB, q *sqlx.DB) {
+func (sm *savedModels) Purge(t testing.TB, q db.DB) {
 	sm.Lock()
 	defer sm.Unlock()
 
@@ -63,6 +63,6 @@ func SaveModels(t testing.TB, models ...models.Deletable) {
 }
 
 // PurgeModels removes all models stored for the given test
-func PurgeModels(t testing.TB, q *sqlx.DB) {
+func PurgeModels(t testing.TB, q db.DB) {
 	_models.Purge(t, q)
 }

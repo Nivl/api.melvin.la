@@ -9,7 +9,6 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
-	"github.com/jmoiron/sqlx"
 )
 
 
@@ -17,7 +16,7 @@ import (
 
 
 // Exists checks if a user exists for a specific ID
-func Exists(q *sqlx.DB, id string) (bool, error) {
+func Exists(q db.DB, id string) (bool, error) {
 	exists := false
 	stmt := "SELECT exists(SELECT 1 FROM users WHERE id=$1 and deleted_at IS NULL)"
 	err := db.Get(q, &exists, stmt, id)
@@ -26,7 +25,7 @@ func Exists(q *sqlx.DB, id string) (bool, error) {
 
 // Save creates or updates the article depending on the value of the id using
 // a transaction
-func (u *User) Save(q *sqlx.DB) error {
+func (u *User) Save(q db.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
@@ -41,7 +40,7 @@ func (u *User) Save(q *sqlx.DB) error {
 
 
 // doCreate persists a user in the database using a Node
-func (u *User) doCreate(q *sqlx.DB) error {
+func (u *User) doCreate(q db.DB) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
@@ -61,7 +60,7 @@ func (u *User) doCreate(q *sqlx.DB) error {
 
 
 // doUpdate updates a user in the database using an optional transaction
-func (u *User) doUpdate(q *sqlx.DB) error {
+func (u *User) doUpdate(q db.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
@@ -79,7 +78,7 @@ func (u *User) doUpdate(q *sqlx.DB) error {
 }
 
 // Delete removes a user from the database using a transaction
-func (u *User) Delete(q *sqlx.DB) error {
+func (u *User) Delete(q db.DB) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
@@ -95,12 +94,12 @@ func (u *User) Delete(q *sqlx.DB) error {
 }
 
 // Trash soft delete a user using a transaction
-func (u *User) Trash(q *sqlx.DB) error {
+func (u *User) Trash(q db.DB) error {
 	return u.doTrash(q)
 }
 
 // doTrash performs a soft delete operation on a user using an optional transaction
-func (u *User) doTrash(q *sqlx.DB) error {
+func (u *User) doTrash(q db.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}

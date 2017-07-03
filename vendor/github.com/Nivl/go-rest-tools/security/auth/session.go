@@ -5,7 +5,6 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/jmoiron/sqlx"
 )
 
 // Session is a structure representing a session that can be saved in the database
@@ -20,7 +19,7 @@ type Session struct {
 }
 
 // Exists check if a session exists in the database
-func (s *Session) Exists(q *sqlx.DB) (bool, error) {
+func (s *Session) Exists(q db.DB) (bool, error) {
 	if s == nil {
 		return false, httperr.NewServerError("session is nil")
 	}
@@ -62,7 +61,7 @@ func SessionJoinSQL(prefix string) string {
 }
 
 // Save is an alias for Create since sessions are not updatable
-func (s *Session) Save(q *sqlx.DB) error {
+func (s *Session) Save(q db.DB) error {
 	if s == nil {
 		return httperr.NewServerError("session is nil")
 	}
@@ -71,7 +70,7 @@ func (s *Session) Save(q *sqlx.DB) error {
 }
 
 // Create persists a session in the database
-func (s *Session) Create(q *sqlx.DB) error {
+func (s *Session) Create(q db.DB) error {
 	if s == nil {
 		return httperr.NewServerError("session is nil")
 	}

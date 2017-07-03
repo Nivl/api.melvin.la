@@ -7,7 +7,6 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/jmoiron/sqlx"
 )
 
 // User is a structure representing a user that can be saved in the database
@@ -42,7 +41,7 @@ func UserJoinSQL(prefix string) string {
 }
 
 // GetUser finds and returns an active user by ID
-func GetUser(q *sqlx.DB, id string) (*User, error) {
+func GetUser(q db.DB, id string) (*User, error) {
 	user := &User{}
 	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
 	err := db.Get(q, user, stmt, id)
@@ -70,7 +69,7 @@ func IsPasswordValid(hash string, raw string) bool {
 }
 
 // Create persists a user in the database
-func (u *User) Create(q *sqlx.DB) error {
+func (u *User) Create(q db.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}
@@ -89,7 +88,7 @@ func (u *User) Create(q *sqlx.DB) error {
 
 // Update updates most of the fields of a persisted user.
 // Excluded fields are id, created_at, deleted_at
-func (u *User) Update(q *sqlx.DB) error {
+func (u *User) Update(q db.DB) error {
 	if u == nil {
 		return httperr.NewServerError("user is not instanced")
 	}

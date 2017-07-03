@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,7 +12,7 @@ import (
 type MockDB struct {
 	Mock  sqlmock.Sqlmock
 	SQLDB *sql.DB
-	DB    *sqlx.DB
+	DB    db.DB
 }
 
 // New creates a new MockDB

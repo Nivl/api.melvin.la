@@ -1,8 +1,8 @@
 package models
 
-import "github.com/jmoiron/sqlx"
+import "github.com/Nivl/go-rest-tools/storage/db"
 
 // Deletable represents an objects that can be deleted from the database
 type Deletable interface {
-	Delete(q *sqlx.DB) error
+	Delete(q db.DB) error
 }

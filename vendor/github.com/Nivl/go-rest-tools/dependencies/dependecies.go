@@ -2,12 +2,13 @@ package dependencies
 
 import (
 	"github.com/Nivl/go-rest-tools/notifiers/mailer"
+	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/bsphere/le_go"
 	"github.com/jmoiron/sqlx"
 )
 
 // DB represents an open connection with write access to the database
-var DB *sqlx.DB
+var DB db.DB
 
 // InitPostgres inits the connection to the database
 func InitPostgres(uri string) error {

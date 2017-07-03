@@ -9,7 +9,6 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
-	"github.com/jmoiron/sqlx"
 )
 
 
@@ -23,7 +22,7 @@ import (
 
 
 // doCreate persists a session in the database using a Node
-func (s *Session) doCreate(q *sqlx.DB) error {
+func (s *Session) doCreate(q db.DB) error {
 	if s == nil {
 		return errors.New("session not instanced")
 	}
@@ -45,7 +44,7 @@ func (s *Session) doCreate(q *sqlx.DB) error {
 
 
 // Delete removes a session from the database using a transaction
-func (s *Session) Delete(q *sqlx.DB) error {
+func (s *Session) Delete(q db.DB) error {
 	if s == nil {
 		return errors.New("session not instanced")
 	}
@@ -61,12 +60,12 @@ func (s *Session) Delete(q *sqlx.DB) error {
 }
 
 // Trash soft delete a session using a transaction
-func (s *Session) Trash(q *sqlx.DB) error {
+func (s *Session) Trash(q db.DB) error {
 	return s.doTrash(q)
 }
 
 // doTrash performs a soft delete operation on a session using an optional transaction
-func (s *Session) doTrash(q *sqlx.DB) error {
+func (s *Session) doTrash(q db.DB) error {
 	if s == nil {
 		return httperr.NewServerError("session is not instanced")
 	}

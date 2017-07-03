@@ -3,12 +3,12 @@ package router
 import (
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/notifiers/mailer"
-	"github.com/jmoiron/sqlx"
+	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
 // Dependencies represents all the dependencies of the API
 type Dependencies struct {
-	DB     *sqlx.DB
+	DB     db.DB
 	Mailer mailer.Mailer
 }
 
