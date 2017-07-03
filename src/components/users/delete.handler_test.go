@@ -23,6 +23,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		{
 			"Should fail on no params",
 			map[string]url.Values{
+				"url":  url.Values{},
 				"form": url.Values{},
 			},
 		},
@@ -37,8 +38,10 @@ func TestDeleteInvalidParams(t *testing.T) {
 		{
 			"Should fail on invalid ID",
 			map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"not-a-uuid"},
+				},
 				"form": url.Values{
-					"id":               []string{"not-a-uuid"},
 					"current_password": []string{"password"},
 				},
 			},
@@ -46,7 +49,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		{
 			"Should fail on missing password",
 			map[string]url.Values{
-				"form": url.Values{
+				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 				},
 			},
@@ -54,8 +57,10 @@ func TestDeleteInvalidParams(t *testing.T) {
 		{
 			"Should fail on blank password",
 			map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
 				"form": url.Values{
-					"id":               []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 					"current_password": []string{"      "},
 				},
 			},
@@ -70,6 +75,43 @@ func TestDeleteInvalidParams(t *testing.T) {
 			endpts := users.Endpoints[users.EndpointDelete]
 			_, err := endpts.Guard.ParseParams(tc.sources)
 			assert.Error(t, err)
+		})
+	}
+}
+
+func TestDeleteValidParams(t *testing.T) {
+	testCases := []struct {
+		description string
+		sources     map[string]url.Values
+	}{
+		{
+			"Should fail on blank password",
+			map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"current_password": []string{"password"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.description, func(t *testing.T) {
+			t.Parallel()
+
+			endpts := users.Endpoints[users.EndpointDelete]
+			data, err := endpts.Guard.ParseParams(tc.sources)
+			assert.NoError(t, err)
+
+			if data != nil {
+				p := data.(*users.DeleteParams)
+				assert.Equal(t, tc.sources["url"].Get("id"), p.ID)
+				assert.Equal(t, tc.sources["form"].Get("current_password"), p.CurrentPassword)
+			}
+
 		})
 	}
 }
