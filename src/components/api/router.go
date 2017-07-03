@@ -1,9 +1,7 @@
 package api
 
 import (
-	"errors"
-	"net/http"
-
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/gorilla/mux"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -11,7 +9,7 @@ import (
 
 var notFoundEndpoint = &router.Endpoint{
 	Handler: func(req router.HTTPRequest, deps *router.Dependencies) error {
-		return errors.New(http.StatusText(http.StatusNotFound))
+		return httperr.NewNotFound()
 	},
 }
 
