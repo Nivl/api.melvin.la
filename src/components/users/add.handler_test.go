@@ -3,6 +3,7 @@ package users_test
 import (
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -20,16 +21,19 @@ import (
 func TestAddInvalidParams(t *testing.T) {
 	testCases := []struct {
 		description string
+		msgMatch    string
 		sources     map[string]url.Values
 	}{
 		{
 			"Should fail on no params",
+			"parameter missing",
 			map[string]url.Values{
 				"form": url.Values{},
 			},
 		},
 		{
 			"Should fail on missing name",
+			"parameter missing: name",
 			map[string]url.Values{
 				"form": url.Values{
 					"email":    []string{"email@valid.tld"},
@@ -39,6 +43,7 @@ func TestAddInvalidParams(t *testing.T) {
 		},
 		{
 			"Should fail on missing email",
+			"parameter missing: email",
 			map[string]url.Values{
 				"form": url.Values{
 					"name":     []string{"username"},
@@ -48,6 +53,7 @@ func TestAddInvalidParams(t *testing.T) {
 		},
 		{
 			"Should fail on missing password",
+			"parameter missing: password",
 			map[string]url.Values{
 				"form": url.Values{
 					"name":  []string{"username"},
@@ -64,7 +70,9 @@ func TestAddInvalidParams(t *testing.T) {
 
 			endpts := users.Endpoints[users.EndpointAdd]
 			_, err := endpts.Guard.ParseParams(tc.sources)
-			assert.Error(t, err)
+			assert.Error(t, err, "expected the guard to fail")
+			assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
+				"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
 		})
 	}
 }

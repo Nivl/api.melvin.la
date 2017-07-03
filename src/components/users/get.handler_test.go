@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
@@ -19,16 +20,19 @@ import (
 func TestGetInvalidParams(t *testing.T) {
 	testCases := []struct {
 		description string
+		msgMatch    string
 		sources     map[string]url.Values
 	}{
 		{
 			"Should fail on missing ID",
+			"parameter missing: id",
 			map[string]url.Values{
 				"url": url.Values{},
 			},
 		},
 		{
 			"Should fail on invalid ID",
+			"not a valid uuid",
 			map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -44,7 +48,9 @@ func TestGetInvalidParams(t *testing.T) {
 
 			endpts := users.Endpoints[users.EndpointGet]
 			_, err := endpts.Guard.ParseParams(tc.sources)
-			assert.Error(t, err)
+			assert.Error(t, err, "expected the guard to fail")
+			assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
+				"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
 		})
 	}
 }

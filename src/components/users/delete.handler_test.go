@@ -3,6 +3,7 @@ package users_test
 import (
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -18,10 +19,12 @@ import (
 func TestDeleteInvalidParams(t *testing.T) {
 	testCases := []struct {
 		description string
+		msgMatch    string
 		sources     map[string]url.Values
 	}{
 		{
 			"Should fail on no params",
+			"parameter missing",
 			map[string]url.Values{
 				"url":  url.Values{},
 				"form": url.Values{},
@@ -29,7 +32,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			"Should fail on missing ID",
+			"parameter missing: id",
 			map[string]url.Values{
+				"url": url.Values{},
 				"form": url.Values{
 					"current_password": []string{"password"},
 				},
@@ -37,6 +42,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			"Should fail on invalid ID",
+			"not a valid uuid",
 			map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -48,14 +54,17 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			"Should fail on missing password",
+			"parameter missing: current_password",
 			map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 				},
+				"form": url.Values{},
 			},
 		},
 		{
 			"Should fail on blank password",
+			"parameter missing: current_password",
 			map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
@@ -74,7 +83,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 
 			endpts := users.Endpoints[users.EndpointDelete]
 			_, err := endpts.Guard.ParseParams(tc.sources)
-			assert.Error(t, err)
+			assert.Error(t, err, "expected the guard to fail")
+			assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
+				"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
 		})
 	}
 }
