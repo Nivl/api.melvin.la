@@ -20,7 +20,7 @@ var deleteEndpoint = &router.Endpoint{
 
 // DeleteParams represent the request params accepted by HandlerDelete
 type DeleteParams struct {
-	Token           string `from:"url" json:"token" params:"uuid"`
+	Token           string `from:"url" json:"token" params:"uuid,required"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim"`
 }
 
