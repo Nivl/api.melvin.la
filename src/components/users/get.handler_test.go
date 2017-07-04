@@ -48,9 +48,10 @@ func TestGetInvalidParams(t *testing.T) {
 
 			endpts := users.Endpoints[users.EndpointGet]
 			_, err := endpts.Guard.ParseParams(tc.sources)
-			assert.Error(t, err, "expected the guard to fail")
-			assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
-				"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
+			if assert.Error(t, err, "expected the guard to fail") {
+				assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
+					"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
+			}
 		})
 	}
 }
