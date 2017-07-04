@@ -13,19 +13,8 @@ const (
 
 // Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
-	EndpointAdd: {
-		Verb:    "POST",
-		Path:    "/sessions",
-		Handler: Add,
-		Params:  &AddParams{},
-	},
-	EndpointDelete: {
-		Verb:    "DELETE",
-		Path:    "/sessions/{token}",
-		Handler: Delete,
-		Params:  &DeleteParams{},
-		Auth:    router.LoggedUserAccess,
-	},
+	EndpointAdd:    addEndpoint,
+	EndpointDelete: deleteEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article

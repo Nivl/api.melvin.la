@@ -73,6 +73,22 @@ func (_m *HTTPRequest) Response() router.HTTPResponse {
 	return r0
 }
 
+// Session provides a mock function with given fields:
+func (_m *HTTPRequest) Session() *auth.Session {
+	ret := _m.Called()
+
+	var r0 *auth.Session
+	if rf, ok := ret.Get(0).(func() *auth.Session); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*auth.Session)
+		}
+	}
+
+	return r0
+}
+
 // Signature provides a mock function with given fields:
 func (_m *HTTPRequest) Signature() string {
 	ret := _m.Called()

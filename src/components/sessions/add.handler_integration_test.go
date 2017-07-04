@@ -11,14 +11,14 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/security/auth/testdata"
+	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAdd(t *testing.T) {
-	defer lifecycle.PurgeModels(t)
-	u1 := testdata.NewUser(t, nil)
+	defer lifecycle.PurgeModels(t, deps.DB)
+	u1 := testauth.NewUser(t, deps.DB, nil)
 
 	tests := []struct {
 		description string
@@ -26,17 +26,17 @@ func TestAdd(t *testing.T) {
 		params      *sessions.AddParams
 	}{
 		{
-			"Invalid email",
+			"Unexisting email should fail",
 			http.StatusBadRequest,
 			&sessions.AddParams{Email: "invalid@fake.com", Password: "fake"},
 		},
 		{
-			"Invalid password",
+			"Invalid password should fail",
 			http.StatusBadRequest,
 			&sessions.AddParams{Email: u1.Email, Password: "invalid"},
 		},
 		{
-			"Valid Request",
+			"Valid Request should work",
 			http.StatusCreated,
 			&sessions.AddParams{Email: u1.Email, Password: "fake"},
 		},
@@ -57,7 +57,7 @@ func TestAdd(t *testing.T) {
 				assert.Equal(t, u1.ID, session.UserID)
 
 				// clean the test
-				(&auth.Session{ID: session.Token}).FullyDelete()
+				(&auth.Session{ID: session.Token}).Delete(deps.DB)
 			}
 		})
 	}

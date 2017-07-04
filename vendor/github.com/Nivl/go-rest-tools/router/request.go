@@ -42,6 +42,9 @@ type HTTPRequest interface {
 
 	// User returns the user that made the request
 	User() *auth.User
+
+	// Session returns the session used to make the request
+	Session() *auth.Session
 }
 
 // Request represent a client request
@@ -51,6 +54,7 @@ type Request struct {
 	http         *http.Request
 	params       interface{}
 	user         *auth.User
+	session      *auth.Session
 	_contentType string
 	logger       logger.Logger
 }
@@ -58,6 +62,11 @@ type Request struct {
 // User returns the user that made the request
 func (req *Request) User() *auth.User {
 	return req.user
+}
+
+// Session returns the session used to make the request
+func (req *Request) Session() *auth.Session {
+	return req.session
 }
 
 // ID returns the ID of the request

@@ -10,24 +10,24 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/security/auth/testdata"
+	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDelete(t *testing.T) {
-	defer lifecycle.PurgeModels(t)
+	defer lifecycle.PurgeModels(t, deps.DB)
 
 	// Do not delete safeSession
-	u1, safeSession := testdata.NewAuth(t)
+	u1, safeSession := testauth.NewAuth(t, deps.DB)
 
 	// We create a couple of sessions for the same user
-	toDelete2 := testdata.NewSession(t, u1)
-	toDelete3 := testdata.NewSession(t, u1)
+	toDelete2 := testauth.NewSession(t, deps.DB, u1)
+	toDelete3 := testauth.NewSession(t, deps.DB, u1)
 
 	// We create a other session attached to an other user
-	_, randomSession := testdata.NewAuth(t)
+	_, randomSession := testauth.NewAuth(t, deps.DB)
 
 	tests := []struct {
 		description string
@@ -82,14 +82,12 @@ func TestDelete(t *testing.T) {
 				// We check that the user is still in DB but is flagged for deletion
 				var session auth.Session
 				stmt := "SELECT * FROM sessions WHERE id=$1 LIMIT 1"
-				err := db.Get(&session, stmt, tc.params.Token)
+				err := db.Get(deps.DB, &session, stmt, tc.params.Token)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				if assert.NotEmpty(t, session.ID, "session fully deleted") {
-					assert.NotNil(t, session.DeletedAt, "User not marked for deletion")
-				}
+				assert.Empty(t, session.ID, "session should be deleted")
 			}
 		})
 	}

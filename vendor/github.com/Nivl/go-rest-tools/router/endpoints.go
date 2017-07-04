@@ -78,6 +78,7 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 					request.res.Error(httperr.NewBadRequest("invalid auth data"), request)
 					return
 				}
+				request.session = session
 				// we get the user and make sure it (still) exists
 				request.user, err = auth.GetUser(deps.DB, session.UserID)
 				if err != nil {
