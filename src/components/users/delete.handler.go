@@ -3,8 +3,19 @@ package users
 import (
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
+
+var deleteEndpoint = &router.Endpoint{
+	Verb:    "DELETE",
+	Path:    "/users/{id}",
+	Handler: Delete,
+	Guard: &guard.Guard{
+		ParamStruct: &DeleteParams{},
+		Auth:        guard.LoggedUserAccess,
+	},
+}
 
 // DeleteParams represent the request params accepted by HandlerDelete
 type DeleteParams struct {

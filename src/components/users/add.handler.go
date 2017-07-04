@@ -2,8 +2,18 @@ package users
 
 import (
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
+
+var addEndpoint = &router.Endpoint{
+	Verb:    "POST",
+	Path:    "/users",
+	Handler: Add,
+	Guard: &guard.Guard{
+		ParamStruct: &AddParams{},
+	},
+}
 
 // AddParams represents the params accepted by Add to create a new user
 type AddParams struct {

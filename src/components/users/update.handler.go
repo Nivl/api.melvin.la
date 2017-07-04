@@ -3,8 +3,19 @@ package users
 import (
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
+
+var updateEndpoint = &router.Endpoint{
+	Verb:    "PATCH",
+	Path:    "/users/{id}",
+	Handler: Update,
+	Guard: &guard.Guard{
+		ParamStruct: &UpdateParams{},
+		Auth:        guard.LoggedUserAccess,
+	},
+}
 
 // UpdateParams represents the params accepted Update to update a user
 type UpdateParams struct {

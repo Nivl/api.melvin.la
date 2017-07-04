@@ -3,8 +3,18 @@ package users
 import (
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
+
+var getEndpoint = &router.Endpoint{
+	Verb:    "GET",
+	Path:    "/users/{id}",
+	Handler: Get,
+	Guard: &guard.Guard{
+		ParamStruct: &GetParams{},
+	},
+}
 
 // GetParams represent the request params accepted by HandlerGet
 type GetParams struct {
