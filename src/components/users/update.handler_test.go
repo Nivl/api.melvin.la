@@ -5,10 +5,9 @@ import (
 	"net/url"
 	"testing"
 
-	"strings"
-
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -18,23 +17,19 @@ import (
 )
 
 func TestUpdateInvalidParams(t *testing.T) {
-	testCases := []struct {
-		description string
-		msgMatch    string
-		sources     map[string]url.Values
-	}{
+	testCases := []testguard.InvalidParamsTestCase{
 		{
-			"Should fail on missing ID",
-			"parameter missing: id",
-			map[string]url.Values{
+			Description: "Should fail on missing ID",
+			MsgMatch:    "parameter missing: id",
+			Sources: map[string]url.Values{
 				"url":  url.Values{},
 				"form": url.Values{},
 			},
 		},
 		{
-			"Should fail on invalid ID",
-			"not a valid uuid",
-			map[string]url.Values{
+			Description: "Should fail on invalid ID",
+			MsgMatch:    "not a valid uuid",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
 				},
@@ -43,19 +38,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			endpts := users.Endpoints[users.EndpointUpdate]
-			_, err := endpts.Guard.ParseParams(tc.sources)
-			if assert.Error(t, err, "expected the guard to fail") {
-				assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
-					"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
-			}
-		})
-	}
+	g := users.Endpoints[users.EndpointUpdate].Guard
+	testguard.InvalidParams(t, g, testCases)
 }
 
 func TestUpdateValidParams(t *testing.T) {
@@ -92,41 +76,24 @@ func TestUpdateValidParams(t *testing.T) {
 }
 
 func TestUpdateAccess(t *testing.T) {
-	testCases := []struct {
-		description string
-		user        *auth.User
-		errCode     int // <= 0 for no error
-	}{
+	testCases := []testguard.AccessTestCase{
 		{
-			"Should fail for anonymous users",
-			nil,
-			http.StatusUnauthorized,
+			Description: "Should fail for anonymous users",
+			User:        nil,
+			ErrCode:     http.StatusUnauthorized,
 		},
 		{
-			"Should work for logged users",
-			&auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
-			0,
+			Description: "Should work for logged users",
+			User:        &auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+			ErrCode:     0,
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			endpts := users.Endpoints[users.EndpointUpdate]
-			_, err := endpts.Guard.HasAccess(tc.user)
-			if tc.errCode > 0 {
-				assert.Error(t, err)
-				assert.Equal(t, tc.errCode, err.Code())
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
+	g := users.Endpoints[users.EndpointUpdate].Guard
+	testguard.AccessTest(t, g, testCases)
 }
 
-func TestGetValidData(t *testing.T) {
+func TestUpdateHappyPath(t *testing.T) {
 	handlerParams := &users.UpdateParams{
 		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		CurrentPassword: "valid password",
@@ -144,11 +111,11 @@ func TestGetValidData(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	mockDB.On("NamedExec", mock.AnythingOfType("string"), mock.AnythingOfType("*auth.User")).Return(nil, nil)
+	mockDB.ExpectUpdate("*auth.User")
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.On("Ok", mock.AnythingOfType("*users.Payload")).Return(nil).Run(func(args mock.Arguments) {
+	res.ExpectOk("*users.Payload", func(args mock.Arguments) {
 		data := args.Get(0).(*users.Payload)
 		assert.Equal(t, user.Name, data.Name, "the name should have not changed")
 		assert.Equal(t, handlerParams.Email, data.Email, "email should have been updated")
@@ -170,7 +137,7 @@ func TestGetValidData(t *testing.T) {
 	res.AssertExpectations(t)
 }
 
-func TestGetInvalidPassword(t *testing.T) {
+func TestUpdateInvalidPassword(t *testing.T) {
 	handlerParams := &users.UpdateParams{
 		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		CurrentPassword: "invalid password",
@@ -184,18 +151,13 @@ func TestGetInvalidPassword(t *testing.T) {
 		Password: userPassword,
 	}
 
-	// Mock the database & add expectations
-	deps := &router.Dependencies{
-		DB: nil, // the DB shouldn't be used
-	}
-
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
 	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Update(req, deps)
+	err = users.Update(req, &router.Dependencies{})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should not have fail")
@@ -218,18 +180,13 @@ func TestUpdateInvalidUser(t *testing.T) {
 		Password: userPassword,
 	}
 
-	// Mock the database & add expectations
-	deps := &router.Dependencies{
-		DB: nil, // the DB shouldn't be used
-	}
-
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
 	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Update(req, deps)
+	err = users.Update(req, &router.Dependencies{})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should not have fail")

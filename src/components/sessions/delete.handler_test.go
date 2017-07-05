@@ -1,14 +1,13 @@
 package sessions_test
 
 import (
-	"database/sql"
 	"net/http"
 	"net/url"
-	"strings"
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -18,15 +17,11 @@ import (
 )
 
 func TestDeleteInvalidParams(t *testing.T) {
-	testCases := []struct {
-		description string
-		msgMatch    string
-		sources     map[string]url.Values
-	}{
+	testCases := []testguard.InvalidParamsTestCase{
 		{
-			"Should fail on missing token",
-			"parameter missing: token",
-			map[string]url.Values{
+			Description: "Should fail on missing token",
+			MsgMatch:    "parameter missing: token",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"token": []string{""},
 				},
@@ -34,9 +29,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 			},
 		},
 		{
-			"Should fail on invalid token",
-			"not a valid uuid: token",
-			map[string]url.Values{
+			Description: "Should fail on invalid token",
+			MsgMatch:    "not a valid uuid: token",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"token": []string{"xxx-yyyy"},
 				},
@@ -45,19 +40,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			endpts := sessions.Endpoints[sessions.EndpointDelete]
-			_, err := endpts.Guard.ParseParams(tc.sources)
-			if assert.Error(t, err, "expected the guard to fail") {
-				assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
-					"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
-			}
-		})
-	}
+	g := sessions.Endpoints[sessions.EndpointDelete].Guard
+	testguard.InvalidParams(t, g, testCases)
 }
 
 func TestDeleteValidParams(t *testing.T) {
@@ -93,6 +77,24 @@ func TestDeleteValidParams(t *testing.T) {
 	}
 }
 
+func TestDeleteAccess(t *testing.T) {
+	testCases := []testguard.AccessTestCase{
+		{
+			Description: "Should fail for anonymous users",
+			User:        nil,
+			ErrCode:     http.StatusUnauthorized,
+		},
+		{
+			Description: "Should work for logged users",
+			User:        &auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+			ErrCode:     0,
+		},
+	}
+
+	g := sessions.Endpoints[sessions.EndpointDelete].Guard
+	testguard.AccessTest(t, g, testCases)
+}
+
 // TestDeleteHappyPath test a user loging out (removing the current session)
 func TestDeleteHappyPath(t *testing.T) {
 	user := &auth.User{ID: "3e916798-a090-4f22-b1d1-04a63fbed6ef"}
@@ -104,16 +106,14 @@ func TestDeleteHappyPath(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	getCall := mockDB.On("Get", mock.AnythingOfType("*auth.Session"), mock.AnythingOfType("string"), mock.AnythingOfType("string"))
-	getCall.Return(nil)
-	getCall.Run(func(args mock.Arguments) {
+	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// return a session that match the session currently in use
 		sess := args.Get(0).(*auth.Session)
 		sess.ID = session.ID
 		sess.UserID = session.UserID
 	})
 	// delete call
-	mockDB.On("Exec", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil, nil)
+	mockDB.ExpectDeletion()
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
@@ -152,16 +152,14 @@ func TestDeleteOtherSession(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	getCall := mockDB.On("Get", mock.AnythingOfType("*auth.Session"), mock.AnythingOfType("string"), mock.AnythingOfType("string"))
-	getCall.Return(nil)
-	getCall.Run(func(args mock.Arguments) {
+	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// returns a session that matched the params and that is attached to the current user
 		sess := args.Get(0).(*auth.Session)
 		sess.ID = handlerParams.Token
 		sess.UserID = session.UserID
 	})
 	// delete call
-	mockDB.On("Exec", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil, nil)
+	mockDB.ExpectDeletion()
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
@@ -229,9 +227,7 @@ func TestDeleteSomeonesSession(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	getCall := mockDB.On("Get", mock.AnythingOfType("*auth.Session"), mock.AnythingOfType("string"), mock.AnythingOfType("string"))
-	getCall.Return(nil)
-	getCall.Run(func(args mock.Arguments) {
+	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// returns a session that matched the params and that is attached to an other user
 		sess := args.Get(0).(*auth.Session)
 		sess.ID = handlerParams.Token
@@ -270,8 +266,7 @@ func TestDeleteUnexistingSession(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	getCall := mockDB.On("Get", mock.AnythingOfType("*auth.Session"), mock.AnythingOfType("string"), mock.AnythingOfType("string"))
-	getCall.Return(sql.ErrNoRows)
+	mockDB.ExpectGetNotFound("*auth.Session")
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
