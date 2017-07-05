@@ -44,3 +44,6 @@ bin
 private.env
 config/api.env
 config/database.env
+
+ignore/
+.vscode/
