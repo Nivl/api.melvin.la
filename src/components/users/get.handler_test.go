@@ -1,15 +1,14 @@
 package users_test
 
 import (
-	"database/sql"
 	"net/http"
 	"net/url"
-	"strings"
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -18,22 +17,18 @@ import (
 )
 
 func TestGetInvalidParams(t *testing.T) {
-	testCases := []struct {
-		description string
-		msgMatch    string
-		sources     map[string]url.Values
-	}{
+	testCases := []testguard.InvalidParamsTestCase{
 		{
-			"Should fail on missing ID",
-			"parameter missing: id",
-			map[string]url.Values{
+			Description: "Should fail on missing ID",
+			MsgMatch:    "parameter missing: id",
+			Sources: map[string]url.Values{
 				"url": url.Values{},
 			},
 		},
 		{
-			"Should fail on invalid ID",
-			"not a valid uuid",
-			map[string]url.Values{
+			Description: "Should fail on invalid ID",
+			MsgMatch:    "not a valid uuid",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
 				},
@@ -41,18 +36,8 @@ func TestGetInvalidParams(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			endpts := users.Endpoints[users.EndpointGet]
-			_, err := endpts.Guard.ParseParams(tc.sources)
-			assert.Error(t, err, "expected the guard to fail")
-			assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
-				"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
-		})
-	}
+	g := users.Endpoints[users.EndpointGet].Guard
+	testguard.InvalidParams(t, g, testCases)
 }
 
 func TestGetValidParams(t *testing.T) {
@@ -102,10 +87,8 @@ func TestGetOthersData(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	dbCon := new(mockdb.DB)
-	dbGetCall := dbCon.On("Get", mock.Anything, mock.AnythingOfType("string"), mock.Anything)
-	dbGetCall.Return(nil)
-	dbGetCall.Run(func(args mock.Arguments) {
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
 		user := args.Get(0).(*auth.User)
 		user.ID = userToGet.ID
 		user.Name = userToGet.Name
@@ -115,7 +98,7 @@ func TestGetOthersData(t *testing.T) {
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.On("Ok", mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+	res.ExpectOk("*users.Payload", func(args mock.Arguments) {
 		pld := args.Get(0).(*users.Payload)
 		assert.Equal(t, userToGet.ID, pld.ID, "ID should have not changed")
 		assert.Equal(t, userToGet.Name, pld.Name, "Name should have not changed")
@@ -130,11 +113,11 @@ func TestGetOthersData(t *testing.T) {
 	req.On("User").Return(requester)
 
 	// call the handler
-	err := users.Get(req, &router.Dependencies{DB: dbCon})
+	err := users.Get(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
-	dbCon.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
 }
@@ -152,7 +135,7 @@ func TestGetOwnData(t *testing.T) {
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.On("Ok", mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+	res.ExpectOk("*users.Payload", func(args mock.Arguments) {
 		pld := args.Get(0).(*users.Payload)
 		assert.Equal(t, requester.ID, pld.ID, "ID should have not changed")
 		assert.Equal(t, requester.Name, pld.Name, "Name should have not changed")
@@ -184,9 +167,8 @@ func TestGetUnexistingUser(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	dbCon := new(mockdb.DB)
-	dbGetCall := dbCon.On("Get", mock.Anything, mock.AnythingOfType("string"), mock.Anything)
-	dbGetCall.Return(sql.ErrNoRows)
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetNotFound("*auth.User")
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
@@ -194,11 +176,11 @@ func TestGetUnexistingUser(t *testing.T) {
 	req.On("User").Return(requester)
 
 	// call the handler
-	err := users.Get(req, &router.Dependencies{DB: dbCon})
+	err := users.Get(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should have fail")
-	dbCon.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 
 	httpErr := httperr.Convert(err)

@@ -3,12 +3,11 @@ package users_test
 import (
 	"net/http"
 	"net/url"
-	"strings"
 	"testing"
 
-	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -17,23 +16,19 @@ import (
 )
 
 func TestDeleteInvalidParams(t *testing.T) {
-	testCases := []struct {
-		description string
-		msgMatch    string
-		sources     map[string]url.Values
-	}{
+	testCases := []testguard.InvalidParamsTestCase{
 		{
-			"Should fail on no params",
-			"parameter missing",
-			map[string]url.Values{
+			Description: "Should fail on no params",
+			MsgMatch:    "parameter missing",
+			Sources: map[string]url.Values{
 				"url":  url.Values{},
 				"form": url.Values{},
 			},
 		},
 		{
-			"Should fail on missing ID",
-			"parameter missing: id",
-			map[string]url.Values{
+			Description: "Should fail on missing ID",
+			MsgMatch:    "parameter missing: id",
+			Sources: map[string]url.Values{
 				"url": url.Values{},
 				"form": url.Values{
 					"current_password": []string{"password"},
@@ -41,9 +36,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 			},
 		},
 		{
-			"Should fail on invalid ID",
-			"not a valid uuid",
-			map[string]url.Values{
+			Description: "Should fail on invalid ID",
+			MsgMatch:    "not a valid uuid",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
 				},
@@ -53,9 +48,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 			},
 		},
 		{
-			"Should fail on missing password",
-			"parameter missing: current_password",
-			map[string]url.Values{
+			Description: "Should fail on missing password",
+			MsgMatch:    "parameter missing: current_password",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 				},
@@ -63,9 +58,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 			},
 		},
 		{
-			"Should fail on blank password",
-			"parameter missing: current_password",
-			map[string]url.Values{
+			Description: "Should fail on blank password",
+			MsgMatch:    "parameter missing: current_password",
+			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 				},
@@ -76,18 +71,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			endpts := users.Endpoints[users.EndpointDelete]
-			_, err := endpts.Guard.ParseParams(tc.sources)
-			assert.Error(t, err, "expected the guard to fail")
-			assert.True(t, strings.Contains(err.Error(), tc.msgMatch),
-				"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.msgMatch)
-		})
-	}
+	g := users.Endpoints[users.EndpointDelete].Guard
+	testguard.InvalidParams(t, g, testCases)
 }
 
 func TestDeleteValidParams(t *testing.T) {
@@ -128,41 +113,24 @@ func TestDeleteValidParams(t *testing.T) {
 }
 
 func TestDeleteAccess(t *testing.T) {
-	testCases := []struct {
-		description string
-		user        *auth.User
-		errCode     int // <= 0 for no error
-	}{
+	testCases := []testguard.AccessTestCase{
 		{
-			"Should fail for anonymous users",
-			nil,
-			http.StatusUnauthorized,
+			Description: "Should fail for anonymous users",
+			User:        nil,
+			ErrCode:     http.StatusUnauthorized,
 		},
 		{
-			"Should work for logged users",
-			&auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
-			0,
+			Description: "Should work for logged users",
+			User:        &auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+			ErrCode:     0,
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			endpts := users.Endpoints[users.EndpointDelete]
-			_, err := endpts.Guard.HasAccess(tc.user)
-			if tc.errCode > 0 {
-				assert.Error(t, err)
-				assert.Equal(t, tc.errCode, err.Code())
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
+	g := users.Endpoints[users.EndpointDelete].Guard
+	testguard.AccessTest(t, g, testCases)
 }
 
-func TestDeleteValidData(t *testing.T) {
+func TestDeleteHappyPath(t *testing.T) {
 	handlerParams := &users.DeleteParams{
 		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		CurrentPassword: "valid password",
@@ -176,15 +144,8 @@ func TestDeleteValidData(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB, err := mockdb.New()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer mockDB.SQLDB.Close()
-	deps := &router.Dependencies{
-		DB: mockDB.DB,
-	}
-	mockDB.Mock.ExpectExec("DELETE").WillReturnResult(sqlmock.NewResult(1, 1))
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectDeletion()
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
@@ -197,10 +158,11 @@ func TestDeleteValidData(t *testing.T) {
 	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Delete(req, deps)
+	err = users.Delete(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
+	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
 }
@@ -218,18 +180,13 @@ func TestDeleteInvalidPassword(t *testing.T) {
 		Password: userPassword,
 	}
 
-	// Mock the database & add expectations
-	deps := &router.Dependencies{
-		DB: nil, // the DB shouldn't be used
-	}
-
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
 	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Delete(req, deps)
+	err = users.Delete(req, &router.Dependencies{DB: nil})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should not have fail")
@@ -252,18 +209,13 @@ func TestDeleteInvalidUser(t *testing.T) {
 		Password: userPassword,
 	}
 
-	// Mock the database & add expectations
-	deps := &router.Dependencies{
-		DB: nil, // the DB shouldn't be used
-	}
-
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
 	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Delete(req, deps)
+	err = users.Delete(req, &router.Dependencies{DB: nil})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should not have fail")

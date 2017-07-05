@@ -1,4 +1,4 @@
-package users_test
+package sessions_test
 
 import (
 	"net/http"
@@ -9,8 +9,9 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
-	"github.com/melvin-laplanche/ml-api/src/components/users"
+	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -25,21 +26,10 @@ func InvalidParams(t *testing.T) {
 			},
 		},
 		{
-			Description: "Should fail on missing name",
-			MsgMatch:    "parameter missing: name",
-			Sources: map[string]url.Values{
-				"form": url.Values{
-					"email":    []string{"email@valid.tld"},
-					"password": []string{"password"},
-				},
-			},
-		},
-		{
 			Description: "Should fail on missing email",
 			MsgMatch:    "parameter missing: email",
 			Sources: map[string]url.Values{
 				"form": url.Values{
-					"name":     []string{"username"},
 					"password": []string{"password"},
 				},
 			},
@@ -49,36 +39,40 @@ func InvalidParams(t *testing.T) {
 			MsgMatch:    "parameter missing: password",
 			Sources: map[string]url.Values{
 				"form": url.Values{
-					"name":  []string{"username"},
 					"email": []string{"email@valid.tld"},
 				},
 			},
 		},
 	}
 
-	g := users.Endpoints[users.EndpointAdd].Guard
+	g := sessions.Endpoints[sessions.EndpointAdd].Guard
 	testguard.InvalidParams(t, g, testCases)
 }
 
-func TestAddHappyPath(t *testing.T) {
-	handlerParams := &users.AddParams{
-		Name:     "username",
+func TestAddValidData(t *testing.T) {
+	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "valid password",
 	}
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	mockDB.ExpectInsert("*auth.User")
+	mockDB.ExpectInsert("*auth.Session")
+	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
+		u := args.Get(0).(*auth.User)
+		u.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
+
+		var err error
+		u.Password, err = auth.CryptPassword(handlerParams.Password)
+		assert.NoError(t, err)
+	})
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectCreated("*users.Payload", func(args mock.Arguments) {
-		user := args.Get(0).(*users.Payload)
-		assert.Equal(t, handlerParams.Name, user.Name)
-		assert.Equal(t, handlerParams.Email, user.Email)
-		assert.NotEmpty(t, user.ID)
-		assert.False(t, user.IsAdmin)
+	res.ExpectCreated("*sessions.Payload", func(args mock.Arguments) {
+		session := args.Get(0).(*sessions.Payload)
+		assert.Equal(t, "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9", session.UserID)
+		assert.NotEmpty(t, session.Token)
 	})
 
 	// Mock the request & add expectations
@@ -87,7 +81,7 @@ func TestAddHappyPath(t *testing.T) {
 	req.On("Params").Return(handlerParams)
 
 	// call the handler
-	err := users.Add(req, &router.Dependencies{DB: mockDB})
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Nil(t, err, "the handler should not have fail")
@@ -96,29 +90,59 @@ func TestAddHappyPath(t *testing.T) {
 	res.AssertExpectations(t)
 }
 
-func TestAddConflict(t *testing.T) {
-	handlerParams := &users.AddParams{
-		Name:     "username",
+func TestAddUnexistingEmail(t *testing.T) {
+	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "valid password",
 	}
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	mockDB.ExpectInsertConflict("*auth.User")
+	mockDB.ExpectGetNotFound("*auth.User")
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
 
 	// call the handler
-	err := users.Add(req, &router.Dependencies{DB: mockDB})
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Error(t, err)
-	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 
 	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusConflict, httpErr.Code())
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
+}
+
+func TestAddWrongPassword(t *testing.T) {
+	handlerParams := &sessions.AddParams{
+		Email:    "email@domain.tld",
+		Password: "invalid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
+		u := args.Get(0).(*auth.User)
+		u.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
+
+		var err error
+		u.Password, err = auth.CryptPassword("valid password")
+		assert.NoError(t, err)
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err)
+	req.AssertExpectations(t)
+
+	httpErr := httperr.Convert(err)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
 }
