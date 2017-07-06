@@ -1,0 +1,148 @@
+package sessions_test
+
+import (
+	"net/http"
+	"net/url"
+	"testing"
+
+	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/melvin-laplanche/ml-api/src/components/sessions"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+func InvalidParams(t *testing.T) {
+	testCases := []testguard.InvalidParamsTestCase{
+		{
+			Description: "Should fail on no params",
+			MsgMatch:    "parameter missing",
+			Sources: map[string]url.Values{
+				"form": url.Values{},
+			},
+		},
+		{
+			Description: "Should fail on missing email",
+			MsgMatch:    "parameter missing: email",
+			Sources: map[string]url.Values{
+				"form": url.Values{
+					"password": []string{"password"},
+				},
+			},
+		},
+		{
+			Description: "Should fail on missing password",
+			MsgMatch:    "parameter missing: password",
+			Sources: map[string]url.Values{
+				"form": url.Values{
+					"email": []string{"email@valid.tld"},
+				},
+			},
+		},
+	}
+
+	g := sessions.Endpoints[sessions.EndpointAdd].Guard
+	testguard.InvalidParams(t, g, testCases)
+}
+
+func TestAddValidData(t *testing.T) {
+	handlerParams := &sessions.AddParams{
+		Email:    "email@domain.tld",
+		Password: "valid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectInsert("*auth.Session")
+	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
+		u := args.Get(0).(*auth.User)
+		u.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
+
+		var err error
+		u.Password, err = auth.CryptPassword(handlerParams.Password)
+		assert.NoError(t, err)
+	})
+
+	// Mock the response & add expectations
+	res := new(mockrouter.HTTPResponse)
+	res.ExpectCreated("*sessions.Payload", func(args mock.Arguments) {
+		session := args.Get(0).(*sessions.Payload)
+		assert.Equal(t, "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9", session.UserID)
+		assert.NotEmpty(t, session.Token)
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Response").Return(res)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Nil(t, err, "the handler should not have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+	res.AssertExpectations(t)
+}
+
+func TestAddUnexistingEmail(t *testing.T) {
+	handlerParams := &sessions.AddParams{
+		Email:    "email@domain.tld",
+		Password: "valid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetNotFound("*auth.User")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err)
+	req.AssertExpectations(t)
+
+	httpErr := httperr.Convert(err)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
+}
+
+func TestAddWrongPassword(t *testing.T) {
+	handlerParams := &sessions.AddParams{
+		Email:    "email@domain.tld",
+		Password: "invalid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
+		u := args.Get(0).(*auth.User)
+		u.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
+
+		var err error
+		u.Password, err = auth.CryptPassword("valid password")
+		assert.NoError(t, err)
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err)
+	req.AssertExpectations(t)
+
+	httpErr := httperr.Convert(err)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
+}

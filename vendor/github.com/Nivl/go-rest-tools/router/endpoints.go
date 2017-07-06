@@ -2,8 +2,9 @@ package router
 
 import (
 	"net/http"
-	"reflect"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
+	"github.com/Nivl/go-rest-tools/logger"
 	"github.com/Nivl/go-rest-tools/network/http/basicauth"
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -16,33 +17,47 @@ type Endpoints []*Endpoint
 
 // Activate adds the endpoints to the router
 func (endpoints Endpoints) Activate(router *mux.Router) {
+	deps := NewDefaultDependencies()
+
 	for _, endpoint := range endpoints {
 		router.
 			Methods(endpoint.Verb).
 			Path(endpoint.Path).
-			Handler(Handler(endpoint))
+			Handler(Handler(endpoint, deps))
 	}
 }
 
 // Handler makes it possible to use a RouteHandler where a http.Handler is required
-func Handler(e *Endpoint) http.Handler {
+func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 	HTTPHandler := func(resWriter http.ResponseWriter, req *http.Request) {
 		request := &Request{
-			ID:       uuid.NewV4().String()[:8],
-			Request:  req,
-			Response: resWriter,
+			id:   uuid.NewV4().String()[:8],
+			http: req,
+			res:  NewResponse(resWriter, deps),
 		}
 		defer request.handlePanic()
 
+		if dependencies.Logentries != nil {
+			request.logger = logger.NewLogEntries(dependencies.Logentries)
+		} else {
+			request.logger = logger.NewBasicLogger()
+		}
+
 		// We set some response data
-		request.Response.Header().Set("X-Request-Id", request.ID)
+		request.res.Header().Set("X-Request-Id", request.id)
 
 		// We Parse the request params
-		if e.Params != nil {
-			// We give request.Params the same type as e.Params
-			request.Params = reflect.New(reflect.TypeOf(e.Params).Elem()).Interface()
-			if err := request.ParseParams(); err != nil {
-				request.Error(err)
+		if e.Guard != nil && e.Guard.ParamStruct != nil {
+			// Get the list of all http params provided by the client
+			sources, err := request.httpParamsBySource()
+			if err != nil {
+				request.res.Error(err, request)
+				return
+			}
+
+			request.params, err = e.Guard.ParseParams(sources)
+			if err != nil {
+				request.res.Error(err, request)
 				return
 			}
 		}
@@ -54,44 +69,38 @@ func Handler(e *Endpoint) http.Handler {
 			session := &auth.Session{ID: sessionID, UserID: userID}
 
 			if session.ID != "" && session.UserID != "" {
-				exists, err := session.Exists()
+				exists, err := session.Exists(deps.DB)
 				if err != nil {
-					request.Error(err)
+					request.res.Error(err, request)
 					return
 				}
 				if !exists {
-					request.Error(httperr.NewBadRequest("invalid auth data"))
+					request.res.Error(httperr.NewBadRequest("invalid auth data"), request)
 					return
 				}
+				request.session = session
 				// we get the user and make sure it (still) exists
-				request.User, err = auth.GetUser(session.UserID)
+				request.user, err = auth.GetUser(deps.DB, session.UserID)
 				if err != nil {
-					request.Error(err)
+					request.res.Error(err, request)
 					return
 				}
-				if request.User == nil {
-					request.Error(httperr.NewBadRequest("user not found"))
+				if request.user == nil {
+					request.res.Error(httperr.NewBadRequest("user not found"), request)
 					return
 				}
-				request.SessionUsed = session
 			}
 		}
 
-		accessGranted := e.Auth == nil || e.Auth(request)
-		if !accessGranted {
-			if request.User == nil {
-				request.Error(httperr.NewUnauthorized())
-			} else {
-				request.Error(httperr.NewForbidden())
-			}
-
+		if allowed, err := e.Guard.HasAccess(request.user); !allowed {
+			request.res.Error(err, request)
 			return
 		}
 
 		// Execute the actual route handler
-		err := e.Handler(request)
+		err := e.Handler(request, deps)
 		if err != nil {
-			request.Error(err)
+			request.res.Error(err, request)
 		}
 	}
 

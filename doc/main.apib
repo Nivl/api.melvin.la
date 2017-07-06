@@ -5,11 +5,9 @@ HOST: http://api-orchid.melvin.la/
 
 API used to run melvin.la
 
-:[Group User](user/main.apib)
+:[Group User](../src/components/users/users.apib)
 
-:[Group Session](session/main.apib)
-
-:[Group Session](blog/main.apib)
+:[Group Session](../src/components/sessions/sessions.apib)
 
 # Data Structure
 
@@ -24,23 +22,6 @@ API used to run melvin.la
 
 + token (required, string)
 + user_id (required, string)
-
-## Article
-
-+ id (required, string)
-+ slug (required, string)
-+ title (required, string)
-+ content (required, string)
-+ subtitle (required, string)
-+ description (required, string)
-+ create_at (required, string)
-+ updated_at (string) - UTC date with the ISO8601 format
-+ published_at (string) - UTC date with the ISO8601 format
-+ user (required, User) - Author of the article
-
-## Articles
-
-+ Results (required, array[Article])
 
 ## Pagination
 
