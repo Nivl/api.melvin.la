@@ -8,13 +8,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"reflect"
-	"strconv"
 	"testing"
 
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/gorilla/mux"
 )
@@ -69,71 +68,17 @@ func (ri *RequestInfo) ParseParams() {
 		return
 	}
 
-	params := reflect.ValueOf(ri.Params)
-	if params.Kind() == reflect.Ptr {
-		params = params.Elem()
+	p := params.NewParams(ri.Params)
+	sources := p.Extract()
+
+	for k, v := range sources["url"] {
+		ri.urlParams[k] = v[0]
 	}
-	ri.parseParamsRecursive(params)
-}
-
-func (ri *RequestInfo) parseParamsRecursive(params reflect.Value) {
-	nbParams := params.NumField()
-	for i := 0; i < nbParams; i++ {
-		param := params.Field(i)
-		paramInfo := params.Type().Field(i)
-		tags := paramInfo.Tag
-
-		if param.Kind() == reflect.Ptr {
-			param = param.Elem()
-		}
-
-		// Handle embeded struct
-		if param.Kind() == reflect.Struct && paramInfo.Anonymous {
-			ri.parseParamsRecursive(param)
-			continue
-		}
-
-		// We get the Value
-		value := ""
-		switch param.Kind() {
-		case reflect.Bool:
-			value = strconv.FormatBool(param.Bool())
-		case reflect.String:
-			value = param.String()
-		case reflect.Int:
-			value = strconv.Itoa(int(param.Int()))
-		case reflect.Ptr:
-			if !param.IsNil() {
-				val := param.Elem()
-				switch val.Kind() {
-				case reflect.Bool:
-					value = strconv.FormatBool(val.Bool())
-				case reflect.String:
-					value = param.String()
-				case reflect.Int:
-					value = strconv.Itoa(int(val.Int()))
-				}
-			}
-		}
-
-		// We get the name from the json tag
-		fieldName := ""
-		jsonOpts := strings.Split(tags.Get("json"), ",")
-		if len(jsonOpts) > 0 {
-			if jsonOpts[0] == "-" {
-				continue
-			}
-			fieldName = jsonOpts[0]
-		}
-
-		switch strings.ToLower(tags.Get("from")) {
-		case "url":
-			ri.urlParams[fieldName] = value
-		case "form":
-			ri.bodyParams[fieldName] = value
-		case "query":
-			ri.queryParams[fieldName] = value
-		}
+	for k, v := range sources["form"] {
+		ri.bodyParams[k] = v[0]
+	}
+	for k, v := range sources["query"] {
+		ri.queryParams[k] = v[0]
 	}
 }
 

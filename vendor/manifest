@@ -2,11 +2,19 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/DATA-DOG/go-sqlmock",
+			"repository": "https://github.com/DATA-DOG/go-sqlmock",
+			"vcs": "git",
+			"revision": "d335ff60c18d1c61e0e3d4a65fe908b3c84556a3",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/Nivl/go-rest-tools",
 			"repository": "https://github.com/Nivl/go-rest-tools",
 			"vcs": "git",
-			"revision": "94c143465720b4fcf2e0d02004710e36893fe4c3",
-			"branch": "master"
+			"revision": "f60475ec777c1a620650a2f0780ff9f5bd5ce58d",
+			"branch": "master",
+			"notests": true
 		},
 		{
 			"importpath": "github.com/bsphere/le_go",
@@ -51,7 +59,7 @@
 			"importpath": "github.com/gosimple/slug",
 			"repository": "https://github.com/gosimple/slug",
 			"vcs": "git",
-			"revision": "dfb5bc66af5ea2fadd6bd1a02ea9eca9bc25f14f",
+			"revision": "f36922d6568f08b11d4e51b377e3e58291972ccc",
 			"branch": "master",
 			"notests": true
 		},
@@ -59,7 +67,7 @@
 			"importpath": "github.com/jmoiron/sqlx",
 			"repository": "https://github.com/jmoiron/sqlx",
 			"vcs": "git",
-			"revision": "8ed836a8adb659e8492bcaa49e0880bb84075fe2",
+			"revision": "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f",
 			"branch": "master",
 			"notests": true
 		},
@@ -67,15 +75,22 @@
 			"importpath": "github.com/kelseyhightower/envconfig",
 			"repository": "https://github.com/kelseyhightower/envconfig",
 			"vcs": "git",
-			"revision": "8bf4bbfc795e2c7c8a5ea47b707453ed019e2ad4",
+			"revision": "70f0258d44cbaa3b6a2581d82f58da01a38e4de4",
 			"branch": "master",
 			"notests": true
+		},
+		{
+			"importpath": "github.com/kisielk/sqlstruct",
+			"repository": "https://github.com/kisielk/sqlstruct",
+			"vcs": "git",
+			"revision": "648daed35d49dac24a4bff253b190a80da3ab6a5",
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/lib/pq",
 			"repository": "https://github.com/lib/pq",
 			"vcs": "git",
-			"revision": "2704adc878c21e1329f46f6e56a1c387d788ff94",
+			"revision": "8837942c3e09574accbc5f150e2c5e057189cace",
 			"branch": "master",
 			"notests": true
 		},
@@ -99,7 +114,7 @@
 			"importpath": "github.com/sendgrid/rest",
 			"repository": "https://github.com/sendgrid/rest",
 			"vcs": "git",
-			"revision": "3ec51b4f1754e13e92409355851a0a82e9a06461",
+			"revision": "14de1ac72d9ae5c3c0d7c02164c52ebd3b951a4e",
 			"branch": "master",
 			"notests": true
 		},
@@ -107,7 +122,7 @@
 			"importpath": "github.com/sendgrid/sendgrid-go",
 			"repository": "https://github.com/sendgrid/sendgrid-go",
 			"vcs": "git",
-			"revision": "c9346883d091e887eb59e75f272209229742e347",
+			"revision": "9506cd6dee4efb38fd7cecfcc3199c95b4f0e8c8",
 			"branch": "master",
 			"notests": true
 		},
@@ -115,7 +130,7 @@
 			"importpath": "github.com/stretchr/testify",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",
-			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
 			"branch": "master",
 			"notests": true
 		},
