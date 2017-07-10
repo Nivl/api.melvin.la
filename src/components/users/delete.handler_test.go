@@ -18,16 +18,9 @@ import (
 func TestDeleteInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
-			Description: "Should fail on no params",
-			MsgMatch:    "parameter missing",
-			Sources: map[string]url.Values{
-				"url":  url.Values{},
-				"form": url.Values{},
-			},
-		},
-		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing: id",
+			MsgMatch:    "parameter missing",
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{},
 				"form": url.Values{
@@ -38,6 +31,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		{
 			Description: "Should fail on invalid ID",
 			MsgMatch:    "not a valid uuid",
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -49,7 +43,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing password",
-			MsgMatch:    "parameter missing: current_password",
+			MsgMatch:    "parameter missing",
+			FieldName:   "current_password",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
@@ -59,7 +54,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on blank password",
-			MsgMatch:    "parameter missing: current_password",
+			MsgMatch:    "parameter missing",
+			FieldName:   "current_password",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
@@ -99,7 +95,7 @@ func TestDeleteValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := users.Endpoints[users.EndpointDelete]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {

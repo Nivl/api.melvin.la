@@ -18,6 +18,8 @@ const (
 	ContentTypeJSON = "application/json"
 	// ContentTypeMultipartForm represents the content type of a multipart request
 	ContentTypeMultipartForm = "multipart/form-data"
+	// ContentTypeForm represents the content type of a POST/PUT/PATCH request
+	ContentTypeForm = "application/x-www-form-urlencoded"
 )
 
 // HTTPRequest represents an http request
@@ -132,9 +134,7 @@ func (req *Request) contentType() string {
 	if req._contentType == "" {
 		contentType := req.http.Header.Get("Content-Type")
 
-		if contentType == "" {
-			req._contentType = "text/html"
-		} else {
+		if contentType != "" {
 			req._contentType = strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
 		}
 	}
@@ -142,8 +142,8 @@ func (req *Request) contentType() string {
 	return req._contentType
 }
 
-// jsonBody parses and returns the body of the request
-func (req *Request) jsonBody() (url.Values, error) {
+// parseJSONBody parses and returns the body of the request
+func (req *Request) parseJSONBody() (url.Values, error) {
 	output := url.Values{}
 
 	if req.contentType() != ContentTypeJSON {
@@ -170,11 +170,18 @@ func (req *Request) httpParamsBySource() (map[string]url.Values, error) {
 		"form":  url.Values{},
 	}
 
-	form, err := req.jsonBody()
-	if err != nil {
-		return nil, err
+	if req.contentType() == ContentTypeJSON {
+		form, err := req.parseJSONBody()
+		if err != nil {
+			return nil, err
+		}
+		params["form"] = form
+	} else if req.contentType() == ContentTypeJSON || req.contentType() == ContentTypeMultipartForm {
+		if err := req.http.ParseForm(); err != nil {
+			return nil, err
+		}
+		params["form"] = req.http.PostForm
 	}
-	params["form"] = form
 
 	return params, nil
 }

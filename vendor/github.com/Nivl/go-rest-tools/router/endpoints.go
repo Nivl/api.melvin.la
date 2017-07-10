@@ -55,7 +55,7 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 				return
 			}
 
-			request.params, err = e.Guard.ParseParams(sources)
+			request.params, err = e.Guard.ParseParams(sources, request.http)
 			if err != nil {
 				request.res.Error(err, request)
 				return
@@ -65,7 +65,10 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 		// We check the auth
 		headers, found := req.Header["Authorization"]
 		if found {
-			userID, sessionID, _ := basicauth.ParseAuthHeader(headers, "basic", "")
+			userID, sessionID, err := basicauth.ParseAuthHeader(headers, "basic", "")
+			if err != nil {
+				request.res.Error(httperr.NewBadRequest("Authorization", "invalid format"), request)
+			}
 			session := &auth.Session{ID: sessionID, UserID: userID}
 
 			if session.ID != "" && session.UserID != "" {
@@ -75,7 +78,7 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 					return
 				}
 				if !exists {
-					request.res.Error(httperr.NewBadRequest("invalid auth data"), request)
+					request.res.Error(httperr.NewNotFoundField("Authorization", "session not found"), request)
 					return
 				}
 				request.session = session
@@ -86,7 +89,7 @@ func Handler(e *Endpoint, deps *Dependencies) http.Handler {
 					return
 				}
 				if request.user == nil {
-					request.res.Error(httperr.NewBadRequest("user not found"), request)
+					request.res.Error(httperr.NewNotFoundField("Authorization", "session not found"), request)
 					return
 				}
 			}

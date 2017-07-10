@@ -7,8 +7,8 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -20,7 +20,8 @@ func TestGetInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing: id",
+			MsgMatch:    "parameter missing",
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{},
 			},
@@ -28,6 +29,7 @@ func TestGetInvalidParams(t *testing.T) {
 		{
 			Description: "Should fail on invalid ID",
 			MsgMatch:    "not a valid uuid",
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -61,7 +63,7 @@ func TestGetValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := users.Endpoints[users.EndpointGet]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {

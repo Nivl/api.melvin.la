@@ -5,12 +5,11 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate api-cli generate model User -t users -e Create,Update,Get,JoinSQL
+//go:generate api-cli generate model User -t users -e Get,JoinSQL
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -66,43 +65,6 @@ func CryptPassword(raw string) (string, error) {
 func IsPasswordValid(hash string, raw string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(raw))
 	return err == nil
-}
-
-// Create persists a user in the database
-func (u *User) Create(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
-	if u.ID != "" {
-		return httperr.NewServerError("cannot persist a user that already has a ID")
-	}
-
-	err := u.doCreate(q)
-	if err != nil && db.IsDup(err) {
-		return httperr.NewConflict("email address already in use")
-	}
-
-	return err
-}
-
-// Update updates most of the fields of a persisted user.
-// Excluded fields are id, created_at, deleted_at
-func (u *User) Update(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
-	if u.ID == "" {
-		return httperr.NewServerError("cannot update a non-persisted user")
-	}
-
-	err := u.doUpdate(q)
-	if err != nil && db.IsDup(err) {
-		return httperr.NewConflict("email address already in use")
-	}
-
-	return err
 }
 
 // IsLogged checks if the user object belong to a logged in user

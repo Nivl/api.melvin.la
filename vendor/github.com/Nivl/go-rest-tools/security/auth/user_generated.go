@@ -26,10 +26,6 @@ func Exists(q db.DB, id string) (bool, error) {
 // Save creates or updates the article depending on the value of the id using
 // a transaction
 func (u *User) Save(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
 	if u.ID == "" {
 		return u.Create(q)
 	}
@@ -37,7 +33,14 @@ func (u *User) Save(q db.DB) error {
 	return u.Update(q)
 }
 
+// Create persists a user in the database
+func (u *User) Create(q db.DB) error {
+	if u.ID != "" {
+		return errors.New("cannot persist a user that already has an ID")
+	}
 
+	return u.doCreate(q)
+}
 
 // doCreate persists a user in the database using a Node
 func (u *User) doCreate(q db.DB) error {
@@ -54,19 +57,23 @@ func (u *User) doCreate(q db.DB) error {
 	stmt := "INSERT INTO users (id, created_at, updated_at, deleted_at, name, email, password, is_admin) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :email, :password, :is_admin)"
 	_, err := q.NamedExec(stmt, u)
 
-  return err
+  return httperr.NewFromSQL(err)
 }
 
+// Update updates most of the fields of a persisted user using a transaction
+// Excluded fields are id, created_at, deleted_at, etc.
+func (u *User) Update(q db.DB) error {
+	if u.ID == "" {
+		return errors.New("cannot update a non-persisted user")
+	}
 
+	return u.doUpdate(q)
+}
 
 // doUpdate updates a user in the database using an optional transaction
 func (u *User) doUpdate(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
 	if u.ID == "" {
-		return httperr.NewServerError("cannot update a non-persisted user")
+		return errors.New("cannot update a non-persisted user")
 	}
 
 	u.UpdatedAt = db.Now()
@@ -74,7 +81,7 @@ func (u *User) doUpdate(q db.DB) error {
 	stmt := "UPDATE users SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, name=:name, email=:email, password=:password, is_admin=:is_admin WHERE id=:id"
 	_, err := q.NamedExec(stmt, u)
 
-	return err
+	return httperr.NewFromSQL(err)
 }
 
 // Delete removes a user from the database using a transaction
@@ -100,12 +107,8 @@ func (u *User) Trash(q db.DB) error {
 
 // doTrash performs a soft delete operation on a user using an optional transaction
 func (u *User) doTrash(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
 	if u.ID == "" {
-		return httperr.NewServerError("cannot trash a non-persisted user")
+		return errors.New("cannot trash a non-persisted user")
 	}
 
 	u.DeletedAt = db.Now()

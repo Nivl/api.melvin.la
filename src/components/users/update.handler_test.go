@@ -20,7 +20,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing: id",
+			MsgMatch:    "parameter missing",
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url":  url.Values{},
 				"form": url.Values{},
@@ -29,6 +30,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		{
 			Description: "Should fail on invalid ID",
 			MsgMatch:    "not a valid uuid",
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -64,7 +66,7 @@ func TestUpdateValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := users.Endpoints[users.EndpointUpdate]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {

@@ -7,8 +7,8 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
@@ -16,18 +16,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func InvalidParams(t *testing.T) {
+func TestInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
-			Description: "Should fail on no params",
-			MsgMatch:    "parameter missing",
-			Sources: map[string]url.Values{
-				"form": url.Values{},
-			},
-		},
-		{
 			Description: "Should fail on missing email",
-			MsgMatch:    "parameter missing: email",
+			MsgMatch:    "parameter missing",
+			FieldName:   "email",
 			Sources: map[string]url.Values{
 				"form": url.Values{
 					"password": []string{"password"},
@@ -36,7 +30,8 @@ func InvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing password",
-			MsgMatch:    "parameter missing: password",
+			MsgMatch:    "parameter missing",
+			FieldName:   "password",
 			Sources: map[string]url.Values{
 				"form": url.Values{
 					"email": []string{"email@valid.tld"},
@@ -113,6 +108,7 @@ func TestAddUnexistingEmail(t *testing.T) {
 
 	httpErr := httperr.Convert(err)
 	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
+	assert.Equal(t, "email/password", httpErr.Field())
 }
 
 func TestAddWrongPassword(t *testing.T) {

@@ -20,7 +20,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing token",
-			MsgMatch:    "parameter missing: token",
+			MsgMatch:    "parameter missing",
+			FieldName:   "token",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"token": []string{""},
@@ -30,7 +31,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid token",
-			MsgMatch:    "not a valid uuid: token",
+			MsgMatch:    "not a valid uuid",
+			FieldName:   "token",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"token": []string{"xxx-yyyy"},
@@ -66,7 +68,7 @@ func TestDeleteValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := sessions.Endpoints[sessions.EndpointDelete]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {

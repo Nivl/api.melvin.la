@@ -7,12 +7,15 @@ import (
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router/formfile"
 )
 
+// Params is a struct used to parse and extract params from an other struct
 type Params struct {
 	data interface{}
 }
 
+// NewParams creates a new Params object from a struct
 func NewParams(data interface{}) *Params {
 	return &Params{
 		data: data,
@@ -20,16 +23,12 @@ func NewParams(data interface{}) *Params {
 }
 
 // Parse fills the paramsStruct using the provided sources
-func (p *Params) Parse(sources map[string]url.Values) error {
-	paramList := reflect.ValueOf(p.data)
-	if paramList.Kind() == reflect.Ptr {
-		paramList = paramList.Elem()
-	}
-
-	return p.parseRecursive(paramList, sources)
+func (p *Params) Parse(sources map[string]url.Values, fileHolder formfile.FileHolder) error {
+	paramList := reflect.Indirect(reflect.ValueOf(p.data))
+	return p.parseRecursive(paramList, sources, fileHolder)
 }
 
-func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.Values) error {
+func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.Values, fileHolder formfile.FileHolder) error {
 	nbParams := paramList.NumField()
 	for i := 0; i < nbParams; i++ {
 		value := paramList.Field(i)
@@ -43,7 +42,7 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 
 		// Handle embedded struct
 		if value.Kind() == reflect.Struct && info.Anonymous {
-			p.parseRecursive(value, sources)
+			p.parseRecursive(value, sources, fileHolder)
 			continue
 		}
 
@@ -53,18 +52,26 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 			paramLocation = "url"
 		}
 
-		source, found := sources[paramLocation]
-		if !found {
-			return httperr.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
-		}
-
 		param := &Param{
 			value: &value,
 			info:  &info,
 			tags:  &tags,
 		}
-		if err := param.SetValue(&source); err != nil {
-			return err
+
+		// the "file" source is a special case as it's not part of the sources object
+		if paramLocation == "file" {
+			if err := param.SetFile(fileHolder); err != nil {
+				return err
+			}
+		} else {
+			source, found := sources[paramLocation]
+			if !found {
+				return httperr.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
+			}
+
+			if err := param.SetValue(&source); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -83,10 +90,7 @@ func (p *Params) Extract() map[string]url.Values {
 		return sources
 	}
 
-	paramList := reflect.ValueOf(p.data)
-	if paramList.Kind() == reflect.Ptr {
-		paramList = paramList.Elem()
-	}
+	paramList := reflect.Indirect(reflect.ValueOf(p.data))
 	p.extractRecursive(paramList, sources)
 	return sources
 }
@@ -94,13 +98,9 @@ func (p *Params) Extract() map[string]url.Values {
 func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]url.Values) {
 	nbParams := paramList.NumField()
 	for i := 0; i < nbParams; i++ {
-		value := paramList.Field(i)
+		value := reflect.Indirect(paramList.Field(i))
 		paramInfo := paramList.Type().Field(i)
 		tags := paramInfo.Tag
-
-		if value.Kind() == reflect.Ptr {
-			value = value.Elem()
-		}
 
 		// Handle embedded struct
 		if value.Kind() == reflect.Struct && paramInfo.Anonymous {

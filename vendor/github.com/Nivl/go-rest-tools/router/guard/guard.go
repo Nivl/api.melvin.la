@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/router/formfile"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
@@ -21,7 +22,7 @@ type Guard struct {
 
 // ParseParams parses and returns the list of params needed
 // Returns an error if a required param is missing, or if a type is wrong
-func (g *Guard) ParseParams(sources map[string]url.Values) (interface{}, error) {
+func (g *Guard) ParseParams(sources map[string]url.Values, fileHolder formfile.FileHolder) (interface{}, error) {
 	// It's ok not to have a guard provided, as well as not having params
 	if g == nil || g.ParamStruct == nil {
 		return nil, nil
@@ -29,7 +30,7 @@ func (g *Guard) ParseParams(sources map[string]url.Values) (interface{}, error) 
 
 	// We give p the same type as g.ParamStruct
 	p := reflect.New(reflect.TypeOf(g.ParamStruct).Elem()).Interface()
-	err := params.NewParams(p).Parse(sources)
+	err := params.NewParams(p).Parse(sources, fileHolder)
 	if err != nil {
 		return nil, err
 	}

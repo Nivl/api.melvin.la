@@ -36,7 +36,7 @@ func (s *Session) doCreate(q db.DB) error {
 	stmt := "INSERT INTO sessions (id, created_at, updated_at, deleted_at, user_id) VALUES (:id, :created_at, :updated_at, :deleted_at, :user_id)"
 	_, err := q.NamedExec(stmt, s)
 
-  return err
+  return httperr.NewFromSQL(err)
 }
 
 
@@ -66,12 +66,8 @@ func (s *Session) Trash(q db.DB) error {
 
 // doTrash performs a soft delete operation on a session using an optional transaction
 func (s *Session) doTrash(q db.DB) error {
-	if s == nil {
-		return httperr.NewServerError("session is not instanced")
-	}
-
 	if s.ID == "" {
-		return httperr.NewServerError("cannot trash a non-persisted session")
+		return errors.New("cannot trash a non-persisted session")
 	}
 
 	s.DeletedAt = db.Now()

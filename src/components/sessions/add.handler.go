@@ -35,7 +35,7 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 	}
 
 	if user.ID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
-		return httperr.NewBadRequest("Bad email/password")
+		return httperr.NewBadRequest("email/password", "Bad email/password")
 	}
 
 	s := &auth.Session{
