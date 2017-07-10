@@ -1,0 +1,46 @@
+### Create an Organization [POST]
+
++ Request (application/json)
+    + Attributes
+        + name (required, string) - Name of the organization
+        + short_name (string) - Short name (or acronym) of the organization
+        + website (string) - Website of the organization
+
++ Response 201 (application/json)
+
+    The Organization has been created
+
+    + Attributes (Organization)
+
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Body
+
+            {
+                "error": "[reason]",
+                "field": "[name of the field that failed]"
+            }
+
++ Response 409 (application/json)
+
+    A value already exists in the database.
+
+    + Body
+
+            {
+                "error": "[reason]",
+                "field": "[name of the field that failed]"
+            }
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Body
+
+            {
+                "error": "something went wrong"
+            }
