@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Nivl/go-rest-tools/dependencies"
-	"github.com/Nivl/go-rest-tools/logger"
 	"github.com/Nivl/go-rest-tools/network/http/basicauth"
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -17,34 +16,40 @@ type Endpoints []*Endpoint
 
 // Activate adds the endpoints to the router
 func (endpoints Endpoints) Activate(router *mux.Router) {
-	deps := NewDefaultDependencies()
-
 	for _, endpoint := range endpoints {
 		router.
 			Methods(endpoint.Verb).
 			Path(endpoint.Path).
-			Handler(Handler(endpoint, deps))
+			Handler(Handler(endpoint))
 	}
 }
 
 // Handler makes it possible to use a RouteHandler where a http.Handler is required
-func Handler(e *Endpoint, deps *Dependencies) http.Handler {
+func Handler(e *Endpoint) http.Handler {
 	HTTPHandler := func(resWriter http.ResponseWriter, req *http.Request) {
+		deps, depsErr := NewDefaultDependenciesWithContext(req.Context())
+		// we need deps for the response, so if it fails we get only the main
+		// deps that we will use for the response, then we'll use that response
+		// to return a 500
+		if depsErr != nil {
+			deps = NewNoFailersDependencies()
+		}
 		request := &Request{
-			id:   uuid.NewV4().String()[:8],
-			http: req,
-			res:  NewResponse(resWriter, deps),
+			id:     uuid.NewV4().String()[:8],
+			http:   req,
+			res:    NewResponse(resWriter, deps),
+			logger: dependencies.NewLogger(),
 		}
 		defer request.handlePanic()
 
-		if dependencies.Logentries != nil {
-			request.logger = logger.NewLogEntries(dependencies.Logentries)
-		} else {
-			request.logger = logger.NewBasicLogger()
-		}
-
 		// We set some response data
 		request.res.Header().Set("X-Request-Id", request.id)
+
+		// if we failed getting the dependencies, we return a 500
+		if depsErr != nil {
+			request.res.Error(depsErr, request)
+			return
+		}
 
 		// We Parse the request params
 		if e.Guard != nil && e.Guard.ParamStruct != nil {

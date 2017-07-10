@@ -1,7 +1,6 @@
 package dependencies
 
 import (
-	"github.com/Nivl/go-rest-tools/notifiers/mailer"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/bsphere/le_go"
 	"github.com/jmoiron/sqlx"
@@ -36,11 +35,19 @@ func InitLogentries(token string) {
 }
 
 // Sendgrid is a sendgrid email client
-var Sendgrid *mailer.Sendgrid
+var Sendgrid *SendgridParams
+
+// SendgridParams represents the configuration of Sendgrid
+type SendgridParams struct {
+	APIKey         string
+	From           string
+	To             string
+	StacktraceUUID string
+}
 
 // InitSendgrid creates a mailer that uses Sendgrid
-func InitSendgrid(api, from, to, stacktraceUUID string) {
-	Sendgrid = mailer.NewSendgrid(api, from, to, stacktraceUUID)
+func InitSendgrid(config *SendgridParams) {
+	Sendgrid = config
 }
 
 // GCP represents the configuration of Google Cloud
