@@ -1,10 +1,13 @@
 package params
 
 import (
+	"io"
+	"mime/multipart"
 	"reflect"
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/primitives/filetype"
 	"github.com/Nivl/go-rest-tools/primitives/strngs"
 )
 
@@ -37,6 +40,10 @@ type ParamOptions struct {
 	// ValidateURL means the field should contain a valid url
 	// params:"url"
 	ValidateURL bool
+
+	// ValidateImage means the field should contain a valid image
+	// params:"image"
+	ValidateImage bool
 }
 
 // Validate checks the given value passes the options set
@@ -60,6 +67,41 @@ func (opts *ParamOptions) Validate(value string) error {
 	}
 
 	return nil
+}
+
+// ValidateFileContent checks the given file passes the options set
+func (opts *ParamOptions) ValidateFileContent(file multipart.File) (string, error) {
+	// Just by security, but it shouldn't be necessary
+	defer file.Seek(0, io.SeekStart)
+
+	var valid bool
+	var mime string
+	var err error
+	var errorMsg string
+
+	if opts.ValidateImage {
+		valid, mime, err = filetype.IsImage(file)
+		errorMsg = "not a valid image"
+	} else {
+		// We still get the mimetype
+		valid = true
+		mimeType, err := filetype.MimeType(file)
+		if err != nil {
+			return "", err
+		}
+		return mimeType, nil
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	if !valid {
+		return "", httperr.NewBadRequest(opts.Name, errorMsg)
+	}
+
+	// check "valid", and return an error if its not
+	return mime, nil
 }
 
 // ApplyTransformations applies all the wanted transformations to the given value
@@ -99,6 +141,8 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 			output.ValidateEmail = true
 		case "url":
 			output.ValidateURL = true
+		case "image":
+			output.ValidateImage = true
 		}
 	}
 

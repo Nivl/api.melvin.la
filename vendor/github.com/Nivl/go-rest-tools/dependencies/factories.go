@@ -36,6 +36,8 @@ func NewStorage(ctx context.Context) (filestorage.FileStorage, error) {
 	} else if Cloudinary != nil {
 		storage = filestorage.NewCloudinary(Cloudinary.APIKey, Cloudinary.Secret)
 		bucket = Cloudinary.Bucket
+	} else {
+		storage, err = filestorage.NewFSStorage()
 	}
 
 	if err != nil {

@@ -53,6 +53,7 @@ func (p *Param) SetFile(source formfile.FileHolder) error {
 			if opts.Required {
 				return httperr.NewBadRequest(opts.Name, "parameter missing")
 			}
+			// if there's no file and it's not required, then we're done
 			return nil
 		}
 		return err
@@ -62,14 +63,17 @@ func (p *Param) SetFile(source formfile.FileHolder) error {
 		File:   file,
 		Header: header,
 	}
-
 	if p.info.Type.String() != "*formfile.FormFile" {
 		return fmt.Errorf("the only accepted type for a file is *formfile.FormFile, got %s", p.info.Type)
 	}
 
+	ff.Mime, err = opts.ValidateFileContent(ff.File)
+	if err != nil {
+		return err
+	}
+
 	p.value.Set(reflect.ValueOf(ff))
 	return nil
-
 }
 
 // SetValue sets the value of the param using the provided source

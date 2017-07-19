@@ -112,6 +112,18 @@ func (s *GCStorage) Attributes(filepath string) (*FileAttributes, error) {
 	return NewAttributesFromGCStorage(gcsAttrs), nil
 }
 
+// Exists check if a file exists
+func (s *GCStorage) Exists(filepath string) (bool, error) {
+	_, err := s.Attributes(filepath)
+	if err == nil {
+		return true, nil
+	}
+	if err == storage.ErrObjectNotExist {
+		return false, nil
+	}
+	return false, err
+}
+
 // URL returns the URL of the file
 func (s *GCStorage) URL(filepath string) (string, error) {
 	return fmt.Sprintf("https://%s.storage.googleapis.com/%s", s.bucketName, filepath), nil
@@ -120,4 +132,15 @@ func (s *GCStorage) URL(filepath string) (string, error) {
 // Delete removes a file, ignores files that do not exist
 func (s *GCStorage) Delete(filepath string) error {
 	return s.bucket.Object(filepath).Delete(s.ctx)
+}
+
+// WriteIfNotExist copies the provided io.Reader to dest if the file does
+// not already exist
+// Returns:
+//   - A boolean specifying if the file got uploaded (true) or if already
+//     existed (false).
+//   - A URL to the uploaded file
+//   - An error if something went wrong
+func (s *GCStorage) WriteIfNotExist(src io.Reader, destPath string) (new bool, url string, err error) {
+	return writeIfNotExist(s, src, destPath)
 }

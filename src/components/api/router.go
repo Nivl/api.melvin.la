@@ -21,6 +21,6 @@ func GetRouter() *mux.Router {
 	users.SetRoutes(r)
 	sessions.SetRoutes(r)
 	about.SetRoutes(r)
-	r.NotFoundHandler = router.Handler(notFoundEndpoint, router.NewDefaultDependencies())
+	r.NotFoundHandler = router.Handler(notFoundEndpoint)
 	return r
 }

@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/Nivl/go-rest-tools/storage/fs"
 )
 
 // NewFSStorage returns a new instance of a File System Storage
@@ -49,6 +51,11 @@ func (s *FSStorage) Read(filepath string) (io.ReadCloser, error) {
 	return os.Open(s.fullPath(filepath))
 }
 
+// Exists checks if a file exists
+func (s *FSStorage) Exists(filepath string) (bool, error) {
+	return fs.FileExists(s.fullPath(filepath))
+}
+
 // Write copy the provided os.File to dest
 func (s *FSStorage) Write(src io.Reader, destPath string) error {
 	fullPath := s.fullPath(destPath)
@@ -89,14 +96,7 @@ func (s *FSStorage) URL(filepath string) (string, error) {
 
 // SetAttributes sets the attributes of the file
 func (s *FSStorage) SetAttributes(filepath string, attrs *UpdatableFileAttributes) (*FileAttributes, error) {
-	return &FileAttributes{
-		ContentType:        attrs.ContentType.(string),
-		ContentDisposition: attrs.ContentDisposition.(string),
-		ContentLanguage:    attrs.ContentLanguage.(string),
-		ContentEncoding:    attrs.ContentEncoding.(string),
-		CacheControl:       attrs.CacheControl.(string),
-		Metadata:           attrs.Metadata,
-	}, nil
+	return NewFileAttributesFromUpdatable(attrs), nil
 }
 
 // Attributes returns the attributes of the file
@@ -107,4 +107,15 @@ func (s *FSStorage) Attributes(filepath string) (*FileAttributes, error) {
 
 func (s *FSStorage) fullPath(filepath string) string {
 	return path.Join(s.path, s.bucket, filepath)
+}
+
+// WriteIfNotExist copies the provided io.Reader to dest if the file does
+// not already exist
+// Returns:
+//   - A boolean specifying if the file got uploaded (true) or if already
+//     existed (false).
+//   - A URL to the uploaded file
+//   - An error if something went wrong
+func (s *FSStorage) WriteIfNotExist(src io.Reader, destPath string) (new bool, url string, err error) {
+	return writeIfNotExist(s, src, destPath)
 }

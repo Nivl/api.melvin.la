@@ -80,55 +80,33 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 
 // Extract extracts the data from the paramsStruct and returns them
 // as a map of url.Values
-func (p *Params) Extract() map[string]url.Values {
+func (p *Params) Extract() (map[string]url.Values, map[string]*formfile.FormFile) {
 	sources := map[string]url.Values{}
 	sources["url"] = url.Values{}
 	sources["form"] = url.Values{}
 	sources["query"] = url.Values{}
+	files := map[string]*formfile.FormFile{}
 
 	if p.data == nil {
-		return sources
+		return sources, files
 	}
 
 	paramList := reflect.Indirect(reflect.ValueOf(p.data))
-	p.extractRecursive(paramList, sources)
-	return sources
+	p.extractRecursive(paramList, sources, files)
+	return sources, files
 }
 
-func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]url.Values) {
+func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]url.Values, files map[string]*formfile.FormFile) {
 	nbParams := paramList.NumField()
 	for i := 0; i < nbParams; i++ {
-		value := reflect.Indirect(paramList.Field(i))
-		paramInfo := paramList.Type().Field(i)
-		tags := paramInfo.Tag
+		value := paramList.Field(i)
+		info := paramList.Type().Field(i)
+		tags := info.Tag
 
 		// Handle embedded struct
-		if value.Kind() == reflect.Struct && paramInfo.Anonymous {
-			p.extractRecursive(value, sources)
+		if reflect.Indirect(value).Kind() == reflect.Struct && info.Anonymous {
+			p.extractRecursive(value, sources, files)
 			continue
-		}
-
-		// We get the Value as string
-		valueStr := ""
-		switch value.Kind() {
-		case reflect.Bool:
-			valueStr = strconv.FormatBool(value.Bool())
-		case reflect.String:
-			valueStr = value.String()
-		case reflect.Int:
-			valueStr = strconv.Itoa(int(value.Int()))
-		case reflect.Ptr:
-			if !value.IsNil() {
-				val := value.Elem()
-				switch val.Kind() {
-				case reflect.Bool:
-					valueStr = strconv.FormatBool(val.Bool())
-				case reflect.String:
-					valueStr = value.String()
-				case reflect.Int:
-					valueStr = strconv.Itoa(int(val.Int()))
-				}
-			}
 		}
 
 		// We get the name from the json tag
@@ -147,6 +125,26 @@ func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]ur
 		if _, found := sources[sourceType]; !found {
 			sources[sourceType] = url.Values{}
 		}
+
+		// Special cases for files
+		if info.Type.String() == "*formfile.FormFile" {
+			if !value.IsNil() {
+				files[fieldName] = value.Interface().(*formfile.FormFile)
+			}
+			continue
+		}
+
+		field := reflect.Indirect(value)
+		valueStr := ""
+		switch field.Kind() {
+		case reflect.Bool:
+			valueStr = strconv.FormatBool(field.Bool())
+		case reflect.String:
+			valueStr = field.String()
+		case reflect.Int:
+			valueStr = strconv.Itoa(int(field.Int()))
+		}
+
 		sources[sourceType].Set(fieldName, valueStr)
 	}
 }

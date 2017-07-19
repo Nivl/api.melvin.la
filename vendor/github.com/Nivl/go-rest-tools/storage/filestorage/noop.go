@@ -27,19 +27,12 @@ func (s *Noop) Read(filepath string) (io.ReadCloser, error) {
 
 // Write copy the provided os.File to dest
 func (s *Noop) Write(src io.Reader, destPath string) error {
-	return errors.New("noop cannot write")
+	return nil
 }
 
 // SetAttributes sets the attributes of the file
 func (s *Noop) SetAttributes(filepath string, attrs *UpdatableFileAttributes) (*FileAttributes, error) {
-	return &FileAttributes{
-		ContentType:        attrs.ContentType.(string),
-		ContentDisposition: attrs.ContentDisposition.(string),
-		ContentLanguage:    attrs.ContentLanguage.(string),
-		ContentEncoding:    attrs.ContentEncoding.(string),
-		CacheControl:       attrs.CacheControl.(string),
-		Metadata:           attrs.Metadata,
-	}, nil
+	return NewFileAttributesFromUpdatable(attrs), nil
 }
 
 // Attributes returns the attributes of the file
@@ -50,10 +43,27 @@ func (s *Noop) Attributes(filepath string) (*FileAttributes, error) {
 
 // URL returns the URL of the file
 func (s *Noop) URL(filepath string) (string, error) {
-	return "", errors.New("noop cannot generate a URL")
+	return "http://localhost/noop/" + filepath, nil
+}
+
+// Exists check if a file exists
+func (s *Noop) Exists(filepath string) (bool, error) {
+	return true, nil
 }
 
 // Delete removes a file, ignores files that do not exist
 func (s *Noop) Delete(filepath string) error {
-	return errors.New("noop cannot read")
+	return nil
+}
+
+// WriteIfNotExist copies the provided io.Reader to dest if the file does
+// not already exist
+// Returns:
+//   - A boolean specifying if the file got uploaded (true) or if already
+//     existed (false).
+//   - A URL to the uploaded file
+//   - An error if something went wrong
+func (s *Noop) WriteIfNotExist(src io.Reader, destPath string) (new bool, url string, err error) {
+	url, _ = s.URL(destPath)
+	return true, url, nil
 }

@@ -47,6 +47,27 @@ func (_m *FileStorage) Delete(filepath string) error {
 	return r0
 }
 
+// Exists provides a mock function with given fields: filepath
+func (_m *FileStorage) Exists(filepath string) (bool, error) {
+	ret := _m.Called(filepath)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(filepath)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(filepath)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ID provides a mock function with given fields:
 func (_m *FileStorage) ID() string {
 	ret := _m.Called()
@@ -154,4 +175,32 @@ func (_m *FileStorage) Write(src io.Reader, destPath string) error {
 	}
 
 	return r0
+}
+
+// WriteIfNotExist provides a mock function with given fields: src, destPath
+func (_m *FileStorage) WriteIfNotExist(src io.Reader, destPath string) (bool, string, error) {
+	ret := _m.Called(src, destPath)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(io.Reader, string) bool); ok {
+		r0 = rf(src, destPath)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 string
+	if rf, ok := ret.Get(1).(func(io.Reader, string) string); ok {
+		r1 = rf(src, destPath)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(io.Reader, string) error); ok {
+		r2 = rf(src, destPath)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
