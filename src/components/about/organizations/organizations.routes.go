@@ -8,11 +8,13 @@ import (
 // Contains the index of all Endpoints
 const (
 	EndpointAdd = iota
+	EndpointUploadLogo
 )
 
 // Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
-	EndpointAdd: addEndpoint,
+	EndpointAdd:        addEndpoint,
+	EndpointUploadLogo: uploadLogoEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article

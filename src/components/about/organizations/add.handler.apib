@@ -1,6 +1,11 @@
 ### Create an Organization [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
     + Attributes
         + name (required, string) - Name of the organization
         + short_name (string) - Short name (or acronym) of the organization

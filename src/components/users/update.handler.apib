@@ -48,6 +48,16 @@
                 "error": "Forbidden"
             }
 
++ Response 404 (application/json)
+
+    The provided id does not match any existing organization
+
+    + Body
+
+            {
+                "error": "[reason]"
+            }
+
 + Response 500 (application/json)
 
     The server experenced an internal error.
