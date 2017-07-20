@@ -1,0 +1,64 @@
+### Delete an organization [DELETE]
+
++ Request (application/json)
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+
++ Response 204 (application/json)
+
+    The session has been deleted
+
+    + Body
+
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Body
+
+            {
+                "error": "[reason]"
+            }
+
++ Response 401 (application/json)
+
+    The requester is not logged in
+
+    + Body
+
+            {
+                "error": "Unauthorized"
+            }
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource
+
+    + Body
+
+            {
+                "error": "Forbidden"
+            }
+
++ Response 404 (application/json)
+
+    The organization does not exist
+
+    + Body
+
+            {
+                "error": "Unauthorized"
+            }
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Body
+
+            {
+                "error": "something went wrong"
+            }
