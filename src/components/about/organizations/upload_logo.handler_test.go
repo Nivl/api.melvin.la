@@ -178,6 +178,7 @@ func TestUploadHappyPath(t *testing.T) {
 	expectedURL := "http://domain.tld/image.png"
 	storage := new(mockfilestorage.FileStorage)
 	storage.ExpectWriteIfNotExist(false, expectedURL)
+	storage.ExpectSetAttributes()
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
