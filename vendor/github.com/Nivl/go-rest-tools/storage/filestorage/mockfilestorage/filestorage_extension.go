@@ -12,9 +12,6 @@ var (
 	// StringType represent a string argument
 	StringType = mock.AnythingOfType("string")
 
-	// ReaderType represents an io.Reader argument
-	ReaderType = mock.AnythingOfType("io.Reader")
-
 	// UpdatableAttrType represents a *filestorage.UpdatableFileAttributes argument
 	UpdatableAttrType = mock.AnythingOfType("*filestorage.UpdatableFileAttributes")
 )
@@ -22,7 +19,7 @@ var (
 // ExpectWriteIfNotExist is an helper that expects a WriteIfNotExist to
 // succeed with the provided params
 func (s *FileStorage) ExpectWriteIfNotExist(isNew bool, url string) *mock.Call {
-	return s.On("WriteIfNotExist", ReaderType, StringType).Return(isNew, url, nil)
+	return s.On("WriteIfNotExist", mock.Anything, StringType).Return(isNew, url, nil)
 }
 
 // ExpectRead is an helper that expects a Read
