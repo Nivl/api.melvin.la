@@ -201,6 +201,7 @@ func TestDeleteInvalidUser(t *testing.T) {
 	userPassword, err := auth.CryptPassword("valid password")
 	assert.NoError(t, err)
 	user := &auth.User{
+		// Different user ID
 		ID:       "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
 		Password: userPassword,
 	}
@@ -214,7 +215,7 @@ func TestDeleteInvalidUser(t *testing.T) {
 	err = users.Delete(req, &router.Dependencies{DB: nil})
 
 	// Assert everything
-	assert.Error(t, err, "the handler should not have fail")
+	assert.Error(t, err, "the handler should have fail")
 	req.AssertExpectations(t)
 
 	httpErr := httperr.Convert(err)
