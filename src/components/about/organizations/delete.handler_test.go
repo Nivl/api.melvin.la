@@ -1,4 +1,4 @@
-package users_test
+package organizations_test
 
 import (
 	"net/http"
@@ -11,8 +11,9 @@ import (
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
-	"github.com/melvin-laplanche/ml-api/src/components/users"
+	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestDeleteInvalidParams(t *testing.T) {
@@ -41,33 +42,9 @@ func TestDeleteInvalidParams(t *testing.T) {
 				},
 			},
 		},
-		{
-			Description: "Should fail on missing password",
-			MsgMatch:    "parameter missing",
-			FieldName:   "current_password",
-			Sources: map[string]url.Values{
-				"url": url.Values{
-					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
-				},
-				"form": url.Values{},
-			},
-		},
-		{
-			Description: "Should fail on blank password",
-			MsgMatch:    "parameter missing",
-			FieldName:   "current_password",
-			Sources: map[string]url.Values{
-				"url": url.Values{
-					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
-				},
-				"form": url.Values{
-					"current_password": []string{"      "},
-				},
-			},
-		},
 	}
 
-	g := users.Endpoints[users.EndpointDelete].Guard
+	g := organizations.Endpoints[organizations.EndpointDelete].Guard
 	testguard.InvalidParams(t, g, testCases)
 }
 
@@ -82,9 +59,6 @@ func TestDeleteValidParams(t *testing.T) {
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 				},
-				"form": url.Values{
-					"current_password": []string{"password"},
-				},
 			},
 		},
 	}
@@ -94,16 +68,14 @@ func TestDeleteValidParams(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			t.Parallel()
 
-			endpts := users.Endpoints[users.EndpointDelete]
+			endpts := organizations.Endpoints[organizations.EndpointDelete]
 			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {
-				p := data.(*users.DeleteParams)
+				p := data.(*organizations.DeleteParams)
 				assert.Equal(t, tc.sources["url"].Get("id"), p.ID)
-				assert.Equal(t, tc.sources["form"].Get("current_password"), p.CurrentPassword)
 			}
-
 		})
 	}
 }
@@ -118,30 +90,32 @@ func TestDeleteAccess(t *testing.T) {
 		{
 			Description: "Should work for logged users",
 			User:        &auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+			ErrCode:     http.StatusForbidden,
+		},
+		{
+			Description: "Should work for logged users",
+			User:        &auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0", IsAdmin: true},
 			ErrCode:     0,
 		},
 	}
 
-	g := users.Endpoints[users.EndpointDelete].Guard
+	g := organizations.Endpoints[organizations.EndpointDelete].Guard
 	testguard.AccessTest(t, g, testCases)
 }
 
 func TestDeleteHappyPath(t *testing.T) {
-	handlerParams := &users.DeleteParams{
-		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
-		CurrentPassword: "valid password",
-	}
-
-	userPassword, err := auth.CryptPassword(handlerParams.CurrentPassword)
-	assert.NoError(t, err)
-	user := &auth.User{
-		ID:       handlerParams.ID,
-		Password: userPassword,
+	handlerParams := &organizations.DeleteParams{
+		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
 	mockDB.ExpectDeletion()
+	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
+		org := args.Get(0).(*organizations.Organization)
+		org.ID = "aa44ca86-553e-4e16-8c30-2e50e63f7eaa"
+		org.Name = "Google"
+	})
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
@@ -151,10 +125,9 @@ func TestDeleteHappyPath(t *testing.T) {
 	req := new(mockrouter.HTTPRequest)
 	req.On("Response").Return(res)
 	req.On("Params").Return(handlerParams)
-	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Delete(req, &router.Dependencies{DB: mockDB})
+	err := organizations.Delete(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
@@ -163,61 +136,27 @@ func TestDeleteHappyPath(t *testing.T) {
 	res.AssertExpectations(t)
 }
 
-func TestDeleteInvalidPassword(t *testing.T) {
-	handlerParams := &users.DeleteParams{
-		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
-		CurrentPassword: "invalid password",
+func TestDeleteUnexistingOrganization(t *testing.T) {
+	handlerParams := &organizations.DeleteParams{
+		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}
 
-	userPassword, err := auth.CryptPassword("valid password")
-	assert.NoError(t, err)
-	user := &auth.User{
-		ID:       handlerParams.ID,
-		Password: userPassword,
-	}
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetNotFound("*organizations.Organization")
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
-	req.On("User").Return(user)
 
 	// call the handler
-	err = users.Delete(req, &router.Dependencies{DB: nil})
-
-	// Assert everything
-	assert.Error(t, err, "the handler should not have fail")
-	req.AssertExpectations(t)
-
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusUnauthorized, httpErr.Code())
-}
-
-func TestDeleteInvalidUser(t *testing.T) {
-	handlerParams := &users.DeleteParams{
-		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
-		CurrentPassword: "valid password",
-	}
-
-	userPassword, err := auth.CryptPassword("valid password")
-	assert.NoError(t, err)
-	user := &auth.User{
-		// Different user ID
-		ID:       "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
-		Password: userPassword,
-	}
-
-	// Mock the request & add expectations
-	req := new(mockrouter.HTTPRequest)
-	req.On("Params").Return(handlerParams)
-	req.On("User").Return(user)
-
-	// call the handler
-	err = users.Delete(req, &router.Dependencies{DB: nil})
+	err := organizations.Delete(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should have fail")
 	req.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
 
 	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusForbidden, httpErr.Code())
+	assert.Equal(t, http.StatusNotFound, httpErr.Code())
 }

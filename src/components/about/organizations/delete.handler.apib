@@ -1,41 +1,31 @@
-### Update a Logo [PUT]
+### Delete an organization [DELETE]
 
-+ Request (multipart/form-data; boundary=---BOUNDARY)
-
++ Request (application/json)
     + Headers
 
             Authorization: basic [base64encoded userID:access_token]
 
+
++ Response 204 (application/json)
+
+    The session has been deleted
+
     + Body
-
-            -----BOUNDARY
-            Content-Disposition: form-data; name="logo"; filename="logo.png"
-            Content-Type: image/png
-
-            data
-            -----BOUNDARY
-
-+ Response 200 (application/json)
-
-    The logo has been uploaded
-
-    + Attributes (Organization)
 
 
 + Response 400 (application/json)
 
-    Invalid file format
+    A value is missing or contains the wrong data.
 
     + Body
 
             {
-                "error": "[reason]",
-                "field": "[name of the field that failed]"
+                "error": "[reason]"
             }
 
 + Response 401 (application/json)
 
-    The user is not logged in
+    The requester is not logged in
 
     + Body
 
@@ -51,6 +41,16 @@
 
             {
                 "error": "Forbidden"
+            }
+
++ Response 404 (application/json)
+
+    The organization does not exist
+
+    + Body
+
+            {
+                "error": "Unauthorized"
             }
 
 + Response 500 (application/json)

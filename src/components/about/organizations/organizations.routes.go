@@ -8,12 +8,14 @@ import (
 // Contains the index of all Endpoints
 const (
 	EndpointAdd = iota
+	EndpointDelete
 	EndpointUploadLogo
 )
 
 // Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
 	EndpointAdd:        addEndpoint,
+	EndpointDelete:     deleteEndpoint,
 	EndpointUploadLogo: uploadLogoEndpoint,
 }
 
