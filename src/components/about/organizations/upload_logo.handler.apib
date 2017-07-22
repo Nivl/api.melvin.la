@@ -21,44 +21,26 @@
 
     + Attributes (Organization)
 
-
 + Response 400 (application/json)
 
     Invalid file format
 
-    + Body
-
-            {
-                "error": "[reason]",
-                "field": "[name of the field that failed]"
-            }
+    + Attributes (DefaultError)
 
 + Response 401 (application/json)
 
     The user is not logged in
 
-    + Body
-
-            {
-                "error": "Unauthorized"
-            }
+     + Attributes (Error401)
 
 + Response 403 (application/json)
 
     The requester does not have the permission to update this resource
 
-    + Body
-
-            {
-                "error": "Forbidden"
-            }
+     + Attributes (Error403)
 
 + Response 500 (application/json)
 
     The server experenced an internal error.
 
-    + Body
-
-            {
-                "error": "something went wrong"
-            }
+     + Attributes (Error500)

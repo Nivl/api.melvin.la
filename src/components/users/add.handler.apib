@@ -9,7 +9,7 @@
 
 + Response 201 (application/json)
 
-    The user has been created
+    The resource has been created.
 
     + Attributes (User)
 
@@ -17,28 +17,16 @@
 
     A value is missing or contains the wrong data.
 
-    + Body
-
-            {
-                "error": "[reason]"
-            }
+    + Attributes (DefaultError)
 
 + Response 409 (application/json)
 
-    The email address is already in use.
+    The email address is already in use by an other resource.
 
-    + Body
-
-            {
-                "error": "[reason]"
-            }
+    + Attributes (DefaultError)
 
 + Response 500 (application/json)
 
     The server experenced an internal error.
 
-    + Body
-
-            {
-                "error": "something went wrong"
-            }
+    + Attributes (Error500)
