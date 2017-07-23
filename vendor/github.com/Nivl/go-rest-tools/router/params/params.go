@@ -69,7 +69,7 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 				return httperr.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
 			}
 
-			if err := param.SetValue(&source); err != nil {
+			if err := param.SetValue(source); err != nil {
 				return err
 			}
 		}

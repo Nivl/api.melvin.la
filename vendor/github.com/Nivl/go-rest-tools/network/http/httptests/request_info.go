@@ -65,7 +65,7 @@ func (ri *RequestInfo) URL() string {
 }
 
 // PopulateQuery populate the query string of a request
-func (ri *RequestInfo) PopulateQuery(qs *url.Values) {
+func (ri *RequestInfo) PopulateQuery(qs url.Values) {
 	for key, value := range ri.queryParams {
 		qs.Add(key, value)
 	}

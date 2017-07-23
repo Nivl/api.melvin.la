@@ -16,7 +16,7 @@ type Param struct {
 	value  *reflect.Value
 	info   *reflect.StructField
 	tags   *reflect.StructTag
-	source *url.Values
+	source url.Values
 }
 
 // NewParamFromStructValue creates a param using a struct value
@@ -77,7 +77,7 @@ func (p *Param) SetFile(source formfile.FileHolder) error {
 }
 
 // SetValue sets the value of the param using the provided source
-func (p *Param) SetValue(source *url.Values) error {
+func (p *Param) SetValue(source url.Values) error {
 	// We parse the tag to get the options
 	opts := NewParamOptions(p.tags)
 	defaultValue := p.tags.Get("default")
@@ -96,12 +96,13 @@ func (p *Param) SetValue(source *url.Values) error {
 		value = defaultValue
 	}
 
-	if err := opts.Validate(value); err != nil {
+	_, valueProvided := source[opts.Name]
+	if err := opts.Validate(value, valueProvided); err != nil {
 		return err
 	}
 
 	// We now set the value in the struct
-	if value != "" {
+	if valueProvided || value != "" {
 		if p.value.Kind() == reflect.Ptr {
 			val := reflect.New(p.value.Type().Elem())
 			p.value.Set(val)

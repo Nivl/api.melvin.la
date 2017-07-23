@@ -1,21 +1,21 @@
-### Create an Organization [POST]
+### Update an organization [PATCH]
 
 + Request (application/json)
-
     + Headers
 
             Authorization: basic [base64encoded userID:access_token]
 
     + Attributes
-        + name (required, string) - Name of the organization
+        + name (string) - Name of the organization
         + short_name (string) - Short name (or acronym) of the organization
         + website (string) - Website of the organization
+        + in_trash (boolean) - Put/remove the resource from the trash
 
-+ Response 201 (application/json)
++ Response 200 (application/json)
 
-    The ressource has been created
+    The resource has been deleted
 
-    + Attributes (Organization)
+    + Body
 
 
 + Response 400 (application/json)
@@ -24,9 +24,21 @@
 
     + Attributes (DefaultError)
 
++ Response 401 (application/json)
+
+    The requester is not logged in
+
+    + Attributes (Error401)
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource
+
+    + Attributes (Error403)
+
 + Response 404 (application/json)
 
-    The ressource does not exist
+    The organization does not exist
 
     + Attributes (Error404)
 

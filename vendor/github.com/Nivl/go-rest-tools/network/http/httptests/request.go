@@ -28,7 +28,7 @@ func NewRequest(t *testing.T, info *RequestInfo) *httptest.ResponseRecorder {
 
 	// Attach the query string
 	qs := req.URL.Query()
-	info.PopulateQuery(&qs)
+	info.PopulateQuery(qs)
 	req.URL.RawQuery = qs.Encode()
 
 	if info.Auth != nil {
