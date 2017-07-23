@@ -103,5 +103,5 @@ func TestAddConflict(t *testing.T) {
 		},
 	}
 
-	testrouter.ConflictTest(t, p)
+	testrouter.ConflictInsertTest(t, p)
 }
