@@ -157,7 +157,7 @@ func TestAddConflictName(t *testing.T) {
 			Name: "Google",
 		},
 	}
-	testrouter.ConflictTest(t, p)
+	testrouter.ConflictInsertTest(t, p)
 }
 
 func TestAddConflictShortName(t *testing.T) {
@@ -170,5 +170,5 @@ func TestAddConflictShortName(t *testing.T) {
 			ShortName: ptrs.NewString("googl"),
 		},
 	}
-	testrouter.ConflictTest(t, p)
+	testrouter.ConflictInsertTest(t, p)
 }

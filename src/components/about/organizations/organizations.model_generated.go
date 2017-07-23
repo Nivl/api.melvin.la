@@ -125,6 +125,16 @@ func (o *Organization) Delete(q db.DB) error {
 	return err
 }
 
+// GetID returns the ID field
+func (o *Organization) GetID() string {
+	return o.ID
+}
+
+// SetID sets the ID field
+func (o *Organization) SetID(id string) {
+	o.ID = id
+}
+
 // IsZero checks if the object is either nil or don't have an ID
 func (o *Organization) IsZero() bool {
 	return o == nil || o.ID == ""

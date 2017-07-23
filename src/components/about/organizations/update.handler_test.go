@@ -9,6 +9,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
@@ -199,27 +200,26 @@ func TestUpdateHappyPath(t *testing.T) {
 	res.AssertExpectations(t)
 }
 
-// func TestUpdateConflictName(t *testing.T) {
-// 	p := &testrouter.ConflictTestParams{
-// 		StructConflicting: "*organizations.Organization",
-// 		FieldConflicting:  "name",
-// 		Handler:           organizations.Update,
-// 		HandlerParams: &organizations.UpdateParams{
-// 			Name: ptrs.NewString("Google"),
-// 		},
-// 	}
-// 	testrouter.ConflictUpdateTest(t, p)
-// }
+func TestUpdateConflictName(t *testing.T) {
+	p := &testrouter.ConflictTestParams{
+		StructConflicting: "*organizations.Organization",
+		FieldConflicting:  "name",
+		Handler:           organizations.Update,
+		HandlerParams: &organizations.UpdateParams{
+			Name: ptrs.NewString("Google"),
+		},
+	}
+	testrouter.ConflictUpdateTest(t, p)
+}
 
-// func TestUpdateConflictShortName(t *testing.T) {
-// 	p := &testrouter.ConflictTestParams{
-// 		StructConflicting: "*organizations.Organization",
-// 		FieldConflicting:  "short_name",
-// 		Handler:           organizations.Update,
-// 		HandlerParams: &organizations.UpdateParams{
-// 			Name:      "Google",
-// 			ShortName: ptrs.NewString("googl"),
-// 		},
-// 	}
-// 	testrouter.ConflictUpdateTest(t, p)
-// }
+func TestUpdateConflictShortName(t *testing.T) {
+	p := &testrouter.ConflictTestParams{
+		StructConflicting: "*organizations.Organization",
+		FieldConflicting:  "short_name",
+		Handler:           organizations.Update,
+		HandlerParams: &organizations.UpdateParams{
+			ShortName: ptrs.NewString("googl"),
+		},
+	}
+	testrouter.ConflictUpdateTest(t, p)
+}
