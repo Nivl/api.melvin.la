@@ -85,7 +85,7 @@ func (o *Organization) doCreate(q db.DB) error {
   return httperr.NewFromSQL(err)
 }
 
-// Update updates most of the fields of a persisted organization using a transaction
+// Update updates most of the fields of a persisted organization
 // Excluded fields are id, created_at, deleted_at, etc.
 func (o *Organization) Update(q db.DB) error {
 	if o.ID == "" {
@@ -95,7 +95,7 @@ func (o *Organization) Update(q db.DB) error {
 	return o.doUpdate(q)
 }
 
-// doUpdate updates a organization in the database using an optional transaction
+// doUpdate updates a organization in the database
 func (o *Organization) doUpdate(q db.DB) error {
 	if o.ID == "" {
 		return errors.New("cannot update a non-persisted organization")
@@ -109,7 +109,7 @@ func (o *Organization) doUpdate(q db.DB) error {
 	return httperr.NewFromSQL(err)
 }
 
-// Delete removes a organization from the database using a transaction
+// Delete removes a organization from the database
 func (o *Organization) Delete(q db.DB) error {
 	if o == nil {
 		return errors.New("organization not instanced")
@@ -122,24 +122,6 @@ func (o *Organization) Delete(q db.DB) error {
 	stmt := "DELETE FROM about_organizations WHERE id=$1"
 	_, err := q.Exec(stmt, o.ID)
 
-	return err
-}
-
-// Trash soft delete a organization using a transaction
-func (o *Organization) Trash(q db.DB) error {
-	return o.doTrash(q)
-}
-
-// doTrash performs a soft delete operation on a organization using an optional transaction
-func (o *Organization) doTrash(q db.DB) error {
-	if o.ID == "" {
-		return errors.New("cannot trash a non-persisted organization")
-	}
-
-	o.DeletedAt = db.Now()
-
-	stmt := "UPDATE about_organizations SET deleted_at = $2 WHERE id=$1"
-	_, err := q.Exec(stmt, o.ID, o.DeletedAt)
 	return err
 }
 

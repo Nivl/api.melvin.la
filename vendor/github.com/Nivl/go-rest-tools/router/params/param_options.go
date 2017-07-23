@@ -44,12 +44,23 @@ type ParamOptions struct {
 	// ValidateImage means the field should contain a valid image
 	// params:"image"
 	ValidateImage bool
+
+	// NoEmpty means the field should not contain an empty value
+	// The difference between `required` and `noempty` is that `require` does`
+	// not accept nil pointer. `noempty` accepts nil pointer, but if a value is
+	// provided it cannot be an empty string.
+	// params:"noempty"
+	NoEmpty bool
 }
 
 // Validate checks the given value passes the options set
-func (opts *ParamOptions) Validate(value string) error {
+func (opts *ParamOptions) Validate(value string, wasProvided bool) error {
 	if value == "" && opts.Required {
 		return httperr.NewBadRequest(opts.Name, "parameter missing")
+	}
+
+	if value == "" && opts.NoEmpty && wasProvided {
+		return httperr.NewBadRequest(opts.Name, "parameter can be omitted but not empty")
 	}
 
 	if value != "" {
@@ -133,6 +144,8 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 		switch opts[i] {
 		case "required":
 			output.Required = true
+		case "noempty":
+			output.NoEmpty = true
 		case "trim":
 			output.Trim = true
 		case "uuid":
