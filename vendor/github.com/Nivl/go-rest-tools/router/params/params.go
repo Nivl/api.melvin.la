@@ -25,7 +25,20 @@ func NewParams(data interface{}) *Params {
 // Parse fills the paramsStruct using the provided sources
 func (p *Params) Parse(sources map[string]url.Values, fileHolder formfile.FileHolder) error {
 	paramList := reflect.Indirect(reflect.ValueOf(p.data))
-	return p.parseRecursive(paramList, sources, fileHolder)
+	err := p.parseRecursive(paramList, sources, fileHolder)
+	if err != nil {
+		return err
+	}
+
+	// If there's a custom validator we'll use it
+	if validator, ok := p.data.(CustomValidation); ok {
+		isValid, field, err := validator.IsValid()
+		if !isValid {
+			return httperr.NewBadRequest(field, err.Error())
+		}
+	}
+
+	return nil
 }
 
 func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.Values, fileHolder formfile.FileHolder) error {
@@ -43,6 +56,15 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 		// Handle embedded struct
 		if value.Kind() == reflect.Struct && info.Anonymous {
 			p.parseRecursive(value, sources, fileHolder)
+
+			// If there's a custom validator we'll use it
+			if validator, ok := value.Interface().(CustomValidation); ok {
+				isValid, field, err := validator.IsValid()
+				if !isValid {
+					return httperr.NewBadRequest(field, err.Error())
+				}
+			}
+
 			continue
 		}
 
