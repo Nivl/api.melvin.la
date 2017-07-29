@@ -1,26 +1,42 @@
 package paginator
 
+import "errors"
+import "fmt"
+
 // HandlerParams represents the params needed to handle a pagination
 type HandlerParams struct {
 	// Page represents the number of the current page
-	Page *int `from:"query" json:"page" default:"1"`
+	Page int `from:"query" json:"page" default:"1"`
 
 	// PerPage represents the maximum number of element we want per page
-	// A value of -1 will
-	PerPage *int `from:"query" json:"per_page"`
+	PerPage int `from:"query" json:"per_page" default:"100"`
+}
+
+// IsValid checks if a paginator is Valid
+func (params *HandlerParams) IsValid() (isValid bool, fieldName string, err error) {
+	p := New(params.Page, params.PerPage)
+	if p.IsValid() {
+		return true, "", nil
+	}
+
+	if p.currentPage <= 0 {
+		return false, "page", errors.New("cannot be <= 0")
+	}
+
+	if p.perPage > p.MaxPerPage {
+		return false, "per_page", fmt.Errorf("cannot be > %d", p.MaxPerPage)
+	}
+
+	if p.perPage <= 0 {
+		return false, "per_page", errors.New("cannot be <= 0")
+	}
+
+	return false, "page/per_page", errors.New("invalid value")
 }
 
 // Paginator returns a Paginator from an HandlerParams
-func (params *HandlerParams) Paginator(defaultPerPage int) *Paginator {
-	// Should never be nil because of the default value
-	p := *params.Page
-
-	pp := defaultPerPage
-	if params.PerPage != nil {
-		pp = *params.PerPage
-	}
-
-	return New(p, pp)
+func (params HandlerParams) Paginator() *Paginator {
+	return New(params.Page, params.PerPage)
 }
 
 // Paginator represents a pagination
@@ -41,6 +57,8 @@ func New(page int, perPage int) *Paginator {
 
 // IsValid checks if the paginator is valid
 func (p *Paginator) IsValid() bool {
+	// Also Update HandlerParams.IsValid() to return a specific error message
+	// to the users
 	return (p.currentPage > 0) && (p.perPage <= p.MaxPerPage) && (p.perPage > 0)
 }
 

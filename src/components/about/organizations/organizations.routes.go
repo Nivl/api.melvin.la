@@ -10,6 +10,7 @@ const (
 	EndpointAdd = iota
 	EndpointDelete
 	EndpointUpdate
+	EndpointList
 	EndpointUploadLogo
 )
 
@@ -18,6 +19,7 @@ var Endpoints = router.Endpoints{
 	EndpointAdd:        addEndpoint,
 	EndpointUpdate:     updateEndpoint,
 	EndpointDelete:     deleteEndpoint,
+	EndpointList:       listEndpoint,
 	EndpointUploadLogo: uploadLogoEndpoint,
 }
 

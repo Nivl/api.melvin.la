@@ -3,6 +3,7 @@ package testorganizations
 import (
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/primitives/ptrs"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/dchest/uniuri"
@@ -32,5 +33,6 @@ func NewOrganization(t *testing.T, dbCon db.DB, org *organizations.Organization)
 		t.Fatal(err)
 	}
 
+	lifecycle.SaveModels(t, org)
 	return org
 }
