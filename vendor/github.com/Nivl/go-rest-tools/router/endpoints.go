@@ -51,23 +51,7 @@ func Handler(e *Endpoint) http.Handler {
 			return
 		}
 
-		// We Parse the request params
-		if e.Guard != nil && e.Guard.ParamStruct != nil {
-			// Get the list of all http params provided by the client
-			sources, err := request.httpParamsBySource()
-			if err != nil {
-				request.res.Error(err, request)
-				return
-			}
-
-			request.params, err = e.Guard.ParseParams(sources, request.http)
-			if err != nil {
-				request.res.Error(err, request)
-				return
-			}
-		}
-
-		// We check the auth
+		// We fetch the user session if a token is provided
 		headers, found := req.Header["Authorization"]
 		if found {
 			userID, sessionID, err := basicauth.ParseAuthHeader(headers, "basic", "")
@@ -100,9 +84,26 @@ func Handler(e *Endpoint) http.Handler {
 			}
 		}
 
+		// Make sure the user has access to the handler
 		if allowed, err := e.Guard.HasAccess(request.user); !allowed {
 			request.res.Error(err, request)
 			return
+		}
+
+		// We Parse the request params
+		if e.Guard != nil && e.Guard.ParamStruct != nil {
+			// Get the list of all http params provided by the client
+			sources, err := request.httpParamsBySource()
+			if err != nil {
+				request.res.Error(err, request)
+				return
+			}
+
+			request.params, err = e.Guard.ParseParams(sources, request.http)
+			if err != nil {
+				request.res.Error(err, request)
+				return
+			}
 		}
 
 		// Execute the actual route handler

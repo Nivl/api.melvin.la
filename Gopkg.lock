@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
   packages = ["dependencies","logger","network/http/basicauth","network/http/httperr","network/http/httptests","notifiers/mailer","paginator","primitives/filetype","primitives/models","primitives/models/lifecycle","primitives/ptrs","primitives/strngs","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs"]
-  revision = "b34be1825335ab5ad5b36ccde2a35644bfeec5f2"
+  revision = "26a6d68b787091873e9e26a64973bc8bb220730b"
 
 [[projects]]
   branch = "master"
@@ -137,7 +137,7 @@
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
-  revision = "a467ab3c3977c4a820c2a4a886d54eb7d68901f0"
+  revision = "3bd178b88a8180be2df394a1fbb81313916f0e7b"
 
 [[projects]]
   branch = "master"
