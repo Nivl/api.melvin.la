@@ -11,6 +11,32 @@ import (
 	"github.com/Nivl/go-rest-tools/primitives/strngs"
 )
 
+const (
+	// ErrMsgMissingParameter represents the error message corresponding to
+	// a missing param
+	ErrMsgMissingParameter = "parameter missing"
+
+	// ErrMsgEmptyParameter represents the error message corresponding to
+	// a missing param
+	ErrMsgEmptyParameter = "parameter can be omitted but not empty"
+
+	// ErrMsgInvalidUUID represents the error message corresponding to
+	// an invalid UUID
+	ErrMsgInvalidUUID = "not a valid uuid"
+
+	// ErrMsgInvalidURL represents the error message corresponding to
+	// an invalid URL
+	ErrMsgInvalidURL = "not a valid url"
+
+	// ErrMsgInvalidEmail represents the error message corresponding to
+	// an invalid Email address
+	ErrMsgInvalidEmail = "not a valid email"
+
+	// ErrMsgInvalidImage represents the error message corresponding to
+	// an invalid image
+	ErrMsgInvalidImage = "not a valid image"
+)
+
 // ParamOptions represent all the options for a field
 type ParamOptions struct {
 	// Ignore means the field should not been parsed
@@ -56,24 +82,24 @@ type ParamOptions struct {
 // Validate checks the given value passes the options set
 func (opts *ParamOptions) Validate(value string, wasProvided bool) error {
 	if value == "" && opts.Required {
-		return httperr.NewBadRequest(opts.Name, "parameter missing")
+		return httperr.NewBadRequest(opts.Name, ErrMsgMissingParameter)
 	}
 
 	if value == "" && opts.NoEmpty && wasProvided {
-		return httperr.NewBadRequest(opts.Name, "parameter can be omitted but not empty")
+		return httperr.NewBadRequest(opts.Name, ErrMsgEmptyParameter)
 	}
 
 	if value != "" {
 		if opts.ValidateUUID && !strngs.IsValidUUID(value) {
-			return httperr.NewBadRequest(opts.Name, "not a valid uuid")
+			return httperr.NewBadRequest(opts.Name, ErrMsgInvalidUUID)
 		}
 
 		if opts.ValidateURL && !strngs.IsValidURL(value) {
-			return httperr.NewBadRequest(opts.Name, "not a valid url")
+			return httperr.NewBadRequest(opts.Name, ErrMsgInvalidURL)
 		}
 
 		if opts.ValidateEmail && !strngs.IsValidEmail(value) {
-			return httperr.NewBadRequest(opts.Name, "not a valid email")
+			return httperr.NewBadRequest(opts.Name, ErrMsgInvalidEmail)
 		}
 	}
 
@@ -92,7 +118,7 @@ func (opts *ParamOptions) ValidateFileContent(file multipart.File) (string, erro
 
 	if opts.ValidateImage {
 		valid, mime, err = filetype.IsImage(file)
-		errorMsg = "not a valid image"
+		errorMsg = ErrMsgInvalidImage
 	} else {
 		// We still get the mimetype
 		valid = true

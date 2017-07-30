@@ -9,6 +9,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
@@ -20,7 +21,7 @@ func TestInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing email",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "email",
 			Sources: map[string]url.Values{
 				"form": url.Values{
@@ -30,7 +31,7 @@ func TestInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing password",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "password",
 			Sources: map[string]url.Values{
 				"form": url.Values{

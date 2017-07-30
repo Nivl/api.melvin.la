@@ -5,7 +5,9 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +17,7 @@ func TestListInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on invalid delete value",
-			MsgMatch:    "invalid boolean",
+			MsgMatch:    params.ErrMsgInvalidBoolean,
 			FieldName:   "deleted",
 			Sources: map[string]url.Values{
 				"query": url.Values{
@@ -25,7 +27,7 @@ func TestListInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail with page = 0",
-			MsgMatch:    "cannot be <= 0",
+			MsgMatch:    paginator.ErrMsgNumberBelow1,
 			FieldName:   "page",
 			Sources: map[string]url.Values{
 				"query": url.Values{
@@ -35,7 +37,7 @@ func TestListInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail with per_page = 0",
-			MsgMatch:    "cannot be <= 0",
+			MsgMatch:    paginator.ErrMsgNumberBelow1,
 			FieldName:   "per_page",
 			Sources: map[string]url.Values{
 				"query": url.Values{

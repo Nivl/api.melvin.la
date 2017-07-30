@@ -3,6 +3,16 @@ package paginator
 import "errors"
 import "fmt"
 
+const (
+	// ErrMsgNumberBelow1 represents the error message corresponding to
+	// a number being "< 1"
+	ErrMsgNumberBelow1 = "cannot be <= 0"
+
+	// ErrInvalidValue represents the error message corresponding to
+	// a number being invalid
+	ErrInvalidValue = "invalid value"
+)
+
 // HandlerParams represents the params needed to handle a pagination
 type HandlerParams struct {
 	// Page represents the number of the current page
@@ -20,7 +30,7 @@ func (params *HandlerParams) IsValid() (isValid bool, fieldName string, err erro
 	}
 
 	if p.currentPage <= 0 {
-		return false, "page", errors.New("cannot be <= 0")
+		return false, "page", errors.New(ErrMsgNumberBelow1)
 	}
 
 	if p.perPage > p.MaxPerPage {
@@ -28,10 +38,10 @@ func (params *HandlerParams) IsValid() (isValid bool, fieldName string, err erro
 	}
 
 	if p.perPage <= 0 {
-		return false, "per_page", errors.New("cannot be <= 0")
+		return false, "per_page", errors.New(ErrMsgNumberBelow1)
 	}
 
-	return false, "page/per_page", errors.New("invalid value")
+	return false, "page/per_page", errors.New(ErrInvalidValue)
 }
 
 // Paginator returns a Paginator from an HandlerParams

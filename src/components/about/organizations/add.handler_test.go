@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/router/params"
+
 	"github.com/Nivl/go-rest-tools/primitives/ptrs"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
@@ -21,7 +23,7 @@ func TestAddInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing name",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "name",
 			Sources: map[string]url.Values{
 				"form": url.Values{
@@ -32,7 +34,7 @@ func TestAddInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid name",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "name",
 			Sources: map[string]url.Values{
 				"form": url.Values{
@@ -42,7 +44,7 @@ func TestAddInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid website",
-			MsgMatch:    "not a valid url",
+			MsgMatch:    params.ErrMsgInvalidURL,
 			FieldName:   "website",
 			Sources: map[string]url.Values{
 				"form": url.Values{

@@ -11,6 +11,16 @@ import (
 	"github.com/Nivl/go-rest-tools/router/formfile"
 )
 
+const (
+	// ErrMsgInvalidBoolean represents the error message corresponding to
+	// an invalid boolean
+	ErrMsgInvalidBoolean = "invalid boolean"
+
+	// ErrMsgInvalidInteger represents the error message corresponding to
+	// an invalid integer
+	ErrMsgInvalidInteger = "invalid integer"
+)
+
 // Param represents a struct param
 type Param struct {
 	value  *reflect.Value
@@ -113,7 +123,7 @@ func (p *Param) SetValue(source url.Values) error {
 		case reflect.Bool:
 			v, err := strconv.ParseBool(value)
 			if err != nil {
-				return httperr.NewBadRequest(opts.Name, "invalid boolean")
+				return httperr.NewBadRequest(opts.Name, ErrMsgInvalidBoolean)
 			}
 			field.SetBool(v)
 		case reflect.String:
@@ -121,7 +131,7 @@ func (p *Param) SetValue(source url.Values) error {
 		case reflect.Int:
 			v, err := strconv.ParseInt(value, 10, 64)
 			if err != nil {
-				return httperr.NewBadRequest(opts.Name, "invalid integer")
+				return httperr.NewBadRequest(opts.Name, ErrMsgInvalidInteger)
 			}
 			field.SetInt(v)
 		}

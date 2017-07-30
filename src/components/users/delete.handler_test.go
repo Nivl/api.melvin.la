@@ -9,6 +9,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -19,7 +20,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{},
@@ -30,7 +31,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid ID",
-			MsgMatch:    "not a valid uuid",
+			MsgMatch:    params.ErrMsgInvalidUUID,
 			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -43,7 +44,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing password",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "current_password",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -54,7 +55,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on blank password",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "current_password",
 			Sources: map[string]url.Values{
 				"url": url.Values{

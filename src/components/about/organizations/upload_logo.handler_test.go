@@ -12,6 +12,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/storage/filestorage/mockfilestorage"
@@ -65,7 +66,7 @@ func TestUploadLogoInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "id",
 			FileHolder:  validFileHolder,
 			Sources: map[string]url.Values{
@@ -74,7 +75,7 @@ func TestUploadLogoInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid uuid",
-			MsgMatch:    "not a valid uuid",
+			MsgMatch:    params.ErrMsgInvalidUUID,
 			FieldName:   "id",
 			FileHolder:  validFileHolder,
 			Sources: map[string]url.Values{
@@ -85,7 +86,7 @@ func TestUploadLogoInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing logo",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "logo",
 			FileHolder:  noFileHolder,
 			Sources: map[string]url.Values{
@@ -96,7 +97,7 @@ func TestUploadLogoInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid logo",
-			MsgMatch:    "not a valid image",
+			MsgMatch:    params.ErrMsgInvalidImage,
 			FieldName:   "logo",
 			FileHolder:  invalidFileHolder,
 			Sources: map[string]url.Values{

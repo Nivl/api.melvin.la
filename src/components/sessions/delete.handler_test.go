@@ -9,6 +9,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
@@ -20,7 +21,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing token",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "token",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -31,7 +32,7 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid token",
-			MsgMatch:    "not a valid uuid",
+			MsgMatch:    params.ErrMsgInvalidUUID,
 			FieldName:   "token",
 			Sources: map[string]url.Values{
 				"url": url.Values{

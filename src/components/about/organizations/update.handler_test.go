@@ -9,6 +9,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -21,7 +22,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing",
+			MsgMatch:    params.ErrMsgMissingParameter,
 			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{},
@@ -29,7 +30,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid ID",
-			MsgMatch:    "not a valid uuid",
+			MsgMatch:    params.ErrMsgInvalidUUID,
 			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -39,7 +40,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on not nil but empty name",
-			MsgMatch:    "parameter can be omitted but not empty",
+			MsgMatch:    params.ErrMsgEmptyParameter,
 			FieldName:   "name",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -52,7 +53,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on not nil but invalid website",
-			MsgMatch:    "not a valid url",
+			MsgMatch:    params.ErrMsgInvalidURL,
 			FieldName:   "website",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -66,7 +67,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on not nil but invalid in_trash",
-			MsgMatch:    "invalid boolean",
+			MsgMatch:    params.ErrMsgInvalidBoolean,
 			FieldName:   "in_trash",
 			Sources: map[string]url.Values{
 				"url": url.Values{
