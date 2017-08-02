@@ -30,7 +30,7 @@ type UpdateParams struct {
 func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	params := req.Params().(*UpdateParams)
 
-	org, err := GetByID(deps.DB, params.ID)
+	org, err := GetAnyByID(deps.DB, params.ID)
 	if err != nil {
 		return err
 	}

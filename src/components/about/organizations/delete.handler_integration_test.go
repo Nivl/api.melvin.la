@@ -11,6 +11,7 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,10 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
-	toDelete := testorganizations.NewOrganization(t, dbCon, nil)
+	basicOrg := testorganizations.NewOrganization(t, dbCon, nil)
+	trashedOrg := testorganizations.NewOrganization(t, dbCon, &organizations.Organization{
+		DeletedAt: db.Now(),
+	})
 
 	tests := []struct {
 		description string
@@ -32,7 +36,12 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 		{
 			"Valid request should work",
 			http.StatusNoContent,
-			&organizations.DeleteParams{ID: toDelete.ID},
+			&organizations.DeleteParams{ID: basicOrg.ID},
+		},
+		{
+			"trashed org should work",
+			http.StatusNoContent,
+			&organizations.DeleteParams{ID: trashedOrg.ID},
 		},
 	}
 

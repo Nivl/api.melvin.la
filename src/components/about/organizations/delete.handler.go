@@ -25,7 +25,7 @@ type DeleteParams struct {
 func Delete(req router.HTTPRequest, deps *router.Dependencies) error {
 	params := req.Params().(*DeleteParams)
 
-	org, err := GetByID(deps.DB, params.ID)
+	org, err := GetAnyByID(deps.DB, params.ID)
 	if err != nil {
 		return err
 	}
