@@ -38,5 +38,5 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 	if err := org.Create(deps.DB); err != nil {
 		return err
 	}
-	return req.Response().Created(org.Export())
+	return req.Response().Created(org.ExportPrivate())
 }

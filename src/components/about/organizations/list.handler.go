@@ -41,5 +41,5 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 	if err != nil {
 		return err
 	}
-	return req.Response().Ok(orgs.Export())
+	return req.Response().Ok(orgs.ExportPrivate())
 }

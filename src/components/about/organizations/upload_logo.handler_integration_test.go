@@ -49,7 +49,7 @@ func TestIntegrationUploadHappyPath(t *testing.T) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				pld := &organizations.Organization{}
+				pld := &organizations.Payload{}
 				if err := json.NewDecoder(rec.Body).Decode(pld); err != nil {
 					assert.NoError(t, err)
 					return
@@ -57,10 +57,9 @@ func TestIntegrationUploadHappyPath(t *testing.T) {
 
 				assert.Equal(t, org.ID, pld.ID, "ID should have not changed")
 				assert.Equal(t, org.Name, pld.Name, "Name should have not changed")
-				assert.NotNil(t, pld.Logo, "Logo should not be nil")
-				assert.NotEmpty(t, *pld.Logo, "Logo should not be empty")
-				assert.Equal(t, "/", string((*pld.Logo)[0]), "Logo should start by a \"/\" as the storage provider should have fallback to the FS one. Got %s", *pld.Logo)
-				exists, err := fs.FileExists(*pld.Logo)
+				assert.NotEmpty(t, pld.Logo, "Logo should not be empty")
+				assert.Equal(t, "/", string(pld.Logo[0]), "Logo should start by a \"/\" as the storage provider should have fallback to the FS one. Got %s", pld.Logo)
+				exists, err := fs.FileExists(pld.Logo)
 				assert.NoError(t, err)
 				assert.True(t, exists, "The file should exist on the filesystem")
 			}

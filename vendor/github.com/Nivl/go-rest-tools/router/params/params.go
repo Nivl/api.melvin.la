@@ -125,9 +125,8 @@ func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]ur
 		info := paramList.Type().Field(i)
 		tags := info.Tag
 
-		// Handle embedded struct
-		if reflect.Indirect(value).Kind() == reflect.Struct && info.Anonymous {
-			p.extractRecursive(value, sources, files)
+		// skip the nil pointers
+		if value.Kind() == reflect.Ptr && value.IsNil() {
 			continue
 		}
 
@@ -139,6 +138,12 @@ func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]ur
 				continue
 			}
 			fieldName = jsonOpts[0]
+		}
+
+		// Handle embedded struct
+		if reflect.Indirect(value).Kind() == reflect.Struct && info.Anonymous {
+			p.extractRecursive(value, sources, files)
+			continue
 		}
 
 		// We get the source type (url, query, form, ...) and add the value

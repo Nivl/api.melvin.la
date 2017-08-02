@@ -16,7 +16,7 @@ script:
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api
   && make migration"
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
-  && go test ./..."
+  && go test -tags=integration  ./..."
 deploy:
   - provider: script
     on: staging

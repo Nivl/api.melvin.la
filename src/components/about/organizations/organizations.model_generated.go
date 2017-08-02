@@ -29,9 +29,23 @@ func JoinSQL(prefix string) string {
 }
 
 // GetByID finds and returns an active organization by ID
+// Deleted object are not returned
 func GetByID(q db.DB, id string) (*Organization, error) {
 	o := &Organization{}
 	stmt := "SELECT * from about_organizations WHERE id=$1 and deleted_at IS NULL LIMIT 1"
+	err := db.Get(q, o, stmt, id)
+	// We want to return nil if a organization is not found
+	if o.ID == "" {
+		return nil, err
+	}
+	return o, err
+}
+
+// GetAnyByID finds and returns an organization by ID.
+// Deleted object are returned
+func GetAnyByID(q db.DB, id string) (*Organization, error) {
+	o := &Organization{}
+	stmt := "SELECT * from about_organizations WHERE id=$1 LIMIT 1"
 	err := db.Get(q, o, stmt, id)
 	// We want to return nil if a organization is not found
 	if o.ID == "" {
