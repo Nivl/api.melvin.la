@@ -183,12 +183,12 @@ func TestUploadHappyPath(t *testing.T) {
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectOk("*organizations.Organization", func(args mock.Arguments) {
-		org := args.Get(0).(*organizations.Organization)
+	res.ExpectOk("*organizations.Payload", func(args mock.Arguments) {
+		org := args.Get(0).(*organizations.Payload)
 		assert.Equal(t, handlerParams.ID, org.ID, "ID should not have changed")
 		assert.Equal(t, "Google", org.Name, "Name should not have changed")
 		assert.NotNil(t, org.Logo, "Logo should not be nil")
-		assert.Equal(t, expectedURL, *org.Logo, "Logo should ha a URL set")
+		assert.Equal(t, expectedURL, org.Logo, "Logo should ha a URL set")
 	})
 
 	// Mock the request & add expectations

@@ -177,13 +177,13 @@ func TestUpdateHappyPath(t *testing.T) {
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectOk("*organizations.Organization", func(args mock.Arguments) {
-		org := args.Get(0).(*organizations.Organization)
+	res.ExpectOk("*organizations.Payload", func(args mock.Arguments) {
+		org := args.Get(0).(*organizations.Payload)
 		assert.Equal(t, handlerParams.ID, org.ID, "ID should have not changed")
 		assert.Equal(t, *handlerParams.Name, org.Name, "name should have been updated")
-		assert.Equal(t, *handlerParams.Website, *org.Website, "Website should have been updated")
-		assert.Equal(t, *handlerParams.ShortName, *org.ShortName, "ShortName should have been updated")
-		assert.NotNil(t, *org.DeletedAt, "DeletedAt should have been set")
+		assert.Equal(t, *handlerParams.Website, org.Website, "Website should have been updated")
+		assert.Equal(t, *handlerParams.ShortName, org.ShortName, "ShortName should have been updated")
+		assert.NotNil(t, org.DeletedAt, "DeletedAt should have been set")
 	})
 
 	// Mock the request & add expectations

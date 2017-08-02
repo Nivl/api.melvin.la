@@ -64,5 +64,5 @@ func UploadLogo(req router.HTTPRequest, deps *router.Dependencies) error {
 		return err
 	}
 
-	return req.Response().Ok(org.Export())
+	return req.Response().Ok(org.ExportPrivate())
 }

@@ -53,18 +53,25 @@ func TestIntegrationUpdate(t *testing.T) {
 		{
 			"Untrash should work",
 			http.StatusOK,
-			changeAll,
+			toUntrash,
 			&organizations.UpdateParams{
-				ID:      toUntrash.ID,
-				InTrash: ptrs.NewBool(false),
+				ID:        toUntrash.ID,
+				InTrash:   ptrs.NewBool(false),
+				Name:      nil,
+				ShortName: nil,
+				Website:   nil,
 			},
 		},
 		{
 			"Noop should work",
 			http.StatusOK,
-			changeAll,
+			noop,
 			&organizations.UpdateParams{
-				ID: noop.ID,
+				ID:        noop.ID,
+				Name:      nil,
+				ShortName: nil,
+				Website:   nil,
+				InTrash:   nil,
 			},
 		},
 	}
@@ -75,7 +82,7 @@ func TestIntegrationUpdate(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				var pld *organizations.Organization
+				var pld *organizations.Payload
 				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
 					t.Fatal(err)
 				}
@@ -88,15 +95,15 @@ func TestIntegrationUpdate(t *testing.T) {
 				}
 
 				if tc.params.ShortName != nil {
-					assert.Equal(t, *tc.params.ShortName, *pld.ShortName, "ShortName should have changed")
+					assert.Equal(t, *tc.params.ShortName, pld.ShortName, "ShortName should have changed")
 				} else {
-					assert.Equal(t, *tc.toUpdate.ShortName, *pld.ShortName, "ShortName should have not changed")
+					assert.Equal(t, *tc.toUpdate.ShortName, pld.ShortName, "ShortName should have not changed")
 				}
 
 				if tc.params.Website != nil {
-					assert.Equal(t, *tc.params.Website, *pld.Website, "Website should have changed")
+					assert.Equal(t, *tc.params.Website, pld.Website, "Website should have changed")
 				} else {
-					assert.Equal(t, *tc.toUpdate.Website, *pld.Website, "Website should have not changed")
+					assert.Equal(t, *tc.toUpdate.Website, pld.Website, "Website should have not changed")
 				}
 
 				if tc.params.InTrash != nil {

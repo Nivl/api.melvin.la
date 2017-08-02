@@ -59,6 +59,6 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 		return err
 	}
 
-	req.Response().Ok(org)
+	req.Response().Ok(org.ExportPrivate())
 	return nil
 }

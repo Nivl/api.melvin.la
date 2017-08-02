@@ -126,10 +126,10 @@ func TestAddHappyPath(t *testing.T) {
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectCreated("*organizations.Organization", func(args mock.Arguments) {
-		org := args.Get(0).(*organizations.Organization)
+	res.ExpectCreated("*organizations.Payload", func(args mock.Arguments) {
+		org := args.Get(0).(*organizations.Payload)
 		assert.Equal(t, handlerParams.Name, org.Name)
-		assert.Equal(t, *handlerParams.Website, *org.Website)
+		assert.Equal(t, *handlerParams.Website, org.Website)
 		assert.NotEmpty(t, org.ID)
 		assert.Empty(t, org.ShortName)
 		assert.Empty(t, org.Logo)

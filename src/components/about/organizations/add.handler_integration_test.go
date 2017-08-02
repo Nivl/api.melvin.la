@@ -45,19 +45,23 @@ func TestAdd(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusCreated {
-				org := &organizations.Organization{}
+				org := &organizations.Payload{}
 				if err := json.NewDecoder(rec.Body).Decode(org); err != nil {
 					t.Fatal(err)
 				}
 
 				assert.NotEmpty(t, org.ID)
 				assert.Equal(t, tc.params.Name, org.Name)
-				assert.Nil(t, org.ShortName)
-				assert.NotNil(t, org.Website)
-				assert.Equal(t, *tc.params.Website, *org.Website)
+				assert.Empty(t, org.ShortName)
+				assert.Equal(t, *tc.params.Website, org.Website)
+				assert.NotNil(t, org.CreatedAt)
 
 				// clean the test
-				org.Delete(dbCon)
+				orgModel, err := organizations.GetByID(dbCon, org.ID)
+				if err != nil {
+					t.Fatal(err)
+				}
+				orgModel.Delete(dbCon)
 			}
 		})
 	}
