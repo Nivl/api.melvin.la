@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
   packages = ["dependencies","logger","network/http/basicauth","network/http/httperr","network/http/httptests","notifiers/mailer","paginator","primitives/filetype","primitives/models","primitives/models/lifecycle","primitives/ptrs","primitives/strngs","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs"]
-  revision = "26a6d68b787091873e9e26a64973bc8bb220730b"
+  revision = "a121fc63102405b599f058cf1d45afc008b35ad5"
 
 [[projects]]
   branch = "master"
@@ -143,7 +143,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "629ff0da413865688533e3d3cad3c54966efcb73"
+  revision = "3c107eb0fd1188c1e2f52a3101424b250162144b"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -155,7 +155,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/api/annotations","googleapis/iam/v1","googleapis/rpc/status"]
-  revision = "b0a3dcfcd1a9bd48e63634bd8802960804cf8315"
+  revision = "09f6ed296fc66555a25fe4ce95173148778dfa85"
 
 [[projects]]
   name = "google.golang.org/grpc"
