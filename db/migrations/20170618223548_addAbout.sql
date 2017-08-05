@@ -30,7 +30,6 @@ CREATE TABLE about_experience (
   description VARCHAR CHECK (length(description) < 10000),
   start_date DATE NOT NULL,
   end_date DATE,
-  position SMALLINT NOT NULL UNIQUE,
   PRIMARY KEY (id)
 );
 
@@ -61,7 +60,6 @@ CREATE TABLE about_education (
   description VARCHAR CHECK (length(description) < 10000),
   start_year smallint NOT NULL CHECK (start_year > 1900 AND start_year < 2100),
   end_year smallint CHECK (end_year > 1900 AND end_year < 2100),
-  position SMALLINT NOT NULL UNIQUE,
   PRIMARY KEY (id)
 );
 
