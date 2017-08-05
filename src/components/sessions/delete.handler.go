@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -32,7 +32,7 @@ func Delete(req router.HTTPRequest, deps *router.Dependencies) error {
 	// password (that's just a logout)
 	if params.Token != req.Session().ID {
 		if !auth.IsPasswordValid(req.User().Password, params.CurrentPassword) {
-			return httperr.NewUnauthorized()
+			return apierror.NewUnauthorized()
 		}
 	}
 
@@ -45,7 +45,7 @@ func Delete(req router.HTTPRequest, deps *router.Dependencies) error {
 
 	// We always return a 404 in case of a user error to avoid brute-force
 	if session.ID == "" || session.UserID != req.User().ID {
-		return httperr.NewNotFound()
+		return apierror.NewNotFound()
 	}
 
 	if err := session.Delete(deps.DB); err != nil {

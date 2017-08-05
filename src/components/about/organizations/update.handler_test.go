@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/primitives/ptrs"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"

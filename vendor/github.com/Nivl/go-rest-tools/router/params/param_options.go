@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
-	"github.com/Nivl/go-rest-tools/primitives/filetype"
-	"github.com/Nivl/go-rest-tools/primitives/strngs"
+	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/filetype"
+	"github.com/Nivl/go-rest-tools/types/strngs"
 )
 
 const (
@@ -82,24 +82,24 @@ type ParamOptions struct {
 // Validate checks the given value passes the options set
 func (opts *ParamOptions) Validate(value string, wasProvided bool) error {
 	if value == "" && opts.Required {
-		return httperr.NewBadRequest(opts.Name, ErrMsgMissingParameter)
+		return apierror.NewBadRequest(opts.Name, ErrMsgMissingParameter)
 	}
 
 	if value == "" && opts.NoEmpty && wasProvided {
-		return httperr.NewBadRequest(opts.Name, ErrMsgEmptyParameter)
+		return apierror.NewBadRequest(opts.Name, ErrMsgEmptyParameter)
 	}
 
 	if value != "" {
 		if opts.ValidateUUID && !strngs.IsValidUUID(value) {
-			return httperr.NewBadRequest(opts.Name, ErrMsgInvalidUUID)
+			return apierror.NewBadRequest(opts.Name, ErrMsgInvalidUUID)
 		}
 
 		if opts.ValidateURL && !strngs.IsValidURL(value) {
-			return httperr.NewBadRequest(opts.Name, ErrMsgInvalidURL)
+			return apierror.NewBadRequest(opts.Name, ErrMsgInvalidURL)
 		}
 
 		if opts.ValidateEmail && !strngs.IsValidEmail(value) {
-			return httperr.NewBadRequest(opts.Name, ErrMsgInvalidEmail)
+			return apierror.NewBadRequest(opts.Name, ErrMsgInvalidEmail)
 		}
 	}
 
@@ -134,7 +134,7 @@ func (opts *ParamOptions) ValidateFileContent(file multipart.File) (string, erro
 	}
 
 	if !valid {
-		return "", httperr.NewBadRequest(opts.Name, errorMsg)
+		return "", apierror.NewBadRequest(opts.Name, errorMsg)
 	}
 
 	// check "valid", and return an error if its not

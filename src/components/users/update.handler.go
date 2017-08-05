@@ -1,7 +1,7 @@
 package users
 
 import (
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -32,13 +32,13 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	user := req.User()
 
 	if params.ID != user.ID {
-		return httperr.NewForbidden()
+		return apierror.NewForbidden()
 	}
 
 	// To change the email or the password we require the current password
 	if params.NewPassword != "" || params.Email != "" {
 		if !auth.IsPasswordValid(user.Password, params.CurrentPassword) {
-			return httperr.NewUnauthorized()
+			return apierror.NewUnauthorized()
 		}
 	}
 

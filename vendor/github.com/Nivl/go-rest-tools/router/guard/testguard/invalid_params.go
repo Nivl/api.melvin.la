@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/stretchr/testify/assert"
@@ -32,8 +32,8 @@ func InvalidParams(t *testing.T, g *guard.Guard, testCases []InvalidParamsTestCa
 				assert.True(t, strings.Contains(err.Error(), tc.MsgMatch),
 					"the error \"%s\" should contain the string \"%s\"", err.Error(), tc.MsgMatch)
 
-				e, casted := err.(httperr.Error)
-				if assert.True(t, casted, "expected the error to be a httperr.Error") {
+				e, casted := err.(apierror.Error)
+				if assert.True(t, casted, "expected the error to be a apierror.Error") {
 					assert.Equal(t, tc.FieldName, e.Field(), "expected %s to be the failing param", tc.FieldName)
 				}
 			}

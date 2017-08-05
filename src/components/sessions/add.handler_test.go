@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
@@ -107,8 +107,8 @@ func TestAddUnexistingEmail(t *testing.T) {
 	assert.Error(t, err)
 	req.AssertExpectations(t)
 
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusBadRequest, httpErr.HTTPStatus())
 	assert.Equal(t, "email/password", httpErr.Field())
 }
 
@@ -140,6 +140,6 @@ func TestAddWrongPassword(t *testing.T) {
 	assert.Error(t, err)
 	req.AssertExpectations(t)
 
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusBadRequest, httpErr.Code())
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusBadRequest, httpErr.HTTPStatus())
 }

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/primitives/models"
+	"github.com/Nivl/go-rest-tools/types/models"
 	"github.com/Nivl/go-rest-tools/storage/db"
 )
 

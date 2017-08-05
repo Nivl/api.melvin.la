@@ -3,13 +3,12 @@ package organizations
 import (
 	"fmt"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
-	"github.com/Nivl/go-rest-tools/primitives/filetype"
-	"github.com/Nivl/go-rest-tools/primitives/ptrs"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/formfile"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/storage/filestorage"
+	"github.com/Nivl/go-rest-tools/types/filetype"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 )
 
 var uploadLogoEndpoint = &router.Endpoint{
@@ -35,9 +34,6 @@ func UploadLogo(req router.HTTPRequest, deps *router.Dependencies) error {
 	org, err := GetByID(deps.DB, params.ID)
 	if err != nil {
 		return err
-	}
-	if org == nil {
-		return httperr.NewNotFound()
 	}
 
 	// we use the shasum as filename that way we don't re-upload the same

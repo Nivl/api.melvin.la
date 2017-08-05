@@ -6,8 +6,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/primitives/filetype"
 	"github.com/Nivl/go-rest-tools/router/formfile"
+	"github.com/Nivl/go-rest-tools/types/filetype"
 )
 
 // NewMultipartData is a helper to generate multipart data that can be returned

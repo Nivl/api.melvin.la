@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -33,12 +33,8 @@ func JoinSQL(prefix string) string {
 func GetByID(q db.DB, id string) (*Organization, error) {
 	o := &Organization{}
 	stmt := "SELECT * from about_organizations WHERE id=$1 and deleted_at IS NULL LIMIT 1"
-	err := db.Get(q, o, stmt, id)
-	// We want to return nil if a organization is not found
-	if o.ID == "" {
-		return nil, err
-	}
-	return o, err
+	err := q.Get(o, stmt, id)
+	return o, apierror.NewFromSQL(err)
 }
 
 // GetAnyByID finds and returns an organization by ID.
@@ -46,12 +42,8 @@ func GetByID(q db.DB, id string) (*Organization, error) {
 func GetAnyByID(q db.DB, id string) (*Organization, error) {
 	o := &Organization{}
 	stmt := "SELECT * from about_organizations WHERE id=$1 LIMIT 1"
-	err := db.Get(q, o, stmt, id)
-	// We want to return nil if a organization is not found
-	if o.ID == "" {
-		return nil, err
-	}
-	return o, err
+	err := q.Get(o, stmt, id)
+	return o, apierror.NewFromSQL(err)
 }
 
 // Exists checks if a organization exists for a specific ID
@@ -96,7 +88,7 @@ func (o *Organization) doCreate(q db.DB) error {
 	stmt := "INSERT INTO about_organizations (id, created_at, updated_at, deleted_at, name, short_name, logo, website) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :short_name, :logo, :website)"
 	_, err := q.NamedExec(stmt, o)
 
-  return httperr.NewFromSQL(err)
+  return apierror.NewFromSQL(err)
 }
 
 // Update updates most of the fields of a persisted organization
@@ -120,7 +112,7 @@ func (o *Organization) doUpdate(q db.DB) error {
 	stmt := "UPDATE about_organizations SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, name=:name, short_name=:short_name, logo=:logo, website=:website WHERE id=:id"
 	_, err := q.NamedExec(stmt, o)
 
-	return httperr.NewFromSQL(err)
+	return apierror.NewFromSQL(err)
 }
 
 // Delete removes a organization from the database

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
 )
 
@@ -34,7 +34,7 @@ func (p *Params) Parse(sources map[string]url.Values, fileHolder formfile.FileHo
 	if validator, ok := p.data.(CustomValidation); ok {
 		isValid, field, err := validator.IsValid()
 		if !isValid {
-			return httperr.NewBadRequest(field, err.Error())
+			return apierror.NewBadRequest(field, err.Error())
 		}
 	}
 
@@ -50,7 +50,7 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 
 		// We make sure we can update the value of field
 		if !value.CanSet() {
-			return httperr.NewServerError("field [%s] could not be set", info.Name)
+			return apierror.NewServerError("field [%s] could not be set", info.Name)
 		}
 
 		// Handle embedded struct
@@ -61,7 +61,7 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 			if validator, ok := value.Interface().(CustomValidation); ok {
 				isValid, field, err := validator.IsValid()
 				if !isValid {
-					return httperr.NewBadRequest(field, err.Error())
+					return apierror.NewBadRequest(field, err.Error())
 				}
 			}
 
@@ -88,7 +88,7 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 		} else {
 			source, found := sources[paramLocation]
 			if !found {
-				return httperr.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
+				return apierror.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
 			}
 
 			if err := param.SetValue(source); err != nil {
