@@ -5,10 +5,11 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -20,7 +21,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing: id",
+			MsgMatch:    params.ErrMsgMissingParameter,
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url":  url.Values{},
 				"form": url.Values{},
@@ -28,7 +30,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid ID",
-			MsgMatch:    "not a valid uuid",
+			MsgMatch:    params.ErrMsgInvalidUUID,
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -64,7 +67,7 @@ func TestUpdateValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := users.Endpoints[users.EndpointUpdate]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {
@@ -163,8 +166,8 @@ func TestUpdateInvalidPassword(t *testing.T) {
 	assert.Error(t, err, "the handler should not have fail")
 	req.AssertExpectations(t)
 
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusUnauthorized, httpErr.Code())
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusUnauthorized, httpErr.HTTPStatus())
 }
 
 func TestUpdateInvalidUser(t *testing.T) {
@@ -192,6 +195,6 @@ func TestUpdateInvalidUser(t *testing.T) {
 	assert.Error(t, err, "the handler should not have fail")
 	req.AssertExpectations(t)
 
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusForbidden, httpErr.Code())
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusForbidden, httpErr.HTTPStatus())
 }

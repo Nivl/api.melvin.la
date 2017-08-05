@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db"

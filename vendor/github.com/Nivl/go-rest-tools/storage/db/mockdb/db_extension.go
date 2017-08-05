@@ -2,6 +2,7 @@ package mockdb
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/lib/pq"
@@ -41,10 +42,11 @@ func (mdb *DB) ExpectInsert(typ string) *mock.Call {
 }
 
 // ExpectInsertConflict is a helper that expects a conflict on an insertion
-func (mdb *DB) ExpectInsertConflict(typ string) *mock.Call {
+func (mdb *DB) ExpectInsertConflict(typ string, fieldName string) *mock.Call {
 	conflictError := new(pq.Error)
 	conflictError.Code = db.ErrDup
 	conflictError.Message = "error: duplicate field"
+	conflictError.Detail = fmt.Sprintf("Key (%s)=(Google) already exists.", fieldName)
 
 	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, conflictError)
 }
@@ -55,10 +57,11 @@ func (mdb *DB) ExpectUpdate(typ string) *mock.Call {
 }
 
 // ExpectUpdateConflict is a helper that expects a conflict on an update
-func (mdb *DB) ExpectUpdateConflict(typ string) *mock.Call {
+func (mdb *DB) ExpectUpdateConflict(typ string, fieldName string) *mock.Call {
 	conflictError := new(pq.Error)
 	conflictError.Code = db.ErrDup
 	conflictError.Message = "error: duplicate field"
+	conflictError.Detail = fmt.Sprintf("Key (%s)=(Google) already exists.", fieldName)
 
 	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, conflictError)
 }

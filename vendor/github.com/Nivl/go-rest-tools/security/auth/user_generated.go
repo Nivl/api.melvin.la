@@ -4,19 +4,50 @@ package auth
 
 import (
 	"errors"
-	
+	"fmt"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
 
+// JoinUserSQL returns a string ready to be embed in a JOIN query
+func JoinUserSQL(prefix string) string {
+	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "name", "email", "password", "is_admin" }
+	output := ""
 
+	for i, field := range fields {
+		if i != 0 {
+			output += ", "
+		}
 
+		fullName := fmt.Sprintf("%s.%s", prefix, field)
+		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
+	}
 
+	return output
+}
 
-// Exists checks if a user exists for a specific ID
-func Exists(q db.DB, id string) (bool, error) {
+// GetUserByID finds and returns an active user by ID
+// Deleted object are not returned
+func GetUserByID(q db.DB, id string) (*User, error) {
+	u := &User{}
+	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
+	err := q.Get(u, stmt, id)
+	return u, apierror.NewFromSQL(err)
+}
+
+// GetAnyUserByID finds and returns an user by ID.
+// Deleted object are returned
+func GetAnyUserByID(q db.DB, id string) (*User, error) {
+	u := &User{}
+	stmt := "SELECT * from users WHERE id=$1 LIMIT 1"
+	err := q.Get(u, stmt, id)
+	return u, apierror.NewFromSQL(err)
+}
+
+// UserExists checks if a user exists for a specific ID
+func UserExists(q db.DB, id string) (bool, error) {
 	exists := false
 	stmt := "SELECT exists(SELECT 1 FROM users WHERE id=$1 and deleted_at IS NULL)"
 	err := db.Get(q, &exists, stmt, id)
@@ -26,10 +57,6 @@ func Exists(q db.DB, id string) (bool, error) {
 // Save creates or updates the article depending on the value of the id using
 // a transaction
 func (u *User) Save(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
 	if u.ID == "" {
 		return u.Create(q)
 	}
@@ -37,7 +64,14 @@ func (u *User) Save(q db.DB) error {
 	return u.Update(q)
 }
 
+// Create persists a user in the database
+func (u *User) Create(q db.DB) error {
+	if u.ID != "" {
+		return errors.New("cannot persist a user that already has an ID")
+	}
 
+	return u.doCreate(q)
+}
 
 // doCreate persists a user in the database using a Node
 func (u *User) doCreate(q db.DB) error {
@@ -54,19 +88,23 @@ func (u *User) doCreate(q db.DB) error {
 	stmt := "INSERT INTO users (id, created_at, updated_at, deleted_at, name, email, password, is_admin) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :email, :password, :is_admin)"
 	_, err := q.NamedExec(stmt, u)
 
-  return err
+  return apierror.NewFromSQL(err)
 }
 
-
-
-// doUpdate updates a user in the database using an optional transaction
-func (u *User) doUpdate(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
+// Update updates most of the fields of a persisted user
+// Excluded fields are id, created_at, deleted_at, etc.
+func (u *User) Update(q db.DB) error {
+	if u.ID == "" {
+		return errors.New("cannot update a non-persisted user")
 	}
 
+	return u.doUpdate(q)
+}
+
+// doUpdate updates a user in the database
+func (u *User) doUpdate(q db.DB) error {
 	if u.ID == "" {
-		return httperr.NewServerError("cannot update a non-persisted user")
+		return errors.New("cannot update a non-persisted user")
 	}
 
 	u.UpdatedAt = db.Now()
@@ -74,10 +112,10 @@ func (u *User) doUpdate(q db.DB) error {
 	stmt := "UPDATE users SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, name=:name, email=:email, password=:password, is_admin=:is_admin WHERE id=:id"
 	_, err := q.NamedExec(stmt, u)
 
-	return err
+	return apierror.NewFromSQL(err)
 }
 
-// Delete removes a user from the database using a transaction
+// Delete removes a user from the database
 func (u *User) Delete(q db.DB) error {
 	if u == nil {
 		return errors.New("user not instanced")
@@ -93,26 +131,14 @@ func (u *User) Delete(q db.DB) error {
 	return err
 }
 
-// Trash soft delete a user using a transaction
-func (u *User) Trash(q db.DB) error {
-	return u.doTrash(q)
+// GetID returns the ID field
+func (u *User) GetID() string {
+	return u.ID
 }
 
-// doTrash performs a soft delete operation on a user using an optional transaction
-func (u *User) doTrash(q db.DB) error {
-	if u == nil {
-		return httperr.NewServerError("user is not instanced")
-	}
-
-	if u.ID == "" {
-		return httperr.NewServerError("cannot trash a non-persisted user")
-	}
-
-	u.DeletedAt = db.Now()
-
-	stmt := "UPDATE users SET deleted_at = $2 WHERE id=$1"
-	_, err := q.Exec(stmt, u.ID, u.DeletedAt)
-	return err
+// SetID sets the ID field
+func (u *User) SetID(id string) {
+	u.ID = id
 }
 
 // IsZero checks if the object is either nil or don't have an ID

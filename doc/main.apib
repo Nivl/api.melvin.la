@@ -9,6 +9,8 @@ API used to run melvin.la
 
 :[Group Session](../src/components/sessions/sessions.apib)
 
+:[Group About](../src/components/about/about.apib)
+
 # Data Structure
 
 ## User
@@ -23,7 +25,37 @@ API used to run melvin.la
 + token (required, string)
 + user_id (required, string)
 
-## Pagination
+## Organization
 
-+ page: 1 (number) - Page to get
-+ per_page (number) - Number of element to get
++ name (required, string)
++ created_at (string)
++ updated_at (string)
++ deleted_at (string)
++ short_name (string)
++ website (string)
++ logo (string)
+
+## Organizations
+
++ results (array[Organization])
+
+## DefaultError
+
++ error : not a valid uuid (required, string) - Reason of the error
++ field : id (string) - Name of the field that failed
+
+## Error401
+
++ error : unauthorized (required, string)
+
+## Error403
+
++ error : forbiden (required, string)
+
+## Error404
+
++ error : not found (required, string)
+
+## Error500
+
++ error : something went wrong (required, string)

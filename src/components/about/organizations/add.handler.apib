@@ -1,0 +1,43 @@
+### Create an Organization [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + name (required, string) - Name of the organization
+        + short_name (string) - Short name (or acronym) of the organization
+        + website (string) - Website of the organization
+
++ Response 201 (application/json)
+
+    The ressource has been created
+
+    + Attributes (Organization)
+
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Attributes (DefaultError)
+
++ Response 404 (application/json)
+
+    The ressource does not exist
+
+    + Attributes (Error404)
+
++ Response 409 (application/json)
+
+    A value already exists in the database.
+
+    + Attributes (DefaultError)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Attributes (Error500)

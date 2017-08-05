@@ -12,6 +12,6 @@ var deps *router.Dependencies
 
 func init() {
 	api.Setup()
-	deps = router.NewDefaultDependencies()
+	deps, _ = router.NewDefaultDependencies()
 	httptests.DefaultRouter = api.GetRouter()
 }

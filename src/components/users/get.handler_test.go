@@ -5,10 +5,11 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -20,14 +21,16 @@ func TestGetInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
-			MsgMatch:    "parameter missing: id",
+			MsgMatch:    params.ErrMsgMissingParameter,
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{},
 			},
 		},
 		{
 			Description: "Should fail on invalid ID",
-			MsgMatch:    "not a valid uuid",
+			MsgMatch:    params.ErrMsgInvalidUUID,
+			FieldName:   "id",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"not-a-uuid"},
@@ -61,7 +64,7 @@ func TestGetValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := users.Endpoints[users.EndpointGet]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {
@@ -183,6 +186,6 @@ func TestGetUnexistingUser(t *testing.T) {
 	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusNotFound, httpErr.Code())
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusNotFound, httpErr.HTTPStatus())
 }

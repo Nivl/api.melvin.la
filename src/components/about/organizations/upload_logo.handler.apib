@@ -1,0 +1,46 @@
+### Update a Logo [PUT]
+
++ Request (multipart/form-data; boundary=---BOUNDARY)
+
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Body
+
+            -----BOUNDARY
+            Content-Disposition: form-data; name="logo"; filename="logo.png"
+            Content-Type: image/png
+
+            data
+            -----BOUNDARY
+
++ Response 200 (application/json)
+
+    The logo has been uploaded
+
+    + Attributes (Organization)
+
++ Response 400 (application/json)
+
+    Invalid file format
+
+    + Attributes (DefaultError)
+
++ Response 401 (application/json)
+
+    The user is not logged in
+
+     + Attributes (Error401)
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource
+
+     + Attributes (Error403)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+     + Attributes (Error500)

@@ -5,10 +5,11 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
@@ -20,7 +21,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing token",
-			MsgMatch:    "parameter missing: token",
+			MsgMatch:    params.ErrMsgMissingParameter,
+			FieldName:   "token",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"token": []string{""},
@@ -30,7 +32,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid token",
-			MsgMatch:    "not a valid uuid: token",
+			MsgMatch:    params.ErrMsgInvalidUUID,
+			FieldName:   "token",
 			Sources: map[string]url.Values{
 				"url": url.Values{
 					"token": []string{"xxx-yyyy"},
@@ -66,7 +69,7 @@ func TestDeleteValidParams(t *testing.T) {
 			t.Parallel()
 
 			endpts := sessions.Endpoints[sessions.EndpointDelete]
-			data, err := endpts.Guard.ParseParams(tc.sources)
+			data, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 
 			if data != nil {
@@ -208,7 +211,7 @@ func TestDeleteOtherSessionWrongPassword(t *testing.T) {
 	// Assert everything
 	assert.Error(t, err, "the handler should not have fail")
 	req.AssertExpectations(t)
-	assert.Equal(t, http.StatusUnauthorized, httperr.Convert(err).Code(), "Should have fail with a 401")
+	assert.Equal(t, http.StatusUnauthorized, apierror.Convert(err).HTTPStatus(), "Should have fail with a 401")
 }
 
 func TestDeleteSomeonesSession(t *testing.T) {
@@ -247,7 +250,7 @@ func TestDeleteSomeonesSession(t *testing.T) {
 	assert.Error(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
-	assert.Equal(t, http.StatusNotFound, httperr.Convert(err).Code(), "Should have fail with a 404")
+	assert.Equal(t, http.StatusNotFound, apierror.Convert(err).HTTPStatus(), "Should have fail with a 404")
 }
 
 func TestDeleteUnexistingSession(t *testing.T) {
@@ -281,5 +284,5 @@ func TestDeleteUnexistingSession(t *testing.T) {
 	assert.Error(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
-	assert.Equal(t, http.StatusNotFound, httperr.Convert(err).Code(), "Should have fail with a 404")
+	assert.Equal(t, http.StatusNotFound, apierror.Convert(err).HTTPStatus(), "Should have fail with a 404")
 }

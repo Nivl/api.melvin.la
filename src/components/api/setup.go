@@ -14,6 +14,12 @@ type Args struct {
 	EmailFrom           string `envconfig:"email_default_from"`
 	EmailTo             string `envconfig:"email_default_to"`
 	EmailStacktraceUUID string `envconfig:"email_stacktrace_uuid"`
+	CloudinaryAPIKey    string `envconfig:"cloudinary_api_key"`
+	CloudinarySecret    string `envconfig:"cloudinary_secret"`
+	CloudinaryBucket    string `envconfig:"cloudinary_bucket"`
+	GCPAPIKey           string `envconfig:"gcp_api_key"`
+	GCPProject          string `envconfig:"gcp_project"`
+	GCPBucket           string `envconfig:"gcp_bucket"`
 	Debug               bool   `default:"false"`
 }
 
@@ -33,7 +39,31 @@ func Setup() *Args {
 	}
 
 	if params.EmailAPIKey != "" {
-		dependencies.InitSendgrid(params.EmailAPIKey, params.EmailFrom, params.EmailTo, params.EmailStacktraceUUID)
+		p := &dependencies.SendgridParams{
+			APIKey:         params.EmailAPIKey,
+			From:           params.EmailFrom,
+			To:             params.EmailTo,
+			StacktraceUUID: params.EmailStacktraceUUID,
+		}
+		dependencies.InitSendgrid(p)
+	}
+
+	if params.GCPAPIKey != "" {
+		p := &dependencies.GCP{
+			APIKey:      params.GCPAPIKey,
+			ProjectName: params.GCPProject,
+			Bucket:      params.GCPBucket,
+		}
+		dependencies.InitGCP(p)
+	}
+
+	if params.CloudinaryAPIKey != "" {
+		p := &dependencies.CloudinaryParams{
+			APIKey: params.CloudinaryAPIKey,
+			Secret: params.CloudinarySecret,
+			Bucket: params.CloudinaryBucket,
+		}
+		dependencies.InitCloudinary(p)
 	}
 
 	return &params

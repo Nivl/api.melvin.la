@@ -6,8 +6,14 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 )
+
+// ResponseError represents the data sent the client when an error occurs
+type ResponseError struct {
+	Error string `json:"error,omitempty"`
+	Field string `json:"field,omitempty"`
+}
 
 // HTTPResponse represents an http response
 type HTTPResponse interface {
@@ -68,25 +74,20 @@ func (res *Response) renderJSON(code int, obj interface{}) error {
 
 // Error sends an error to the client
 // If the error is an instance of HTTPError, the returned code will
-// match HTTPError.Code(). It returns a 500 if no code has been set.
+// match HTTPError.HTTPStatus(). It returns a 500 if no code has been set.
 func (res *Response) Error(e error, req HTTPRequest) {
-	err := httperr.Convert(e)
-	switch err.Code() {
-	case http.StatusInternalServerError:
-		res.errorJSON(`{"error":"Something went wrong"}`, http.StatusInternalServerError)
-	default:
-		// Some errors do not need a body
-		if err.Error() == "" {
-			res.writer.WriteHeader(err.Code())
-		} else {
-			res.errorJSON(fmt.Sprintf(`{"error":"%s"}`, err.Error()), err.Code())
-		}
-	}
+	err := apierror.Convert(e)
+	res.errorJSON(err)
 
-	req.Logger().Errorf(`code: "%d", message: "%s", %s`, err.Code(), err.Error(), req)
+	// if the error has a field attached we log it
+	field := ""
+	if err.Field() != "" {
+		field = fmt.Sprintf(`, field: "%s"`, err.Field())
+	}
+	req.Logger().Errorf(`code: "%d"%s, message: "%s", %s`, err.HTTPStatus(), field, err.Error(), req)
 
 	// We send an email for all server error
-	if err.Code() == http.StatusInternalServerError {
+	if err.HTTPStatus() == http.StatusInternalServerError {
 		sendEmail := func(stacktrace []byte) {
 			err := res.deps.Mailer.SendStackTrace(stacktrace, req.Signature(), err.Error(), req.ID())
 			if err != nil {
@@ -100,9 +101,21 @@ func (res *Response) Error(e error, req HTTPRequest) {
 
 // errorJSON set the request content to the specified error message and HTTP code.
 // The error message should be valid json.
-func (res *Response) errorJSON(err string, code int) {
-	res.setJSON(code)
-	fmt.Fprintln(res.writer, err)
+func (res *Response) errorJSON(err apierror.Error) {
+	if err.Error() == "" {
+		res.writer.WriteHeader(err.HTTPStatus())
+		return
+	}
+	resError := &ResponseError{
+		Error: err.Error(),
+		Field: err.Field(),
+	}
+
+	if err.HTTPStatus() == http.StatusInternalServerError {
+		resError.Error = "Something went wrong"
+		resError.Field = ""
+	}
+	res.renderJSON(err.HTTPStatus(), resError)
 }
 
 // setJSON set the response to JSON and with the specify HTTP code.

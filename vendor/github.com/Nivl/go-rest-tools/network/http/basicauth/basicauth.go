@@ -19,6 +19,9 @@ func SetWWWAuthenticate(res http.ResponseWriter, typ, realm string) {
 }
 
 // ParseAuthHeader returns a username and password from a list of Auth header
+// Supported type are "basic" and "password". Example
+// 		basic user:password
+//		password base64EncodedPassword
 // TODO(melvin): support multiple realm
 func ParseAuthHeader(auths []string, typeWanted, realmWanted string) (string, string, error) {
 	for _, auth := range auths {
@@ -35,7 +38,7 @@ func ParseAuthHeader(auths []string, typeWanted, realmWanted string) (string, st
 				continue
 			}
 
-			//  If a realm is wanted, we want need at least 3 params
+			//  If a realm is wanted, we need at least 3 params
 			// (type, realm, and the encoded string)
 			if nbArg != 3 && realmWanted != "" {
 				continue

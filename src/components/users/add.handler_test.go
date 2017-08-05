@@ -1,32 +1,26 @@
 package users_test
 
 import (
-	"net/http"
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
+	"github.com/Nivl/go-rest-tools/router/params"
+	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-func InvalidParams(t *testing.T) {
+func TestInvalidParams(t *testing.T) {
 	testCases := []testguard.InvalidParamsTestCase{
 		{
-			Description: "Should fail on no params",
-			MsgMatch:    "parameter missing",
-			Sources: map[string]url.Values{
-				"form": url.Values{},
-			},
-		},
-		{
 			Description: "Should fail on missing name",
-			MsgMatch:    "parameter missing: name",
+			MsgMatch:    params.ErrMsgMissingParameter,
+			FieldName:   "name",
 			Sources: map[string]url.Values{
 				"form": url.Values{
 					"email":    []string{"email@valid.tld"},
@@ -36,7 +30,8 @@ func InvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing email",
-			MsgMatch:    "parameter missing: email",
+			MsgMatch:    params.ErrMsgMissingParameter,
+			FieldName:   "email",
 			Sources: map[string]url.Values{
 				"form": url.Values{
 					"name":     []string{"username"},
@@ -46,7 +41,8 @@ func InvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on missing password",
-			MsgMatch:    "parameter missing: password",
+			MsgMatch:    params.ErrMsgMissingParameter,
+			FieldName:   "password",
 			Sources: map[string]url.Values{
 				"form": url.Values{
 					"name":  []string{"username"},
@@ -97,28 +93,16 @@ func TestAddHappyPath(t *testing.T) {
 }
 
 func TestAddConflict(t *testing.T) {
-	handlerParams := &users.AddParams{
-		Name:     "username",
-		Email:    "email@domain.tld",
-		Password: "valid password",
+	p := &testrouter.ConflictTestParams{
+		StructConflicting: "*auth.User",
+		FieldConflicting:  "email",
+		Handler:           users.Add,
+		HandlerParams: &users.AddParams{
+			Name:     "username",
+			Email:    "email@domain.tld",
+			Password: "valid password",
+		},
 	}
 
-	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
-	mockDB.ExpectInsertConflict("*auth.User")
-
-	// Mock the request & add expectations
-	req := new(mockrouter.HTTPRequest)
-	req.On("Params").Return(handlerParams)
-
-	// call the handler
-	err := users.Add(req, &router.Dependencies{DB: mockDB})
-
-	// Assert everything
-	assert.Error(t, err)
-	mockDB.AssertExpectations(t)
-	req.AssertExpectations(t)
-
-	httpErr := httperr.Convert(err)
-	assert.Equal(t, http.StatusConflict, httpErr.Code())
+	testrouter.ConflictInsertTest(t, p)
 }

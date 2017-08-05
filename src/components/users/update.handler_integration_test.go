@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 )
@@ -95,7 +95,7 @@ func TestUpdate(t *testing.T) {
 				if tc.params.NewPassword != "" {
 					// To check the password has been updated with need to get the
 					// encrypted version, and compare it to the raw one
-					updatedUser, err := auth.GetUser(deps.DB, tc.params.ID)
+					updatedUser, err := auth.GetUserByID(deps.DB, tc.params.ID)
 					if err != nil {
 						t.Fatal(err)
 					}

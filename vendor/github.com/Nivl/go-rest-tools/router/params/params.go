@@ -6,13 +6,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/router/formfile"
 )
 
+// Params is a struct used to parse and extract params from an other struct
 type Params struct {
 	data interface{}
 }
 
+// NewParams creates a new Params object from a struct
 func NewParams(data interface{}) *Params {
 	return &Params{
 		data: data,
@@ -20,16 +23,25 @@ func NewParams(data interface{}) *Params {
 }
 
 // Parse fills the paramsStruct using the provided sources
-func (p *Params) Parse(sources map[string]url.Values) error {
-	paramList := reflect.ValueOf(p.data)
-	if paramList.Kind() == reflect.Ptr {
-		paramList = paramList.Elem()
+func (p *Params) Parse(sources map[string]url.Values, fileHolder formfile.FileHolder) error {
+	paramList := reflect.Indirect(reflect.ValueOf(p.data))
+	err := p.parseRecursive(paramList, sources, fileHolder)
+	if err != nil {
+		return err
 	}
 
-	return p.parseRecursive(paramList, sources)
+	// If there's a custom validator we'll use it
+	if validator, ok := p.data.(CustomValidation); ok {
+		isValid, field, err := validator.IsValid()
+		if !isValid {
+			return apierror.NewBadRequest(field, err.Error())
+		}
+	}
+
+	return nil
 }
 
-func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.Values) error {
+func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.Values, fileHolder formfile.FileHolder) error {
 	nbParams := paramList.NumField()
 	for i := 0; i < nbParams; i++ {
 		value := paramList.Field(i)
@@ -38,12 +50,21 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 
 		// We make sure we can update the value of field
 		if !value.CanSet() {
-			return httperr.NewServerError("field [%s] could not be set", info.Name)
+			return apierror.NewServerError("field [%s] could not be set", info.Name)
 		}
 
 		// Handle embedded struct
 		if value.Kind() == reflect.Struct && info.Anonymous {
-			p.parseRecursive(value, sources)
+			p.parseRecursive(value, sources, fileHolder)
+
+			// If there's a custom validator we'll use it
+			if validator, ok := value.Interface().(CustomValidation); ok {
+				isValid, field, err := validator.IsValid()
+				if !isValid {
+					return apierror.NewBadRequest(field, err.Error())
+				}
+			}
+
 			continue
 		}
 
@@ -53,18 +74,26 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 			paramLocation = "url"
 		}
 
-		source, found := sources[paramLocation]
-		if !found {
-			return httperr.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
-		}
-
 		param := &Param{
 			value: &value,
 			info:  &info,
 			tags:  &tags,
 		}
-		if err := param.SetValue(&source); err != nil {
-			return err
+
+		// the "file" source is a special case as it's not part of the sources object
+		if paramLocation == "file" {
+			if err := param.SetFile(fileHolder); err != nil {
+				return err
+			}
+		} else {
+			source, found := sources[paramLocation]
+			if !found {
+				return apierror.NewServerError("source [%s] for field [%s] does not exists", paramLocation, info.Name)
+			}
+
+			if err := param.SetValue(source); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -73,62 +102,32 @@ func (p *Params) parseRecursive(paramList reflect.Value, sources map[string]url.
 
 // Extract extracts the data from the paramsStruct and returns them
 // as a map of url.Values
-func (p *Params) Extract() map[string]url.Values {
+func (p *Params) Extract() (map[string]url.Values, map[string]*formfile.FormFile) {
 	sources := map[string]url.Values{}
 	sources["url"] = url.Values{}
 	sources["form"] = url.Values{}
 	sources["query"] = url.Values{}
+	files := map[string]*formfile.FormFile{}
 
 	if p.data == nil {
-		return sources
+		return sources, files
 	}
 
-	paramList := reflect.ValueOf(p.data)
-	if paramList.Kind() == reflect.Ptr {
-		paramList = paramList.Elem()
-	}
-	p.extractRecursive(paramList, sources)
-	return sources
+	paramList := reflect.Indirect(reflect.ValueOf(p.data))
+	p.extractRecursive(paramList, sources, files)
+	return sources, files
 }
 
-func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]url.Values) {
+func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]url.Values, files map[string]*formfile.FormFile) {
 	nbParams := paramList.NumField()
 	for i := 0; i < nbParams; i++ {
 		value := paramList.Field(i)
-		paramInfo := paramList.Type().Field(i)
-		tags := paramInfo.Tag
+		info := paramList.Type().Field(i)
+		tags := info.Tag
 
-		if value.Kind() == reflect.Ptr {
-			value = value.Elem()
-		}
-
-		// Handle embedded struct
-		if value.Kind() == reflect.Struct && paramInfo.Anonymous {
-			p.extractRecursive(value, sources)
+		// skip the nil pointers
+		if value.Kind() == reflect.Ptr && value.IsNil() {
 			continue
-		}
-
-		// We get the Value as string
-		valueStr := ""
-		switch value.Kind() {
-		case reflect.Bool:
-			valueStr = strconv.FormatBool(value.Bool())
-		case reflect.String:
-			valueStr = value.String()
-		case reflect.Int:
-			valueStr = strconv.Itoa(int(value.Int()))
-		case reflect.Ptr:
-			if !value.IsNil() {
-				val := value.Elem()
-				switch val.Kind() {
-				case reflect.Bool:
-					valueStr = strconv.FormatBool(val.Bool())
-				case reflect.String:
-					valueStr = value.String()
-				case reflect.Int:
-					valueStr = strconv.Itoa(int(val.Int()))
-				}
-			}
 		}
 
 		// We get the name from the json tag
@@ -141,12 +140,38 @@ func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]ur
 			fieldName = jsonOpts[0]
 		}
 
+		// Handle embedded struct
+		if reflect.Indirect(value).Kind() == reflect.Struct && info.Anonymous {
+			p.extractRecursive(value, sources, files)
+			continue
+		}
+
 		// We get the source type (url, query, form, ...) and add the value
 		sourceType := strings.ToLower(tags.Get("from"))
 
 		if _, found := sources[sourceType]; !found {
 			sources[sourceType] = url.Values{}
 		}
+
+		// Special cases for files
+		if info.Type.String() == "*formfile.FormFile" {
+			if !value.IsNil() {
+				files[fieldName] = value.Interface().(*formfile.FormFile)
+			}
+			continue
+		}
+
+		field := reflect.Indirect(value)
+		valueStr := ""
+		switch field.Kind() {
+		case reflect.Bool:
+			valueStr = strconv.FormatBool(field.Bool())
+		case reflect.String:
+			valueStr = field.String()
+		case reflect.Int:
+			valueStr = strconv.Itoa(int(field.Int()))
+		}
+
 		sources[sourceType].Set(fieldName, valueStr)
 	}
 }

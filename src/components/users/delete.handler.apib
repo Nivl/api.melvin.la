@@ -11,7 +11,7 @@
 
 + Response 204 (application/json)
 
-    The user has been deleted
+    The resource has been deleted
 
     + Body
 
@@ -19,38 +19,22 @@
 
     A value is missing or contains the wrong data.
 
-    + Body
-
-            {
-                "error": "[reason of the error]"
-            }
+    + Attributes (DefaultError)
 
 + Response 401 (application/json)
 
     The `current_password` does not match the user's password
 
-    + Body
-
-            {
-                "error": "Unauthorized"
-            }
+    + Attributes (Error401)
 
 + Response 403 (application/json)
 
     The requester does not have the permission to update this resource
 
-    + Body
-
-            {
-                "error": "Forbidden"
-            }
+    + Attributes (Error403)
 
 + Response 500 (application/json)
 
     The server experenced an internal error.
 
-    + Body
-
-            {
-                "error": "something went wrong"
-            }
+    + Attributes (Error500)
