@@ -10,8 +10,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
-  packages = ["dependencies","logger","network/http/basicauth","network/http/httperr","network/http/httptests","notifiers/mailer","paginator","primitives/filetype","primitives/models","primitives/models/lifecycle","primitives/ptrs","primitives/strngs","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs"]
-  revision = "a121fc63102405b599f058cf1d45afc008b35ad5"
+  packages = ["dependencies","logger","network/http/basicauth","network/http/httptests","notifiers/mailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/strngs"]
+  revision = "f9f93cb6786d453a0aa61126d5cfd8e623d1e110"
 
 [[projects]]
   branch = "master"
@@ -119,7 +119,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish"]
-  revision = "558b6879de74bc843225cde5686419267ff707ca"
+  revision = "42ff06aea7c329876e5a0fe94acc96902accf0ad"
 
 [[projects]]
   branch = "master"
@@ -131,7 +131,7 @@
   branch = "master"
   name = "golang.org/x/oauth2"
   packages = [".","google","internal","jws","jwt"]
-  revision = "b53b38ad8a6435bd399ea76d0fa74f23149cca4e"
+  revision = "96fca6c793ec32f068f97942ae3c7c073810dfc1"
 
 [[projects]]
   branch = "master"
@@ -143,7 +143,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "3c107eb0fd1188c1e2f52a3101424b250162144b"
+  revision = "93a219feb72690ca01348faec80d5a076a32f688"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -166,6 +166,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "43525acbf21c6bf4cfcea62e4d04ae6f0c4bdb5142753ea8363353f796f341c4"
+  inputs-digest = "db90704074db481b915f693f46ddb225764431ffefe391cace317c3f2a38cdce"
   solver-name = "gps-cdcl"
   solver-version = 1

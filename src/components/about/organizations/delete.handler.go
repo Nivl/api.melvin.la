@@ -1,7 +1,6 @@
 package organizations
 
 import (
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 )
@@ -28,10 +27,6 @@ func Delete(req router.HTTPRequest, deps *router.Dependencies) error {
 	org, err := GetAnyByID(deps.DB, params.ID)
 	if err != nil {
 		return err
-	}
-
-	if org.IsZero() {
-		return httperr.NewNotFound()
 	}
 
 	if err := org.Delete(deps.DB); err != nil {

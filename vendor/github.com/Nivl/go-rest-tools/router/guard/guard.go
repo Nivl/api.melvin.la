@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -38,7 +38,7 @@ func (g *Guard) ParseParams(sources map[string]url.Values, fileHolder formfile.F
 }
 
 // HasAccess check if a given user has access to the
-func (g *Guard) HasAccess(u *auth.User) (bool, httperr.Error) {
+func (g *Guard) HasAccess(u *auth.User) (bool, apierror.Error) {
 	// It's ok not to have a guard provided, as well as not having an auth check
 	if g == nil || g.Auth == nil {
 		return true, nil

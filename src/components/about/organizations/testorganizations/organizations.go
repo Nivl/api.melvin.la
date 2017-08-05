@@ -3,8 +3,8 @@ package testorganizations
 import (
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/primitives/models/lifecycle"
-	"github.com/Nivl/go-rest-tools/primitives/ptrs"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"

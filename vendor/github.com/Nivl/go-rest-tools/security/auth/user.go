@@ -1,15 +1,13 @@
 package auth
 
 import (
-	"fmt"
-
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
 )
 
 // User is a structure representing a user that can be saved in the database
-//go:generate api-cli generate model User -t users -e Get,JoinSQL
+//go:generate api-cli generate model User -t users --single=false
 type User struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`
@@ -20,35 +18,6 @@ type User struct {
 	Email    string `db:"email"`
 	Password string `db:"password"`
 	IsAdmin  bool   `db:"is_admin"`
-}
-
-// UserJoinSQL returns a string ready to be embed in a JOIN query
-func UserJoinSQL(prefix string) string {
-	fields := []string{"id", "created_at", "updated_at", "deleted_at", "name", "email", "password"}
-	output := ""
-
-	for i, field := range fields {
-		if i != 0 {
-			output += ", "
-		}
-
-		fullName := fmt.Sprintf("%s.%s", prefix, field)
-		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
-	}
-
-	return output
-}
-
-// GetUser finds and returns an active user by ID
-func GetUser(q db.DB, id string) (*User, error) {
-	user := &User{}
-	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
-	err := db.Get(q, user, stmt, id)
-	// We want to return nil if a user is not found
-	if user.ID == "" {
-		return nil, err
-	}
-	return user, err
 }
 
 // CryptPassword returns a password encrypted with bcrypt

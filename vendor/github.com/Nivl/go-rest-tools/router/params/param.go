@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
 )
 
@@ -61,7 +61,7 @@ func (p *Param) SetFile(source formfile.FileHolder) error {
 		// if the file is missing it's ok as long as it's not required
 		if err == http.ErrMissingFile {
 			if opts.Required {
-				return httperr.NewBadRequest(opts.Name, "parameter missing")
+				return apierror.NewBadRequest(opts.Name, "parameter missing")
 			}
 			// if there's no file and it's not required, then we're done
 			return nil
@@ -123,7 +123,7 @@ func (p *Param) SetValue(source url.Values) error {
 		case reflect.Bool:
 			v, err := strconv.ParseBool(value)
 			if err != nil {
-				return httperr.NewBadRequest(opts.Name, ErrMsgInvalidBoolean)
+				return apierror.NewBadRequest(opts.Name, ErrMsgInvalidBoolean)
 			}
 			field.SetBool(v)
 		case reflect.String:
@@ -131,7 +131,7 @@ func (p *Param) SetValue(source url.Values) error {
 		case reflect.Int:
 			v, err := strconv.ParseInt(value, 10, 64)
 			if err != nil {
-				return httperr.NewBadRequest(opts.Name, ErrMsgInvalidInteger)
+				return apierror.NewBadRequest(opts.Name, ErrMsgInvalidInteger)
 			}
 			field.SetInt(v)
 		}

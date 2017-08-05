@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -35,7 +35,7 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 	}
 
 	if user.ID == "" || !auth.IsPasswordValid(user.Password, params.Password) {
-		return httperr.NewBadRequest("email/password", "Bad email/password")
+		return apierror.NewBadRequest("email/password", "Bad email/password")
 	}
 
 	s := &auth.Session{

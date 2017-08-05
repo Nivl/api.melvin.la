@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httperr"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/formfile/mockformfile"
 	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
@@ -232,6 +232,6 @@ func TestUploadNotFound(t *testing.T) {
 	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 
-	e := httperr.Convert(err)
-	assert.Equal(t, http.StatusNotFound, e.Code())
+	e := apierror.Convert(err)
+	assert.Equal(t, http.StatusNotFound, e.HTTPStatus())
 }
