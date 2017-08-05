@@ -1,8 +1,8 @@
 package organizations
 
 import (
-	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 )
 
 // Payload represents an article to be returned to the clients
@@ -20,19 +20,28 @@ type Payload struct {
 // ExportPublic returns an Organization payload trimmed from all sensitive
 // information that can be
 func (o *Organization) ExportPublic() *Payload {
-	pld := &Payload{
+	// It's OK to export a nil organization
+	if o == nil {
+		return nil
+	}
+
+	return &Payload{
 		ID:        o.ID,
 		Name:      o.Name,
 		ShortName: ptrs.UnwrapString(o.ShortName),
 		Logo:      ptrs.UnwrapString(o.Logo),
 		Website:   ptrs.UnwrapString(o.Website),
 	}
-	return pld
 }
 
 // ExportPrivate returns an Organization payload that can be
 // safely returned to the clients
 func (o *Organization) ExportPrivate() *Payload {
+	// It's OK to export a nil organization
+	if o == nil {
+		return nil
+	}
+
 	pld := o.ExportPublic()
 	pld.CreatedAt = o.CreatedAt
 	pld.UpdatedAt = o.UpdatedAt
@@ -45,6 +54,7 @@ func (o *Organization) ExportPrivate() *Payload {
 type ListPayload struct {
 	Results []*Payload `json:"results"`
 }
+
 // ExportPrivate returns a list of Organization as a payload that can be
 // returned to the clients
 func (o Organizations) ExportPrivate() *ListPayload {
