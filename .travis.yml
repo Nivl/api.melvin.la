@@ -11,7 +11,6 @@ install:
 - docker-compose build
 - docker-compose up -d
 script:
-- echo `bash <(curl -s https://codecov.io/env)`
 - until docker-compose exec database psql "$POSTGRES_URI" -c "select 1" > /dev/null
   2>&1; do sleep 2; done
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api
