@@ -6,14 +6,14 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	uuid "github.com/satori/go.uuid"
 )
 
 // JoinSQL returns a string ready to be embed in a JOIN query
 func JoinSQL(prefix string) string {
-	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "organization_id", "job_title", "location", "description", "start_date", "end_date" }
+	fields := []string{"id", "created_at", "updated_at", "deleted_at", "organization_id", "job_title", "location", "description", "start_date", "end_date"}
 	output := ""
 
 	for i, field := range fields {
@@ -26,17 +26,6 @@ func JoinSQL(prefix string) string {
 	}
 
 	return output
-}
-
-
-
-// GetAnyByID finds and returns an experience by ID.
-// Deleted object are returned
-func GetAnyByID(q db.DB, id string) (*Experience, error) {
-	e := &Experience{}
-	stmt := "SELECT * from about_experience WHERE id=$1 LIMIT 1"
-	err := q.Get(e, stmt, id)
-	return e, apierror.NewFromSQL(err)
 }
 
 // Exists checks if a experience exists for a specific ID
@@ -81,7 +70,7 @@ func (e *Experience) doCreate(q db.DB) error {
 	stmt := "INSERT INTO about_experience (id, created_at, updated_at, deleted_at, organization_id, job_title, location, description, start_date, end_date) VALUES (:id, :created_at, :updated_at, :deleted_at, :organization_id, :job_title, :location, :description, :start_date, :end_date)"
 	_, err := q.NamedExec(stmt, e)
 
-  return apierror.NewFromSQL(err)
+	return apierror.NewFromSQL(err)
 }
 
 // Update updates most of the fields of a persisted experience

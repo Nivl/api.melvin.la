@@ -4,10 +4,10 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 )
 
 // Guard represents a security access system for routes

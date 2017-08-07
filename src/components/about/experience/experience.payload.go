@@ -15,8 +15,8 @@ type Payload struct {
 	JobTitle    string   `json:"job_title"`
 	Location    string   `json:"location,omitempty"`
 	Description string   `json:"description,omitempty"`
-	StartDate   *db.Time `json:"start_date"`
-	EndDate     *db.Time `json:"end_date,omitempty"`
+	StartDate   *db.Date `json:"start_date"`
+	EndDate     *db.Date `json:"end_date,omitempty"`
 
 	Organization *organizations.Payload `json:"organization,omitempty"`
 }

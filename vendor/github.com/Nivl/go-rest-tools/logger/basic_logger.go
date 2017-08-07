@@ -36,6 +36,7 @@ func (bl *BasicLogger) Close() error {
 	return nil
 }
 
+// NewBasicLogger creates an instance of BasicLogger
 func NewBasicLogger() *BasicLogger {
 	return &BasicLogger{}
 }
