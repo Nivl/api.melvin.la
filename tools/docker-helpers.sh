@@ -65,3 +65,17 @@ function ml-tests {
   echo "Start testings"
   ml-exec "cd src && go test -tags=integration ./..."
 }
+
+# Execute a test
+function ml-coverage {
+  echo "Restart services..."
+  ddc-stop &> /dev/null
+  # ddc-build &> /dev/null
+  ddc-up &> /dev/null
+
+  echo "Update database"
+  ml-make "migration"
+
+  echo "Start testings"
+  ml-exec "cd src && ../go.test.sh"
+}
