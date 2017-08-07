@@ -18,7 +18,7 @@ script:
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
   && ./go.test.sh"
 after_success:
-  - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
+- docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
   && include_cov=coverage.txt bash <(curl -s https://codecov.io/bash)"
 deploy:
   - provider: script
