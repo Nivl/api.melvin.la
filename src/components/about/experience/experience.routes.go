@@ -12,7 +12,7 @@ const (
 
 // Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
-//EndpointAdd: addEndpoint,
+	EndpointAdd: addEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article

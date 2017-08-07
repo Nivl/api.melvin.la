@@ -7,8 +7,9 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
+	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 )
 
 const (
@@ -19,6 +20,10 @@ const (
 	// ErrMsgInvalidInteger represents the error message corresponding to
 	// an invalid integer
 	ErrMsgInvalidInteger = "invalid integer"
+
+	// ErrMsgInvalidDate represents the error message corresponding to
+	// an invalid date
+	ErrMsgInvalidDate = "invalid date"
 )
 
 // Param represents a struct param
@@ -134,6 +139,16 @@ func (p *Param) SetValue(source url.Values) error {
 				return apierror.NewBadRequest(opts.Name, ErrMsgInvalidInteger)
 			}
 			field.SetInt(v)
+		case reflect.Struct:
+			// All the special cases
+			switch p.value.Type().String() {
+			case "*db.Date":
+				d, err := db.NewDate(value)
+				if err != nil {
+					return apierror.NewBadRequest(opts.Name, ErrMsgInvalidDate)
+				}
+				p.value.Set(reflect.ValueOf(d))
+			}
 		}
 	}
 	return nil

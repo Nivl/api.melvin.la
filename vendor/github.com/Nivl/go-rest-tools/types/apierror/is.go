@@ -35,7 +35,7 @@ func IsBadRequest(e error) bool {
 	return err.HTTPStatus() == http.StatusBadRequest
 }
 
-// IsForbidden checks if an error is caused by a forbiden access
+// IsForbidden checks if an error is caused by a forbidden access
 func IsForbidden(e error) bool {
 	err, casted := e.(*APIError)
 	if !casted {
