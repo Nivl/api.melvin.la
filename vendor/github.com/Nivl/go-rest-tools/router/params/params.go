@@ -1,13 +1,14 @@
 package params
 
 import (
+	"fmt"
 	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router/formfile"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 )
 
 // Params is a struct used to parse and extract params from an other struct
@@ -155,9 +156,7 @@ func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]ur
 
 		// Special cases for files
 		if info.Type.String() == "*formfile.FormFile" {
-			if !value.IsNil() {
-				files[fieldName] = value.Interface().(*formfile.FormFile)
-			}
+			files[fieldName] = value.Interface().(*formfile.FormFile)
 			continue
 		}
 
@@ -170,6 +169,11 @@ func (p *Params) extractRecursive(paramList reflect.Value, sources map[string]ur
 			valueStr = field.String()
 		case reflect.Int:
 			valueStr = strconv.Itoa(int(field.Int()))
+		default:
+			// If we have anything that implements a stringer, then let's use that
+			if s, isStringer := value.Interface().(fmt.Stringer); isStringer {
+				valueStr = s.String()
+			}
 		}
 
 		sources[sourceType].Set(fieldName, valueStr)

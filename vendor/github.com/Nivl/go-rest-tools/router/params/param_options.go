@@ -4,6 +4,7 @@ import (
 	"io"
 	"mime/multipart"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -35,6 +36,10 @@ const (
 	// ErrMsgInvalidImage represents the error message corresponding to
 	// an invalid image
 	ErrMsgInvalidImage = "not a valid image"
+
+	// ErrMsgMaxLen represents the error message corresponding to
+	// a field that exceed the maximum number of char
+	ErrMsgMaxLen = "too many chars"
 )
 
 // ParamOptions represent all the options for a field
@@ -77,10 +82,19 @@ type ParamOptions struct {
 	// provided it cannot be an empty string.
 	// params:"noempty"
 	NoEmpty bool
+
+	// MaxLen represents the maximum length a param can have (under its string
+	// form). Any invalid values (including 0) will be ignored
+	// maxlen:"255"
+	MaxLen int
 }
 
 // Validate checks the given value passes the options set
 func (opts *ParamOptions) Validate(value string, wasProvided bool) error {
+	if opts.MaxLen > 0 && len(value) > opts.MaxLen {
+		return apierror.NewBadRequest(opts.Name, ErrMsgMaxLen)
+	}
+
 	if value == "" && opts.Required {
 		return apierror.NewBadRequest(opts.Name, ErrMsgMissingParameter)
 	}
@@ -161,6 +175,13 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 		}
 
 		output.Name = jsonOpts[0]
+	}
+
+	// We use the maxlen tag to get the max length of a the value
+	maxlen := tags.Get("maxlen")
+	if len(maxlen) > 0 {
+		// we silently fail on errors
+		output.MaxLen, _ = strconv.Atoi(maxlen)
 	}
 
 	// We parse the params

@@ -22,7 +22,7 @@ func NewDefaultDependencies() (*Dependencies, error) {
 	return NewDefaultDependenciesWithContext(context.TODO())
 }
 
-// NewDefaultDependenciesWithContext returns the defauls dependencies using
+// NewDefaultDependenciesWithContext returns the defaults dependencies using
 // the provided context
 func NewDefaultDependenciesWithContext(ctx context.Context) (*Dependencies, error) {
 	storage, err := dependencies.NewStorage(ctx)

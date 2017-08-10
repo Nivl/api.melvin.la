@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// DB is an interface representing a database connection
 type DB interface {
 	sqlx.Ext
 	sqlx.Preparer

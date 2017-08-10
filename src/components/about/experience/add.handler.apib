@@ -7,9 +7,12 @@
             Authorization: basic [base64encoded userID:access_token]
 
     + Attributes
-        + name (required, string) - Name of the organization
-        + short_name (string) - Short name (or acronym) of the organization
-        + website (string) - Website of the organization
+        + organization_id (required, string) - ID of the organization the experience is for
+        + job_title (required, string) - Job title
+        + location (required, string) - Location
+        + description (required, string) - Description of the work accomplished
+        + start_date (required, string) - Date the experience started. Format `month-year` (ex: `04-2016`).
+        + end_date (string) - Date the experience ended. Format `month-year` (ex: `04-2016`). Has to be later or equal to `start_date`
 
 + Response 201 (application/json)
 
