@@ -23,8 +23,8 @@ func TestDelete(t *testing.T) {
 	u1, safeSession := testauth.NewAuth(t, deps.DB)
 
 	// We create a couple of sessions for the same user
-	toDelete2 := testauth.NewSession(t, deps.DB, u1)
-	toDelete3 := testauth.NewSession(t, deps.DB, u1)
+	toDelete2 := testauth.NewPersistedSession(t, deps.DB, u1)
+	toDelete3 := testauth.NewPersistedSession(t, deps.DB, u1)
 
 	// We create a other session attached to an other user
 	_, randomSession := testauth.NewAuth(t, deps.DB)

@@ -26,8 +26,8 @@ func TestIntegrationAdd(t *testing.T) {
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
-	org := testorganizations.NewOrganization(t, dbCon, nil)
-	deletedOrg := testorganizations.NewOrganization(t, dbCon, &organizations.Organization{
+	org := testorganizations.NewPersisted(t, dbCon, nil)
+	deletedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
 		DeletedAt: db.Now(),
 	})
 

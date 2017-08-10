@@ -31,10 +31,10 @@ func TestIntegrationListPagination(t *testing.T) {
 	adminAuth := httptests.NewRequestAuth(admSession)
 
 	for i := 0; i < 35; i++ {
-		testorganizations.NewOrganization(t, dbCon, nil)
+		testorganizations.NewPersisted(t, dbCon, nil)
 	}
 	// adding a deleted organization
-	testorganizations.NewOrganization(t, dbCon, &organizations.Organization{
+	testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
 		DeletedAt: db.Now(),
 	})
 
@@ -95,7 +95,7 @@ func TestIntegrationListOrdering(t *testing.T) {
 	}
 	// create the orgs and save them to the database
 	for _, name := range names {
-		testorganizations.NewOrganization(t, dbCon, &organizations.Organization{
+		testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
 			Name: name,
 		})
 	}

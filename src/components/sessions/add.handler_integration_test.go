@@ -9,16 +9,16 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAdd(t *testing.T) {
 	defer lifecycle.PurgeModels(t, deps.DB)
-	u1 := testauth.NewUser(t, deps.DB, nil)
+	u1 := testauth.NewPersistedUser(t, deps.DB, nil)
 
 	tests := []struct {
 		description string

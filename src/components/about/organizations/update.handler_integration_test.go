@@ -26,9 +26,9 @@ func TestIntegrationUpdate(t *testing.T) {
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
-	noop := testorganizations.NewOrganization(t, dbCon, nil)
-	changeAll := testorganizations.NewOrganization(t, dbCon, nil)
-	toUntrash := testorganizations.NewOrganization(t, dbCon, &organizations.Organization{
+	noop := testorganizations.NewPersisted(t, dbCon, nil)
+	changeAll := testorganizations.NewPersisted(t, dbCon, nil)
+	toUntrash := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
 		DeletedAt: db.Now(),
 	})
 
