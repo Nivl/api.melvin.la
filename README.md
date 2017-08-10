@@ -21,6 +21,7 @@ Bash helpers can be found in `tools/docker-helpers.sh`
 
 ```
 travis encrypt HEROKU_API_KEY=$(heroku auth:token) --add
+travis encrypt APIARY_API_KEY=your-token --add
 ```
 
 ## Documentation

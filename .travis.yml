@@ -5,6 +5,10 @@ env:
   global:
     - POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
     - secure: "CP5hpihwZsv60Dcn6N2+TiP9CMpTaNX0tMM9AudsRLt50QPsZkcAVDiMhsegW+vfAAkM4cw4IvdKqgkv/9JYt+HCAd3pErTzh+MRLxr5HkagfV8aZfeU/fLrXAo9vGpnc/v23tbWoPRh8pWyOJ78gnxsPZHgKRsNNSJ2AYW5ApU="
+    - secure: "cSZSr+yJpzezK/DxuveGjfGDEORSksZ/D1z9lHWGu/MFsOK39UrYwDaiGfjqph3EWpdytWIE7TKqmHwpMUFq2rLEn1ujicSFSLwZ+aEUKLq2UvktabVu1b1UAALlwJBkUPYdR7cuaqBiHLvRSbXZTWeZY6RS9yTTwkaW7rrWQgA="
+before_install:
+- gem install apiaryio
+- npm install -g hercule
 install:
 - cp config/api-common.env config/api.env
 - cp config/database-common.env config/database.env
@@ -17,6 +21,10 @@ script:
   && make migration"
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
   && go test -tags=integration  ./..."
+after_success:
+- hercule doc/main.apib -o apiary.apib
+- apiary publish --api-name="apimelvinla"
+
 deploy:
   - provider: script
     on: staging
