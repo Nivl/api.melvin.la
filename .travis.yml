@@ -5,6 +5,10 @@ env:
   global:
     - POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
     - secure: "CP5hpihwZsv60Dcn6N2+TiP9CMpTaNX0tMM9AudsRLt50QPsZkcAVDiMhsegW+vfAAkM4cw4IvdKqgkv/9JYt+HCAd3pErTzh+MRLxr5HkagfV8aZfeU/fLrXAo9vGpnc/v23tbWoPRh8pWyOJ78gnxsPZHgKRsNNSJ2AYW5ApU="
+    - secure: "cSZSr+yJpzezK/DxuveGjfGDEORSksZ/D1z9lHWGu/MFsOK39UrYwDaiGfjqph3EWpdytWIE7TKqmHwpMUFq2rLEn1ujicSFSLwZ+aEUKLq2UvktabVu1b1UAALlwJBkUPYdR7cuaqBiHLvRSbXZTWeZY6RS9yTTwkaW7rrWQgA="
+before_install:
+- gem install apiaryio
+- npm install -g hercule
 install:
 - cp config/api-common.env config/api.env
 - cp config/database-common.env config/database.env
@@ -18,6 +22,7 @@ script:
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
   && ../go.test.sh"
 after_success:
+- hercule doc/main.apib -o apiary.apib && apiary publish --api-name="apimelvinla"
 - docker-compose exec api /bin/bash -ic "cd /go/src/github.com/melvin-laplanche/ml-api/src
   && CODECOV_ENV=$CODECOV_ENV CODECOV_TOKEN=$CODECOV_TOKEN CODECOV_URL=$CODECOV_URL CODECOV_SLUG=$CODECOV_SLUG VCS_COMMIT_ID=$VCS_COMMIT_ID VCS_BRANCH_NAME=$VCS_BRANCH_NAME VCS_PULL_REQUEST=$VCS_PULL_REQUEST VCS_SLUG=$VCS_SLUG VCS_TAG=$VCS_TAG CI_BUILD_URL=$CI_BUILD_URL CI_BUILD_ID=$CI_BUILD_ID CI_JOB_ID=$CI_JOB_ID CI=$CI TRAVIS=$TRAVIS SHIPPABLE=$SHIPPABLE TRAVIS_BRANCH=$TRAVIS_BRANCH TRAVIS_COMMIT=$TRAVIS_COMMIT TRAVIS_JOB_NUMBER=$TRAVIS_JOB_NUMBER TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST TRAVIS_JOB_ID=$TRAVIS_JOB_ID TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG TRAVIS_TAG=$TRAVIS_TAG TRAVIS_OS_NAME=$TRAVIS_OS_NAME include_cov=coverage.txt bash <(curl -s https://codecov.io/bash)"
 deploy:
