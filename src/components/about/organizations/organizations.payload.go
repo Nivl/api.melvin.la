@@ -7,14 +7,14 @@ import (
 
 // Payload represents an article to be returned to the clients
 type Payload struct {
-	ID        string   `db:"id"         json:"id"`
-	CreatedAt *db.Time `json:"created_at"`
-	UpdatedAt *db.Time `db:"updated_at" json:"updated_at,omitempty"`
-	DeletedAt *db.Time `db:"deleted_at" json:"deleted_at,omitempty"`
-	Name      string   `db:"name"       json:"name"`
-	ShortName string   `db:"short_name" json:"short_name,omitempty"`
-	Logo      string   `db:"logo"       json:"logo,omitempty"`
-	Website   string   `db:"website"    json:"website,omitempty"`
+	ID        string   `json:"id"`
+	CreatedAt *db.Time `json:"created_at,omitempty"`
+	UpdatedAt *db.Time `json:"updated_at,omitempty"`
+	DeletedAt *db.Time `json:"deleted_at,omitempty"`
+	Name      string   `json:"name"`
+	ShortName string   `json:"short_name,omitempty"`
+	Logo      string   `json:"logo,omitempty"`
+	Website   string   `json:"website,omitempty"`
 }
 
 // ExportPublic returns an Organization payload trimmed from all sensitive

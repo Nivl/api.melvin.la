@@ -27,7 +27,7 @@ func TestIntegrationUploadHappyPath(t *testing.T) {
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
-	org := testorganizations.NewOrganization(t, dbCon, nil)
+	org := testorganizations.NewPersisted(t, dbCon, nil)
 
 	tests := []struct {
 		description string

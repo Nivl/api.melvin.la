@@ -5,13 +5,13 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -49,7 +49,7 @@ func TestGetValidParams(t *testing.T) {
 		sources     map[string]url.Values
 	}{
 		{
-			"Should fail on blank password",
+			"Should work with a valid ID",
 			map[string]url.Values{
 				"url": url.Values{
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},

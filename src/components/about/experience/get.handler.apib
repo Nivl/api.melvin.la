@@ -1,0 +1,29 @@
+### Get an Experience [GET]
+
+If the requester is either anonymous or a logged-in user, the endpoint will only
+get resources that are not soft-deleted not orphans. If the requester is an
+admin, any kind can be returned.
+
++ Request (application/json)
+
++ Response 200 (application/json)
+
+    + Attributes (User)
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Attributes (DefaultError)
+
++ Response 404 (application/json)
+
+    The resoure does not exist, is soft-deleted, or is orphan.
+
+    + Attributes (Error404)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Attributes (Error500)

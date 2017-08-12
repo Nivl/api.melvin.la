@@ -9,9 +9,9 @@ import (
 
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
 	"github.com/stretchr/testify/assert"
@@ -23,8 +23,8 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
-	basicOrg := testorganizations.NewOrganization(t, dbCon, nil)
-	trashedOrg := testorganizations.NewOrganization(t, dbCon, &organizations.Organization{
+	basicOrg := testorganizations.NewPersisted(t, dbCon, nil)
+	trashedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
 		DeletedAt: db.Now(),
 	})
 

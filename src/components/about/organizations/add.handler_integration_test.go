@@ -73,7 +73,7 @@ func TestIntegrationAddConflictName(t *testing.T) {
 
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
-	org := testorganizations.NewOrganization(t, dbCon, nil)
+	org := testorganizations.NewPersisted(t, dbCon, nil)
 
 	p := &organizations.AddParams{
 		Name: org.Name,
@@ -98,7 +98,7 @@ func TestIntegrationAddConflictShortName(t *testing.T) {
 
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
-	org := testorganizations.NewOrganization(t, dbCon, nil)
+	org := testorganizations.NewPersisted(t, dbCon, nil)
 
 	p := &organizations.AddParams{
 		Name:      uniuri.New(),
