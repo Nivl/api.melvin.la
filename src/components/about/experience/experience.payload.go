@@ -54,3 +54,31 @@ func (e *Experience) ExportPrivate() *Payload {
 	pld.Organization = e.Organization.ExportPrivate()
 	return pld
 }
+
+// ListPayload represents a list of Experience that can be
+// safely returned to the clients
+type ListPayload struct {
+	Results []*Payload `json:"results"`
+}
+
+// ExportPrivate returns a list of Experience as a payload that can be
+// returned to the clients
+func (e ListExperience) ExportPrivate() *ListPayload {
+	pld := &ListPayload{}
+	pld.Results = make([]*Payload, len(e))
+	for i, exp := range e {
+		pld.Results[i] = exp.ExportPrivate()
+	}
+	return pld
+}
+
+// ExportPublic returns a list of Experience as a payload without any
+// sensitive information
+func (e ListExperience) ExportPublic() *ListPayload {
+	pld := &ListPayload{}
+	pld.Results = make([]*Payload, len(e))
+	for i, exp := range e {
+		pld.Results[i] = exp.ExportPublic()
+	}
+	return pld
+}
