@@ -4,7 +4,7 @@ services:
 env:
   global:
     - POSTGRES_URI="user=pguser password=pguser dbname=api-melvin host=ml_api_postgres sslmode=disable"
-    - secure: "CP5hpihwZsv60Dcn6N2+TiP9CMpTaNX0tMM9AudsRLt50QPsZkcAVDiMhsegW+vfAAkM4cw4IvdKqgkv/9JYt+HCAd3pErTzh+MRLxr5HkagfV8aZfeU/fLrXAo9vGpnc/v23tbWoPRh8pWyOJ78gnxsPZHgKRsNNSJ2AYW5ApU="
+    - secure: "oCmYUNpZaUApnjMOdtZpfef0iIinEkCPGh8Ywj621SC01VuFewnwwnaV9jsN5B0XoN1DQcNXExmeHvqEjAMu45phB+1YAh+W70maXGtAM4SAFTQrb7Or+cJiJlfRR8uxg5urhbx449BvlOo0dMrWdDd+b72S1fHpmM6So9g3zm0="
     - secure: "cSZSr+yJpzezK/DxuveGjfGDEORSksZ/D1z9lHWGu/MFsOK39UrYwDaiGfjqph3EWpdytWIE7TKqmHwpMUFq2rLEn1ujicSFSLwZ+aEUKLq2UvktabVu1b1UAALlwJBkUPYdR7cuaqBiHLvRSbXZTWeZY6RS9yTTwkaW7rrWQgA="
 before_install:
 - gem install apiaryio
