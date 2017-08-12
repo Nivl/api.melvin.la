@@ -1,0 +1,31 @@
+### List all experience [GET]
+
++ Parameters
+    + orphans: false (boolean,optional) - Return the orphans resources
+    + deleted: false (boolean,optional) - Return the deleted resources
+    + page: 1 (number,optional) - Page to get
+    + per_page: 100 (number,optional) - Number of element to get
+
++ Request (application/json)
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
++ Response 200 (application/json)
+
+    The resource has been deleted
+
+    + Attributes (Organizations)
+
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Attributes (DefaultError)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Attributes (Error500)
