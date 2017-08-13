@@ -28,6 +28,7 @@ type UpdateParams struct {
 	StartDate      *db.Date `from:"form" json:"start_date"`
 	EndDate        *db.Date `from:"form" json:"end_date"`
 	InTrash        *bool    `from:"form" json:"in_trash"`
+	UnsetEndDate   bool     `from:"form" json:"unset_end_date" default:"false"`
 }
 
 // Update represent an API handler to update an organization
@@ -53,9 +54,9 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	}
 	if params.EndDate != nil {
 		exp.EndDate = params.EndDate
-		if params.EndDate.IsZero() {
-			exp.EndDate = nil
-		}
+	}
+	if params.UnsetEndDate {
+		exp.EndDate = nil
 	}
 	if params.OrganizationID != nil {
 		org, err := organizations.GetByID(deps.DB, *params.OrganizationID)
