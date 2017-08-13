@@ -65,6 +65,16 @@ func TestListInvalidParams(t *testing.T) {
 				},
 			},
 		},
+		{
+			Description: "Should fail with invalid operator",
+			MsgMatch:    params.ErrMsgEnum,
+			FieldName:   "op",
+			Sources: map[string]url.Values{
+				"query": url.Values{
+					"op": []string{"nand"},
+				},
+			},
+		},
 	}
 
 	g := experience.Endpoints[experience.EndpointList].Guard
@@ -120,6 +130,16 @@ func TestListValidParams(t *testing.T) {
 				"query": url.Values{
 					"orphans": []string{"true"},
 					"deleted": []string{"true"},
+				},
+			},
+		},
+		{
+			"Should work with orphans, deleted and an op",
+			map[string]url.Values{
+				"query": url.Values{
+					"orphans": []string{"true"},
+					"deleted": []string{"true"},
+					"op":      []string{"or"},
 				},
 			},
 		},

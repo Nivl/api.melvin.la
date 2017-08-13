@@ -22,8 +22,9 @@ var listEndpoint = &router.Endpoint{
 // ListParams represents the params accepted by the Add endpoint
 type ListParams struct {
 	paginator.HandlerParams
-	Deleted *bool `from:"query" json:"deleted" default:"false"`
-	Orphans *bool `from:"query" json:"orphans" default:"false"`
+	Deleted  *bool  `from:"query" json:"deleted"`
+	Orphans  *bool  `from:"query" json:"orphans"`
+	Operator string `from:"query" json:"op" default:"and" enum:"and,or"`
 }
 
 // List is an endpoint used to list all Experience
@@ -53,7 +54,7 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 
 	whereClause := ""
 	if len(whereList) > 0 {
-		whereClause = "WHERE " + strings.Join(whereList, " AND ")
+		whereClause = "WHERE " + strings.Join(whereList, params.Operator)
 	}
 	exps := ListExperience{}
 

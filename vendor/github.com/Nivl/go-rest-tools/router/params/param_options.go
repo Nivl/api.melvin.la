@@ -9,6 +9,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/types/filetype"
+	"github.com/Nivl/go-rest-tools/types/slices"
 	"github.com/Nivl/go-rest-tools/types/strngs"
 )
 
@@ -40,6 +41,10 @@ const (
 	// ErrMsgMaxLen represents the error message corresponding to
 	// a field that exceed the maximum number of char
 	ErrMsgMaxLen = "too many chars"
+
+	// ErrMsgEnum represents the error message corresponding to
+	// a field that doesn't contain a value set in an enum
+	ErrMsgEnum = "not a valid value"
 )
 
 // ParamOptions represent all the options for a field
@@ -87,6 +92,10 @@ type ParamOptions struct {
 	// form). Any invalid values (including 0) will be ignored
 	// maxlen:"255"
 	MaxLen int
+
+	// AuthorizedValues represents the list of authorized value for this param
+	// enum:"and,or"
+	AuthorizedValues []string
 }
 
 // Validate checks the given value passes the options set
@@ -114,6 +123,16 @@ func (opts *ParamOptions) Validate(value string, wasProvided bool) error {
 
 		if opts.ValidateEmail && !strngs.IsValidEmail(value) {
 			return apierror.NewBadRequest(opts.Name, ErrMsgInvalidEmail)
+		}
+
+		if len(opts.AuthorizedValues) > 0 {
+			found, err := slices.InSlice(opts.AuthorizedValues, value)
+			if err != nil {
+				return err
+			}
+			if !found {
+				return apierror.NewBadRequest(opts.Name, ErrMsgEnum)
+			}
 		}
 	}
 
@@ -182,6 +201,13 @@ func NewParamOptions(tags *reflect.StructTag) *ParamOptions {
 	if len(maxlen) > 0 {
 		// we silently fail on errors
 		output.MaxLen, _ = strconv.Atoi(maxlen)
+	}
+
+	// We use the enu, tag to get all the authorized value a param can have
+	enum := tags.Get("enum")
+	if len(enum) > 0 {
+		// we silently fail on errors
+		output.AuthorizedValues = strings.Split(enum, ",")
 	}
 
 	// We parse the params
