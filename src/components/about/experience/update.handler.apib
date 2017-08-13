@@ -1,0 +1,57 @@
+### Update an experience [PATCH]
+
++ Request (application/json)
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + organization_id (string) - ID of the organization the experience is for
+        + job_title (string) - Job title
+        + location (string) - Location
+        + description (string) - Description of the work accomplished
+        + start_date (string) - Date the experience started. Format `month-year` (ex: `04-2016`)
+        + end_date (string) - Date the experience ended. Format `month-year` (ex: `04-2016`). Has to be later or equal to `start_date`
+        + in_trash (boolean) - Put/remove the resource from the trash
+
++ Response 200 (application/json)
+
+    The resource has been deleted
+
+    + Body
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data
+
+    + Attributes (DefaultError)
+
++ Response 401 (application/json)
+
+    The requester is not logged in
+
+    + Attributes (Error401)
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource
+
+    + Attributes (Error403)
+
++ Response 404 (application/json)
+
+    The organization does not exist
+
+    + Attributes (Error404)
+
++ Response 409 (application/json)
+
+    A value already exists in the database
+
+    + Attributes (DefaultError)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error
+
+    + Attributes (Error500)
