@@ -14,7 +14,6 @@ var listEndpoint = &router.Endpoint{
 	Path:    "/about/experience",
 	Handler: List,
 	Guard: &guard.Guard{
-		Auth:        guard.AdminAccess,
 		ParamStruct: &ListParams{},
 	},
 }
@@ -50,11 +49,15 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 				whereList = append(whereList, "exp.deleted_at IS NULL")
 			}
 		}
+	} else {
+		params.Operator = "and"
+		whereList = append(whereList, "exp.deleted_at IS NULL")
+		whereList = append(whereList, "org.deleted_at IS NULL")
 	}
 
 	whereClause := ""
 	if len(whereList) > 0 {
-		whereClause = "WHERE " + strings.Join(whereList, params.Operator)
+		whereClause = "WHERE " + strings.Join(whereList, " "+params.Operator+" ")
 	}
 	exps := ListExperience{}
 

@@ -1,7 +1,6 @@
 package experience_test
 
 import (
-	"net/http"
 	"net/url"
 	"testing"
 
@@ -176,14 +175,14 @@ func TestListValidParams(t *testing.T) {
 func TestListAccess(t *testing.T) {
 	testCases := []testguard.AccessTestCase{
 		{
-			Description: "Should fail for anonymous users",
+			Description: "Should work for anonymous users",
 			User:        nil,
-			ErrCode:     http.StatusUnauthorized,
+			ErrCode:     0,
 		},
 		{
-			Description: "Should fail for logged users",
+			Description: "Should work for logged users",
 			User:        &auth.User{ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
-			ErrCode:     http.StatusForbidden,
+			ErrCode:     0,
 		},
 		{
 			Description: "Should work for admin users",
