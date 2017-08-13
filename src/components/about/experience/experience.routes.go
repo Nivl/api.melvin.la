@@ -11,6 +11,7 @@ const (
 	EndpointGet
 	EndpointList
 	EndpointUpdate
+	EndpointDelete
 )
 
 // Endpoints is a list of endpoints for this components
@@ -19,6 +20,7 @@ var Endpoints = router.Endpoints{
 	EndpointGet:    getEndpoint,
 	EndpointList:   listEndpoint,
 	EndpointUpdate: updateEndpoint,
+	EndpointDelete: deleteEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article
