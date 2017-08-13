@@ -9,12 +9,14 @@ import (
 const (
 	EndpointAdd = iota
 	EndpointGet
+	EndpointList
 )
 
 // Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
-	EndpointAdd: addEndpoint,
-	EndpointGet: getEndpoint,
+	EndpointAdd:  addEndpoint,
+	EndpointGet:  getEndpoint,
+	EndpointList: listEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article

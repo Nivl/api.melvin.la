@@ -10,8 +10,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
-  packages = ["dependencies","logger","network/http/basicauth","network/http/httptests","notifiers/mailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/strngs"]
-  revision = "e6e5131a094656d511a72b46342f8d92538be178"
+  packages = ["dependencies","logger","network/http/basicauth","network/http/httptests","notifiers/mailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/slices","types/strngs"]
+  revision = "dfdd046cd86a67d7f22862e4890174b07be0da81"
 
 [[projects]]
   branch = "master"
@@ -137,13 +137,13 @@
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
-  revision = "3bd178b88a8180be2df394a1fbb81313916f0e7b"
+  revision = "b19bf474d317b857955b12035d2c5acb57ce8b01"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "5c4ffd5985e22d25e9cadc37183b88c3a31497c2"
+  revision = "98825bb0065da4054e5da6db34f5fc598e50bc24"
 
 [[projects]]
   name = "google.golang.org/appengine"

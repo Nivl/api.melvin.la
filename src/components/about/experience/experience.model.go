@@ -25,8 +25,8 @@ type Experience struct {
 	*organizations.Organization `db:"org"`
 }
 
-// List represents a list of experience
-type List []*Experience
+// ListExperience represents a list of experience
+type ListExperience []*Experience
 
 // GetByID finds and returns an active experience by ID
 // Deleted object are not returned
