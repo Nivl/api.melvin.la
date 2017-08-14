@@ -5,14 +5,15 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
+	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -160,4 +161,33 @@ func TestDeleteUnexistingOrganization(t *testing.T) {
 
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusNotFound, httpErr.HTTPStatus())
+}
+
+func TestDeleteNoDBCon(t *testing.T) {
+	handlerParams := &organizations.DeleteParams{
+		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectDeletionError()
+	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
+		org := args.Get(0).(*organizations.Organization)
+		*org = *(testorganizations.New())
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := organizations.Delete(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
 }

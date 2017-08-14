@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
   packages = ["dependencies","logger","network/http/basicauth","network/http/httptests","notifiers/mailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/slices","types/strngs"]
-  revision = "1d37f5d0d3a5b853b2f792e7591d13650b376ca7"
+  revision = "bee41b95ae8c497c74814666b6154d5ea7fff0af"
 
 [[projects]]
   branch = "master"

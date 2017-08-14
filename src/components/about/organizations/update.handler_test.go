@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
@@ -13,7 +12,10 @@ import (
 	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
+	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -223,4 +225,66 @@ func TestUpdateConflictShortName(t *testing.T) {
 		},
 	}
 	testrouter.ConflictUpdateTest(t, p)
+}
+
+func TestUpdateNoDBCon(t *testing.T) {
+	handlerParams := &organizations.UpdateParams{
+		ID:        "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		Name:      ptrs.NewString("Google"),
+		ShortName: ptrs.NewString("googl"),
+		Website:   ptrs.NewString("https://google.com"),
+		InTrash:   ptrs.NewBool(true),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
+		exp := args.Get(0).(*organizations.Organization)
+		*exp = *(testorganizations.New())
+	})
+	mockDB.ExpectUpdateError("*organizations.Organization")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := organizations.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
+
+func TestUpdateUnexisting(t *testing.T) {
+	handlerParams := &organizations.UpdateParams{
+		ID:        "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		Name:      ptrs.NewString("Google"),
+		ShortName: ptrs.NewString("googl"),
+		Website:   ptrs.NewString("https://google.com"),
+		InTrash:   ptrs.NewBool(true),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetNotFound("*organizations.Organization")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := organizations.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusNotFound, apiError.HTTPStatus())
 }

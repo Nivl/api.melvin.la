@@ -6,9 +6,13 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/paginator"
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/stretchr/testify/assert"
 )
@@ -139,4 +143,25 @@ func TestListAccess(t *testing.T) {
 
 	g := organizations.Endpoints[organizations.EndpointList].Guard
 	testguard.AccessTest(t, g, testCases)
+}
+
+func TestListNoBDCon(t *testing.T) {
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectSelectError("*organizations.Organizations")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(&organizations.ListParams{})
+
+	// call the handler
+	err := organizations.List(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
 }

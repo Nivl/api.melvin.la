@@ -6,7 +6,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/formfile/mockformfile"
 	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
@@ -16,7 +15,9 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/storage/filestorage/mockfilestorage"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
+	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -234,4 +235,81 @@ func TestUploadNotFound(t *testing.T) {
 
 	e := apierror.Convert(err)
 	assert.Equal(t, http.StatusNotFound, e.HTTPStatus())
+}
+
+func TestUploadStorageFailed(t *testing.T) {
+	cwd, _ := os.Getwd()
+	handlerParams := &organizations.UploadLogoParams{
+		ID:   "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
+		Logo: testformfile.NewFormFile(t, cwd, "black_pixel.png"),
+	}
+	defer handlerParams.Logo.File.Close()
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
+		org := args.Get(0).(*organizations.Organization)
+		*org = *(testorganizations.New())
+	})
+
+	// Mock the storage provider
+	storage := new(mockfilestorage.FileStorage)
+	storage.ExpectWriteIfNotExistError()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	deps := &router.Dependencies{DB: mockDB, Storage: storage}
+	err := organizations.UploadLogo(req, deps)
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	storage.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
+
+func TestUploadDBNoCon(t *testing.T) {
+	cwd, _ := os.Getwd()
+	handlerParams := &organizations.UploadLogoParams{
+		ID:   "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
+		Logo: testformfile.NewFormFile(t, cwd, "black_pixel.png"),
+	}
+	defer handlerParams.Logo.File.Close()
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
+		exp := args.Get(0).(*organizations.Organization)
+		*exp = *(testorganizations.New())
+	})
+	mockDB.ExpectUpdateError("*organizations.Organization")
+
+	// Mock the storage provider
+	expectedURL := "http://domain.tld/image.png"
+	storage := new(mockfilestorage.FileStorage)
+	storage.ExpectWriteIfNotExist(false, expectedURL)
+	storage.ExpectSetAttributes()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	deps := &router.Dependencies{DB: mockDB, Storage: storage}
+	err := organizations.UploadLogo(req, deps)
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	storage.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
 }
