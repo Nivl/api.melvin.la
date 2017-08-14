@@ -55,11 +55,21 @@ func (mdb *DB) ExpectGetError(typ string) *mock.Call {
 	return getCall
 }
 
-// ExpectSelectError is an helper that expects a connection error on a Select
+// ExpectSelect is an helper that expects a connection error on a Select
+func (mdb *DB) ExpectSelect(typ string, runnable func(args mock.Arguments)) *mock.Call {
+	selectCall := mdb.On("Select", mock.AnythingOfType(typ), StringType, InType, InType)
+	selectCall.Return(nil)
+	if runnable != nil {
+		selectCall.Run(runnable)
+	}
+	return selectCall
+}
+
+// ExpectSelectError is an helper that expects a Select
 func (mdb *DB) ExpectSelectError(typ string) *mock.Call {
-	getCall := mdb.On("Select", mock.AnythingOfType(typ), StringType, InType, InType)
-	getCall.Return(serverError)
-	return getCall
+	selectCall := mdb.On("Select", mock.AnythingOfType(typ), StringType, InType, InType)
+	selectCall.Return(serverError)
+	return selectCall
 }
 
 // ExpectDeletion is a helper that expects a deletion

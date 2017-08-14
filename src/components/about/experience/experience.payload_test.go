@@ -22,6 +22,12 @@ func TestExportPublic(t *testing.T) {
 	assert.Equal(t, exp.Location, pld.Location, "Location should not have been changed")
 }
 
+func TestExportPublicNil(t *testing.T) {
+	var exp *experience.Experience
+	pld := exp.ExportPublic()
+	assert.Nil(t, pld, "nil should export as nil")
+}
+
 func TestExportPrivate(t *testing.T) {
 	exp := testexperience.New()
 	pld := exp.ExportPrivate()
@@ -32,6 +38,12 @@ func TestExportPrivate(t *testing.T) {
 	assert.Equal(t, exp.JobTitle, pld.JobTitle, "JobTitle should not have been changed")
 	assert.Equal(t, exp.Description, pld.Description, "Description should not have been changed")
 	assert.Equal(t, exp.Location, pld.Location, "Location should not have been changed")
+}
+
+func TestExportPrivateNil(t *testing.T) {
+	var exp *experience.Experience
+	pld := exp.ExportPrivate()
+	assert.Nil(t, pld, "nil should export as nil")
 }
 
 func TestExportListPublic(t *testing.T) {

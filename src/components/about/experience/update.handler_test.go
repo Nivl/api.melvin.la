@@ -412,3 +412,33 @@ func TestUpdateUnexistingOrg(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, apiError.HTTPStatus())
 	assert.Equal(t, "organization_id", apiError.Field())
 }
+
+func TestUpdateGetOrgNoDBCon(t *testing.T) {
+	handlerParams := &experience.UpdateParams{
+		ID:             uuid.NewV4().String(),
+		OrganizationID: ptrs.NewString(uuid.NewV4().String()),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
+		exp := args.Get(0).(*experience.Experience)
+		*exp = *(testexperience.New())
+	})
+	mockDB.ExpectGetError("*organizations.Organization")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := experience.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
