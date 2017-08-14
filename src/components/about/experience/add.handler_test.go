@@ -363,3 +363,41 @@ func TestAddOrgNotFound(t *testing.T) {
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusNotFound, httpErr.HTTPStatus())
 }
+
+func TestAddNoDBCon(t *testing.T) {
+	org := &organizations.Organization{
+		ID:   "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		Name: "Org name",
+	}
+
+	handlerParams := &experience.AddParams{
+		OrganizationID: org.ID,
+		JobTitle:       "Title",
+		Location:       "Los Angeles area, CA",
+		Description:    "description of the work done",
+		StartDate:      db.Today(),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectInsertError("*experience.Experience")
+	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
+		o := args.Get(0).(*organizations.Organization)
+		*o = *org
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := experience.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
+}

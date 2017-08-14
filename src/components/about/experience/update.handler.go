@@ -61,6 +61,9 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	if params.OrganizationID != nil {
 		org, err := organizations.GetByID(deps.DB, *params.OrganizationID)
 		if err != nil {
+			if apierror.IsNotFound(err) {
+				return apierror.NewNotFoundField("organization_id", err.Error())
+			}
 			return err
 		}
 		exp.Organization = org

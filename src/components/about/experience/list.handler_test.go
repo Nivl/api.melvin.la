@@ -1,13 +1,19 @@
 package experience_test
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/paginator"
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
+	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/stretchr/testify/assert"
 )
@@ -193,4 +199,28 @@ func TestListAccess(t *testing.T) {
 
 	g := experience.Endpoints[experience.EndpointList].Guard
 	testguard.AccessTest(t, g, testCases)
+}
+
+func TestListNoBDCon(t *testing.T) {
+	requester := testauth.NewUser()
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectSelectError("*experience.ListExperience")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(&experience.ListParams{})
+	req.On("User").Return(requester)
+
+	// call the handler
+	err := experience.List(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
 }

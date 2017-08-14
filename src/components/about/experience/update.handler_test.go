@@ -5,6 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/melvin-laplanche/ml-api/src/components/about/experience/testexperience"
+
+	"github.com/satori/go.uuid"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
@@ -312,4 +316,99 @@ func TestUpdateEndDateBeforeStartDate(t *testing.T) {
 	apiError := apierror.Convert(err)
 	assert.Equal(t, http.StatusBadRequest, apiError.HTTPStatus())
 	assert.Equal(t, "end_date", apiError.Field())
+}
+
+func TestUpdateNoDBCon(t *testing.T) {
+	handlerParams := &experience.UpdateParams{
+		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		JobTitle:    ptrs.NewString("JobTitle"),
+		Location:    ptrs.NewString("Location"),
+		Description: ptrs.NewString("Description"),
+		StartDate:   db.Today(),
+		InTrash:     ptrs.NewBool(true),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
+		exp := args.Get(0).(*experience.Experience)
+		*exp = *(testexperience.New())
+	})
+	mockDB.ExpectUpdateError("*experience.Experience")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := experience.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
+
+func TestUpdateUnexisting(t *testing.T) {
+	handlerParams := &experience.UpdateParams{
+		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		JobTitle:    ptrs.NewString("JobTitle"),
+		Location:    ptrs.NewString("Location"),
+		Description: ptrs.NewString("Description"),
+		StartDate:   db.Today(),
+		InTrash:     ptrs.NewBool(true),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetNotFound("*experience.Experience")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := experience.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusNotFound, apiError.HTTPStatus())
+}
+
+func TestUpdateUnexistingOrg(t *testing.T) {
+	handlerParams := &experience.UpdateParams{
+		ID:             uuid.NewV4().String(),
+		OrganizationID: ptrs.NewString(uuid.NewV4().String()),
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
+		exp := args.Get(0).(*experience.Experience)
+		*exp = *(testexperience.New())
+	})
+	mockDB.ExpectGetNotFound("*organizations.Organization")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := experience.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusNotFound, apiError.HTTPStatus())
+	assert.Equal(t, "organization_id", apiError.Field())
 }
