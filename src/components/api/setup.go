@@ -24,14 +24,14 @@ type Args struct {
 }
 
 // Setup parses the env, sets the app globals and returns the params
-func Setup() *Args {
+func Setup() (*Args, error) {
 	var params Args
 	if err := envconfig.Process("", &params); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if err := dependencies.InitPostgres(params.PostgresURI); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if params.LogEntriesToken != "" {
@@ -66,5 +66,5 @@ func Setup() *Args {
 		dependencies.InitCloudinary(p)
 	}
 
-	return &params
+	return &params, nil
 }
