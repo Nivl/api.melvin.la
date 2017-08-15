@@ -10,9 +10,26 @@ import (
 )
 
 var (
-	// StringType represent a string argument
+	// StringType represents a string argument
 	StringType = mock.AnythingOfType("string")
+	// InType represents an int argument
+	InType = mock.AnythingOfType("int")
+
+	// serverError represents a database connection error
+	serverError = &pq.Error{
+		Code:    "08006",
+		Message: "error: connection failure",
+		Detail:  "the connection to the database failed",
+	}
 )
+
+func newConflictError(fieldName string) *pq.Error {
+	return &pq.Error{
+		Code:    db.ErrDup,
+		Message: "error: duplicate field",
+		Detail:  fmt.Sprintf("Key (%s)=(Google) already exists.", fieldName),
+	}
+}
 
 // ExpectGet is a helper that expects a Get
 func (mdb *DB) ExpectGet(typ string, runnable func(args mock.Arguments)) *mock.Call {
@@ -31,9 +48,38 @@ func (mdb *DB) ExpectGetNotFound(typ string) *mock.Call {
 	return getCall
 }
 
+// ExpectGetError is a helper that expects a connection error on a Get
+func (mdb *DB) ExpectGetError(typ string) *mock.Call {
+	getCall := mdb.On("Get", mock.AnythingOfType(typ), StringType, StringType)
+	getCall.Return(serverError)
+	return getCall
+}
+
+// ExpectSelect is an helper that expects a connection error on a Select
+func (mdb *DB) ExpectSelect(typ string, runnable func(args mock.Arguments)) *mock.Call {
+	selectCall := mdb.On("Select", mock.AnythingOfType(typ), StringType, InType, InType)
+	selectCall.Return(nil)
+	if runnable != nil {
+		selectCall.Run(runnable)
+	}
+	return selectCall
+}
+
+// ExpectSelectError is an helper that expects a Select
+func (mdb *DB) ExpectSelectError(typ string) *mock.Call {
+	selectCall := mdb.On("Select", mock.AnythingOfType(typ), StringType, InType, InType)
+	selectCall.Return(serverError)
+	return selectCall
+}
+
 // ExpectDeletion is a helper that expects a deletion
 func (mdb *DB) ExpectDeletion() *mock.Call {
 	return mdb.On("Exec", StringType, StringType).Return(nil, nil)
+}
+
+// ExpectDeletionError is a helper that expects a deletion to fail
+func (mdb *DB) ExpectDeletionError() *mock.Call {
+	return mdb.On("Exec", StringType, StringType).Return(nil, serverError)
 }
 
 // ExpectInsert is a helper that expects an insertion
@@ -41,13 +87,14 @@ func (mdb *DB) ExpectInsert(typ string) *mock.Call {
 	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, nil)
 }
 
+// ExpectInsertError is a helper that expects an insert to fail
+func (mdb *DB) ExpectInsertError(typ string) *mock.Call {
+	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, serverError)
+}
+
 // ExpectInsertConflict is a helper that expects a conflict on an insertion
 func (mdb *DB) ExpectInsertConflict(typ string, fieldName string) *mock.Call {
-	conflictError := new(pq.Error)
-	conflictError.Code = db.ErrDup
-	conflictError.Message = "error: duplicate field"
-	conflictError.Detail = fmt.Sprintf("Key (%s)=(Google) already exists.", fieldName)
-
+	conflictError := newConflictError(fieldName)
 	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, conflictError)
 }
 
@@ -58,10 +105,11 @@ func (mdb *DB) ExpectUpdate(typ string) *mock.Call {
 
 // ExpectUpdateConflict is a helper that expects a conflict on an update
 func (mdb *DB) ExpectUpdateConflict(typ string, fieldName string) *mock.Call {
-	conflictError := new(pq.Error)
-	conflictError.Code = db.ErrDup
-	conflictError.Message = "error: duplicate field"
-	conflictError.Detail = fmt.Sprintf("Key (%s)=(Google) already exists.", fieldName)
-
+	conflictError := newConflictError(fieldName)
 	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, conflictError)
+}
+
+// ExpectUpdateError is a helper that expects an update to fail
+func (mdb *DB) ExpectUpdateError(typ string) *mock.Call {
+	return mdb.On("NamedExec", StringType, mock.AnythingOfType(typ)).Return(nil, serverError)
 }

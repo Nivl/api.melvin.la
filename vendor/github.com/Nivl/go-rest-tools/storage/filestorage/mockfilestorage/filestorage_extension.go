@@ -1,6 +1,7 @@
 package mockfilestorage
 
 import (
+	"errors"
 	"os"
 	"path"
 
@@ -20,6 +21,14 @@ var (
 // succeed with the provided params
 func (s *FileStorage) ExpectWriteIfNotExist(isNew bool, url string) *mock.Call {
 	return s.On("WriteIfNotExist", mock.Anything, StringType).Return(isNew, url, nil)
+}
+
+// ExpectWriteIfNotExistError is an helper that expects a WriteIfNotExist to
+// fail
+func (s *FileStorage) ExpectWriteIfNotExistError() *mock.Call {
+	call := s.On("WriteIfNotExist", mock.Anything, StringType)
+	call.Return(false, "", errors.New("server unreachable"))
+	return call
 }
 
 // ExpectRead is an helper that expects a Read

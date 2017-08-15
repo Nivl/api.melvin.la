@@ -178,3 +178,30 @@ func TestGetUnexisting(t *testing.T) {
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusNotFound, httpErr.HTTPStatus())
 }
+
+func TestGetNoBDCon(t *testing.T) {
+	handlerParams := &experience.GetParams{
+		ID: uuid.NewV4().String(),
+	}
+	requester := testauth.NewUser()
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetError("*experience.Experience")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(requester)
+
+	// call the handler
+	err := experience.Get(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
+}

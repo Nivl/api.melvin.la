@@ -5,13 +5,13 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -80,7 +80,7 @@ func TestAddValidData(t *testing.T) {
 	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
-	assert.Nil(t, err, "the handler should not have fail")
+	assert.NoError(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
@@ -142,4 +142,64 @@ func TestAddWrongPassword(t *testing.T) {
 
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusBadRequest, httpErr.HTTPStatus())
+	assert.Equal(t, "email/password", httpErr.Field())
+}
+
+func TestAddNoDbConOnGet(t *testing.T) {
+	handlerParams := &sessions.AddParams{
+		Email:    "email@domain.tld",
+		Password: "invalid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetError("*auth.User")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
+}
+
+func TestAddNoDBConOnSave(t *testing.T) {
+	handlerParams := &sessions.AddParams{
+		Email:    "email@domain.tld",
+		Password: "valid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectInsertError("*auth.Session")
+	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
+		u := args.Get(0).(*auth.User)
+		u.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
+
+		var err error
+		u.Password, err = auth.CryptPassword(handlerParams.Password)
+		assert.NoError(t, err)
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := sessions.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
 }

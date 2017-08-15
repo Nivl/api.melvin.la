@@ -5,13 +5,13 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 )
@@ -221,4 +221,38 @@ func TestDeleteInvalidUser(t *testing.T) {
 
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusForbidden, httpErr.HTTPStatus())
+}
+
+func TestDeleteNoDBConOnDelete(t *testing.T) {
+	handlerParams := &users.DeleteParams{
+		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		CurrentPassword: "valid password",
+	}
+
+	userPassword, err := auth.CryptPassword(handlerParams.CurrentPassword)
+	assert.NoError(t, err)
+	user := &auth.User{
+		ID:       handlerParams.ID,
+		Password: userPassword,
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectDeletionError()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(user)
+
+	// call the handler
+	err = users.Delete(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
 }

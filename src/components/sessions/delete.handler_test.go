@@ -5,13 +5,13 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -285,4 +285,70 @@ func TestDeleteUnexistingSession(t *testing.T) {
 	mockDB.AssertExpectations(t)
 	req.AssertExpectations(t)
 	assert.Equal(t, http.StatusNotFound, apierror.Convert(err).HTTPStatus(), "Should have fail with a 404")
+}
+
+func TestDeleteNoDBConOnDelete(t *testing.T) {
+	user := &auth.User{ID: "3e916798-a090-4f22-b1d1-04a63fbed6ef"}
+	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
+
+	handlerParams := &sessions.DeleteParams{
+		Token: session.ID,
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
+		// return a session that match the session currently in use
+		sess := args.Get(0).(*auth.Session)
+		sess.ID = session.ID
+		sess.UserID = session.UserID
+	})
+	// delete call
+	mockDB.ExpectDeletionError()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(user)
+	req.On("Session").Return(session)
+
+	// call the handler
+	err := sessions.Delete(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
+}
+
+func TestDeleteNoDBConOnGet(t *testing.T) {
+	user := &auth.User{ID: "3e916798-a090-4f22-b1d1-04a63fbed6ef"}
+	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
+
+	handlerParams := &sessions.DeleteParams{
+		Token: session.ID,
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGetError("*auth.Session")
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("Session").Return(session)
+
+	// call the handler
+	err := sessions.Delete(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
 }

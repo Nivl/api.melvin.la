@@ -74,5 +74,9 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 	if err != nil {
 		return err
 	}
-	return req.Response().Ok(exps.ExportPrivate())
+
+	if req.User().IsAdm() {
+		return req.Response().Ok(exps.ExportPrivate())
+	}
+	return req.Response().Ok(exps.ExportPublic())
 }

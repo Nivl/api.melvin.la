@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	args := api.Setup()
+	args, err := api.Setup()
+	if err != nil {
+		panic(err)
+	}
 
 	r := api.GetRouter()
 	port := ":" + args.Port

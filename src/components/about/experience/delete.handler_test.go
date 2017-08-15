@@ -161,3 +161,33 @@ func TestDeleteUnexistingExperience(t *testing.T) {
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusNotFound, httpErr.HTTPStatus())
 }
+
+func TestDeleteNoDBCon(t *testing.T) {
+	handlerParams := &experience.DeleteParams{
+		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+	}
+
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectDeletionError()
+	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
+		org := args.Get(0).(*experience.Experience)
+		org.ID = "aa44ca86-553e-4e16-8c30-2e50e63f7eaa"
+		org.JobTitle = "Google"
+	})
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := experience.Delete(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
+}
