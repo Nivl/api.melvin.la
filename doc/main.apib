@@ -27,10 +27,11 @@ API used to run melvin.la
 
 ## Organization
 
-+ name (required, string)
++ id (required, string)
 + created_at (string)
 + updated_at (string)
 + deleted_at (string)
++ name (required, string)
 + short_name (string)
 + website (string)
 + logo (string)
@@ -38,6 +39,23 @@ API used to run melvin.la
 ## Organizations
 
 + results (array[Organization])
+
+## Experience
+
++ id (required, string)
++ created_at (string)
++ updated_at (string)
++ deleted_at (string)
++ job_title (required, string)
++ location (string)
++ description (string)
++ start_date (required, string)
++ end_date (string)
++ organization (required, Organization)
+
+## ListExperience
+
++ results (array[Experience])
 
 ## DefaultError
 
