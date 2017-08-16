@@ -202,7 +202,7 @@ func TestAddInvalidParams(t *testing.T) {
 			},
 		},
 		{
-			Description: "Should fail on invalid start date",
+			Description: "Should fail on invalid start year",
 			MsgMatch:    education.ErrMsgInvalidStartYear,
 			FieldName:   "start_year",
 			Sources: map[string]url.Values{
@@ -216,7 +216,7 @@ func TestAddInvalidParams(t *testing.T) {
 			},
 		},
 		{
-			Description: "Should fail with the end date being before the start date",
+			Description: "Should fail with the end year being before the start year",
 			MsgMatch:    education.ErrMsgEndYearBeforeStart,
 			FieldName:   "end_year",
 			Sources: map[string]url.Values{
@@ -227,6 +227,21 @@ func TestAddInvalidParams(t *testing.T) {
 					"description":     []string{"description"},
 					"start_year":      []string{"2013"},
 					"end_year":        []string{"2011"},
+				},
+			},
+		},
+		{
+			Description: "Should fail on invalid end year",
+			MsgMatch:    education.ErrMsgInvalidEndYear,
+			FieldName:   "end_year",
+			Sources: map[string]url.Values{
+				"form": url.Values{
+					"organization_id": []string{"7cfb9bd6-7e5d-4793-b0bd-d0a26a758390"},
+					"degree":          []string{"CS"},
+					"location":        []string{"CSULB"},
+					"description":     []string{"description"},
+					"start_year":      []string{"2013"},
+					"end_year":        []string{"3098"},
 				},
 			},
 		},

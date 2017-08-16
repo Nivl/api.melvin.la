@@ -3,56 +3,58 @@ package education_test
 import (
 	"testing"
 
-	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
+	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 
-	"github.com/melvin-laplanche/ml-api/src/components/about/experience/testexperience"
+	"github.com/melvin-laplanche/ml-api/src/components/about/education/testeducation"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestExportPublic(t *testing.T) {
-	exp := testexperience.New()
+	exp := testeducation.New()
 	pld := exp.ExportPublic()
 	assert.Nil(t, pld.CreatedAt, "createdAt should not have been exported")
 	assert.Nil(t, pld.UpdatedAt, "createdAt should not have been exported")
 	assert.Nil(t, pld.DeletedAt, "deletedAt should not have been exported")
 
 	assert.Equal(t, exp.ID, pld.ID, "ID should not have been changed")
-	assert.Equal(t, exp.JobTitle, pld.JobTitle, "JobTitle should not have been changed")
+	assert.Equal(t, exp.Degree, pld.Degree, "Degree should not have been changed")
+	assert.Equal(t, exp.GPA, pld.GPA, "GPA should not have been changed")
 	assert.Equal(t, exp.Description, pld.Description, "Description should not have been changed")
 	assert.Equal(t, exp.Location, pld.Location, "Location should not have been changed")
 }
 
 func TestExportPublicNil(t *testing.T) {
-	var exp *experience.Experience
+	var exp *education.Education
 	pld := exp.ExportPublic()
 	assert.Nil(t, pld, "nil should export as nil")
 }
 
 func TestExportPrivate(t *testing.T) {
-	exp := testexperience.New()
+	exp := testeducation.New()
 	pld := exp.ExportPrivate()
 	assert.NotNil(t, pld.CreatedAt, "createdAt should have been exported")
 	assert.NotNil(t, pld.UpdatedAt, "createdAt should have been exported")
 
 	assert.Equal(t, exp.ID, pld.ID, "ID should not have been changed")
-	assert.Equal(t, exp.JobTitle, pld.JobTitle, "JobTitle should not have been changed")
+	assert.Equal(t, exp.Degree, pld.Degree, "Degree should not have been changed")
+	assert.Equal(t, exp.GPA, pld.GPA, "GPA should not have been changed")
 	assert.Equal(t, exp.Description, pld.Description, "Description should not have been changed")
 	assert.Equal(t, exp.Location, pld.Location, "Location should not have been changed")
 }
 
 func TestExportPrivateNil(t *testing.T) {
-	var exp *experience.Experience
+	var exp *education.Education
 	pld := exp.ExportPrivate()
 	assert.Nil(t, pld, "nil should export as nil")
 }
 
 func TestExportListPublic(t *testing.T) {
-	l := experience.ListExperience{
-		testexperience.New(),
-		testexperience.New(),
-		testexperience.New(),
-		testexperience.New(),
-		testexperience.New(),
+	l := education.ListEducation{
+		testeducation.New(),
+		testeducation.New(),
+		testeducation.New(),
+		testeducation.New(),
+		testeducation.New(),
 	}
 	pld := l.ExportPublic()
 
@@ -63,7 +65,8 @@ func TestExportListPublic(t *testing.T) {
 			assert.Nil(t, r.DeletedAt, "deletedAt should not have been exported")
 
 			assert.Equal(t, l[i].ID, r.ID, "ID should not have been changed")
-			assert.Equal(t, l[i].JobTitle, r.JobTitle, "JobTitle should not have been changed")
+			assert.Equal(t, l[i].Degree, r.Degree, "Degree should not have been changed")
+			assert.Equal(t, l[i].GPA, r.GPA, "GPA should not have been changed")
 			assert.Equal(t, l[i].Description, r.Description, "Description should not have been changed")
 			assert.Equal(t, l[i].Location, r.Location, "Location should not have been changed")
 		}
@@ -71,12 +74,12 @@ func TestExportListPublic(t *testing.T) {
 }
 
 func TestExportListPrivate(t *testing.T) {
-	l := experience.ListExperience{
-		testexperience.New(),
-		testexperience.New(),
-		testexperience.New(),
-		testexperience.New(),
-		testexperience.New(),
+	l := education.ListEducation{
+		testeducation.New(),
+		testeducation.New(),
+		testeducation.New(),
+		testeducation.New(),
+		testeducation.New(),
 	}
 	pld := l.ExportPrivate()
 
@@ -86,7 +89,8 @@ func TestExportListPrivate(t *testing.T) {
 			assert.NotNil(t, r.UpdatedAt, "createdAt should have been exported")
 
 			assert.Equal(t, l[i].ID, r.ID, "ID should not have been changed")
-			assert.Equal(t, l[i].JobTitle, r.JobTitle, "JobTitle should not have been changed")
+			assert.Equal(t, l[i].Degree, r.Degree, "Degree should not have been changed")
+			assert.Equal(t, l[i].GPA, r.GPA, "GPA should not have been changed")
 			assert.Equal(t, l[i].Description, r.Description, "Description should not have been changed")
 			assert.Equal(t, l[i].Location, r.Location, "Location should not have been changed")
 		}
