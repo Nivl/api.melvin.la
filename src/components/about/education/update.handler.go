@@ -25,7 +25,7 @@ type UpdateParams struct {
 	ID             string  `from:"url" json:"id" params:"required,uuid"`
 	OrganizationID *string `from:"form" json:"organization_id" params:"noempty,uuid" maxlen:"255"`
 	Degree         *string `from:"form" json:"degree" params:"noempty,trim" maxlen:"255"`
-	GPA            *string `from:"form" json:"gpa" params:"noempty,trim" maxlen:"5"`
+	GPA            *string `from:"form" json:"gpa" params:"trim" maxlen:"5"`
 	Location       *string `from:"form" json:"location" params:"noempty,trim" maxlen:"255"`
 	Description    *string `from:"form" json:"description" params:"noempty,trim" maxlen:"10000"`
 	StartYear      *int    `from:"form" json:"start_year"`
