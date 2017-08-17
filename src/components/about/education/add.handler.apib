@@ -1,4 +1,4 @@
-### Create an Experience [POST]
+### Create an Education [POST]
 
 + Request (application/json)
 
@@ -8,17 +8,18 @@
 
     + Attributes
         + organization_id (required, string) - ID of the organization the experience is for
-        + job_title (required, string) - Job title
+        + degree (required, string) - Name of the degree
+        + gpa (string) - GPA
         + location (required, string) - Location
         + description (required, string) - Description of the work accomplished
-        + start_date (required, string) - Date the experience started. Format `month-year` (ex: `04-2016`).
-        + end_date (string) - Date the experience ended. Format `month-year` (ex: `04-2016`). Has to be later or equal to `start_date`
+        + start_year (required, number) - Year the started.
+        + end_year (number) - Year ended
 
 + Response 201 (application/json)
 
     The ressource has been created
 
-    + Attributes (Experience)
+    + Attributes (Education)
 
 
 + Response 400 (application/json)
