@@ -8,7 +8,7 @@ import (
 // Contains the index of all Endpoints
 const (
 	EndpointAdd = iota
-	// EndpointGet
+	EndpointGet
 	// EndpointList
 	// EndpointUpdate
 	EndpointDelete
@@ -17,7 +17,7 @@ const (
 // Endpoints is a list of endpoints for this components
 var Endpoints = router.Endpoints{
 	EndpointAdd: addEndpoint,
-	// 	EndpointGet:    getEndpoint,
+	EndpointGet: getEndpoint,
 	// 	EndpointList:   listEndpoint,
 	// 	EndpointUpdate: updateEndpoint,
 	EndpointDelete: deleteEndpoint,
