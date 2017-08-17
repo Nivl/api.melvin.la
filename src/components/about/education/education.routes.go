@@ -8,9 +8,9 @@ import (
 // Contains the index of all Endpoints
 const (
 	EndpointAdd = iota
-	EndpointGet
-	EndpointList
-	EndpointUpdate
+	// EndpointGet
+	// EndpointList
+	// EndpointUpdate
 	EndpointDelete
 )
 
@@ -20,7 +20,7 @@ var Endpoints = router.Endpoints{
 	// 	EndpointGet:    getEndpoint,
 	// 	EndpointList:   listEndpoint,
 	// 	EndpointUpdate: updateEndpoint,
-	// 	EndpointDelete: deleteEndpoint,
+	EndpointDelete: deleteEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article
