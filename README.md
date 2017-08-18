@@ -4,10 +4,12 @@
 [![Build Status](https://travis-ci.org/melvin-laplanche/ml-api.svg?branch=master)](https://travis-ci.org/melvin-laplanche/ml-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/melvin-laplanche/ml-api)](https://goreportcard.com/report/github.com/melvin-laplanche/ml-api)
 [![codecov](https://codecov.io/gh/melvin-laplanche/ml-api/branch/master/graph/badge.svg)](https://codecov.io/gh/melvin-laplanche/ml-api)
+[![BCH compliance](https://bettercodehub.com/edge/badge/melvin-laplanche/ml-api?branch=master)](https://bettercodehub.com/results/melvin-laplanche/ml-api)
 
 ## Staging badges
 [![Build Status](https://travis-ci.org/melvin-laplanche/ml-api.svg?branch=staging)](https://travis-ci.org/melvin-laplanche/ml-api)
 [![codecov](https://codecov.io/gh/melvin-laplanche/ml-api/branch/staging/graph/badge.svg)](https://codecov.io/gh/melvin-laplanche/ml-api)
+[![BCH compliance](https://bettercodehub.com/edge/badge/melvin-laplanche/ml-api?branch=staging)](https://bettercodehub.com/results/melvin-laplanche/ml-api)
 
 ## Run the API using docker
 
