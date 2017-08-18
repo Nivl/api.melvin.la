@@ -1,0 +1,59 @@
+### Update an education [PATCH]
+
++ Request (application/json)
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + organization_id (string) - ID of the organization the experience is for
+        + degree (string) - Name of the Degree
+        + gpa (string) - GPA
+        + location (string) - Location
+        + description (string) - Description of the work accomplished
+        + start_year (number) - Year started
+        + end_year (number) - Year ended
+        + unset_end_year (boolean) - Unset the end_year
+        + in_trash (boolean) - Put/remove the resource from the trash
+
++ Response 200 (application/json)
+
+    The resource has been Updated
+
+    + Attributes (Education)
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data
+
+    + Attributes (DefaultError)
+
++ Response 401 (application/json)
+
+    The requester is not logged in
+
+    + Attributes (Error401)
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource
+
+    + Attributes (Error403)
+
++ Response 404 (application/json)
+
+    The organization does not exist
+
+    + Attributes (Error404)
+
++ Response 409 (application/json)
+
+    A value already exists in the database
+
+    + Attributes (DefaultError)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error
+
+    + Attributes (Error500)
