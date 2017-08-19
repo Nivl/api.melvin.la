@@ -6,6 +6,7 @@ import (
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
+	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
@@ -31,34 +32,7 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 	params := req.Params().(*ListParams)
 	paginator := params.Paginator()
 
-	whereList := []string{}
-	// Only the an admins can filter on deleted/orphans
-	if req.User().IsAdm() {
-		if params.Orphans != nil {
-			if *params.Orphans {
-				whereList = append(whereList, "org.deleted_at IS NOT NULL")
-			} else {
-				whereList = append(whereList, "org.deleted_at IS NULL")
-			}
-		}
-
-		if params.Deleted != nil {
-			if *params.Deleted {
-				whereList = append(whereList, "edu.deleted_at IS NOT NULL")
-			} else {
-				whereList = append(whereList, "edu.deleted_at IS NULL")
-			}
-		}
-	} else {
-		params.Operator = "and"
-		whereList = append(whereList, "edu.deleted_at IS NULL")
-		whereList = append(whereList, "org.deleted_at IS NULL")
-	}
-
-	whereClause := ""
-	if len(whereList) > 0 {
-		whereClause = "WHERE " + strings.Join(whereList, " "+params.Operator+" ")
-	}
+	whereClause := makeListWhereClause(params, req.User())
 	edus := ListEducation{}
 
 	stmt := `SELECT edu.*, ` + organizations.JoinSQL("org") + `
@@ -79,4 +53,38 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 		return req.Response().Ok(edus.ExportPrivate())
 	}
 	return req.Response().Ok(edus.ExportPublic())
+}
+
+func makeListWhereClause(p *ListParams, u *auth.User) string {
+	whereList := []string{}
+
+	// Only the an admins can filter on deleted/orphans so regular
+	// users only get non-orphans and non-deleted data
+	if !u.IsAdm() {
+		p.Operator = "and"
+		whereList = append(whereList, "edu.deleted_at IS NULL")
+		whereList = append(whereList, "org.deleted_at IS NULL")
+		return strings.Join(whereList, " and ")
+	}
+
+	if p.Orphans != nil {
+		if *p.Orphans {
+			whereList = append(whereList, "org.deleted_at IS NOT NULL")
+		} else {
+			whereList = append(whereList, "org.deleted_at IS NULL")
+		}
+	}
+
+	if p.Deleted != nil {
+		if *p.Deleted {
+			whereList = append(whereList, "edu.deleted_at IS NOT NULL")
+		} else {
+			whereList = append(whereList, "edu.deleted_at IS NULL")
+		}
+	}
+
+	if len(whereList) > 0 {
+		return "WHERE " + strings.Join(whereList, " "+p.Operator+" ")
+	}
+	return ""
 }
