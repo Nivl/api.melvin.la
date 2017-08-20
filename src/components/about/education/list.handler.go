@@ -33,8 +33,6 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 	paginator := params.Paginator()
 
 	whereClause := makeListWhereClause(params, req.User())
-	edus := ListEducation{}
-
 	stmt := `SELECT edu.*, ` + organizations.JoinSQL("org") + `
 	FROM about_education edu
 	JOIN about_organizations org
@@ -44,6 +42,7 @@ func List(req router.HTTPRequest, deps *router.Dependencies) error {
 	OFFSET $1
 	LIMIT $2`
 
+	edus := ListEducation{}
 	err := deps.DB.Select(&edus, stmt, paginator.Offset(), paginator.Limit())
 	if err != nil {
 		return err
@@ -64,22 +63,21 @@ func makeListWhereClause(p *ListParams, u *auth.User) string {
 		p.Operator = "and"
 		whereList = append(whereList, "edu.deleted_at IS NULL")
 		whereList = append(whereList, "org.deleted_at IS NULL")
-		return strings.Join(whereList, " and ")
-	}
-
-	if p.Orphans != nil {
-		if *p.Orphans {
-			whereList = append(whereList, "org.deleted_at IS NOT NULL")
-		} else {
-			whereList = append(whereList, "org.deleted_at IS NULL")
+	} else {
+		if p.Orphans != nil {
+			if *p.Orphans {
+				whereList = append(whereList, "org.deleted_at IS NOT NULL")
+			} else {
+				whereList = append(whereList, "org.deleted_at IS NULL")
+			}
 		}
-	}
 
-	if p.Deleted != nil {
-		if *p.Deleted {
-			whereList = append(whereList, "edu.deleted_at IS NOT NULL")
-		} else {
-			whereList = append(whereList, "edu.deleted_at IS NULL")
+		if p.Deleted != nil {
+			if *p.Deleted {
+				whereList = append(whereList, "edu.deleted_at IS NOT NULL")
+			} else {
+				whereList = append(whereList, "edu.deleted_at IS NULL")
+			}
 		}
 	}
 
