@@ -41,5 +41,6 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 		return err
 	}
 
-	return req.Response().Created(NewPrivatePayload(user))
+	profile := &Profile{User: user}
+	return req.Response().Created(profile.ExportPrivate())
 }
