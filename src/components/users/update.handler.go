@@ -21,7 +21,7 @@ var updateEndpoint = &router.Endpoint{
 type UpdateParams struct {
 	ID              string `from:"url" json:"id"  params:"uuid,required"`
 	Name            string `from:"form" json:"name" params:"trim" maxlen:"255"`
-	Email           string `from:"form" json:"email" params:"trim" maxlen:"255"`
+	Email           string `from:"form" json:"email" params:"trim,email" maxlen:"255"`
 	CurrentPassword string `from:"form" json:"current_password" params:"trim" maxlen:"255"`
 	NewPassword     string `from:"form" json:"new_password" params:"trim" maxlen:"255"`
 
