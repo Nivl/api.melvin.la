@@ -2,24 +2,18 @@ package dependencies
 
 import (
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/storage/db/sqlx"
 	"github.com/bsphere/le_go"
-	"github.com/jmoiron/sqlx"
 )
 
 // DB represents an open connection with write access to the database
-var DB db.DB
+var DB db.Connection
 
 // InitPostgres inits the connection to the database
 func InitPostgres(uri string) error {
-	con, err := sqlx.Connect("postgres", uri)
-	if err != nil {
-		return err
-	}
-
-	// Unsafe returns a version of DB which will silently succeed to scan when
-	// columns in the SQL result have no fields in the destination struct.
-	DB = con.Unsafe()
-	return nil
+	var err error
+	DB, err = sqlx.New(uri)
+	return err
 }
 
 // Logentries represents an open connection to logentries

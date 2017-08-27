@@ -32,7 +32,7 @@ func NewProfile() *users.Profile {
 }
 
 // NewPersistedProfile creates and persists a new user and user profile with "fake" as password
-func NewPersistedProfile(t *testing.T, q db.DB, p *users.Profile) *users.Profile {
+func NewPersistedProfile(t *testing.T, q db.Queryable, p *users.Profile) *users.Profile {
 	if p == nil {
 		p = &users.Profile{}
 	}
@@ -74,7 +74,7 @@ func NewPersistedProfile(t *testing.T, q db.DB, p *users.Profile) *users.Profile
 }
 
 // NewAuth creates a new user and their session
-func NewAuth(t *testing.T, q db.DB) (*auth.User, *auth.Session) {
+func NewAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	user, session := testauth.NewAuth(t, q)
 	p := NewProfile()
 	p.ID = ""
@@ -87,7 +87,7 @@ func NewAuth(t *testing.T, q db.DB) (*auth.User, *auth.Session) {
 }
 
 // NewAdminAuth creates a new admin and their session
-func NewAdminAuth(t *testing.T, q db.DB) (*auth.User, *auth.Session) {
+func NewAdminAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	user, session := testauth.NewAdminAuth(t, q)
 	p := NewProfile()
 	p.ID = ""

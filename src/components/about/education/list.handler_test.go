@@ -208,7 +208,7 @@ func TestListNoBDCon(t *testing.T) {
 	requester := testauth.NewUser()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectSelectError("*education.ListEducation")
 
 	// Mock the request & add expectations
@@ -239,7 +239,7 @@ func TestListPublic(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectSelect("*education.ListEducation", func(args mock.Arguments) {
 		l := args.Get(0).(*education.ListEducation)
 		*l = eduList
@@ -290,7 +290,7 @@ func TestListPrivate(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectSelect("*education.ListEducation", func(args mock.Arguments) {
 		l := args.Get(0).(*education.ListEducation)
 		*l = eduList

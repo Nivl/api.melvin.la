@@ -51,9 +51,8 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusNoContent {
-				exists, err := experience.Exists(dbCon, tc.params.ID)
-				assert.NoError(t, err, "Exists() should have not failed")
-				assert.False(t, exists, "the organization should no longer exists")
+				_, err := experience.GetAnyByID(dbCon, tc.params.ID)
+				assert.True(t, apierror.IsNotFound(err), "GetByID() should have failed with an IsNotFound error")
 			}
 		})
 	}

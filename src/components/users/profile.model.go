@@ -30,7 +30,7 @@ type Profile struct {
 
 // GetByIDWithProfile finds and returns an active user with their profile by ID
 // Deleted object are not returned
-func GetByIDWithProfile(q db.DB, id string) (*Profile, error) {
+func GetByIDWithProfile(q db.Queryable, id string) (*Profile, error) {
 	u := &Profile{}
 	stmt := `
 	SELECT profile.*, ` + auth.JoinUserSQL("users") + `
@@ -47,7 +47,7 @@ func GetByIDWithProfile(q db.DB, id string) (*Profile, error) {
 // GetAnyByIDWithProfile finds and returns an active user with their
 // profile by ID
 // Deleted object are returned
-func GetAnyByIDWithProfile(q db.DB, id string) (*Profile, error) {
+func GetAnyByIDWithProfile(q db.Queryable, id string) (*Profile, error) {
 	u := &Profile{}
 	stmt := `
 	SELECT profile.*, ` + auth.JoinUserSQL("users") + `

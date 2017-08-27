@@ -168,7 +168,7 @@ func TestUploadHappyPath(t *testing.T) {
 	defer handlerParams.Logo.File.Close()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		org := args.Get(0).(*organizations.Organization)
 		org.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
@@ -218,7 +218,7 @@ func TestUploadNotFound(t *testing.T) {
 	defer handlerParams.Logo.File.Close()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*organizations.Organization")
 
 	// Mock the request & add expectations
@@ -246,7 +246,7 @@ func TestUploadStorageFailed(t *testing.T) {
 	defer handlerParams.Logo.File.Close()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		org := args.Get(0).(*organizations.Organization)
 		*org = *(testorganizations.New())
@@ -283,7 +283,7 @@ func TestUploadDBNoCon(t *testing.T) {
 	defer handlerParams.Logo.File.Close()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		exp := args.Get(0).(*organizations.Organization)
 		*exp = *(testorganizations.New())

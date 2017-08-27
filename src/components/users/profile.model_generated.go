@@ -1,6 +1,6 @@
 package users
 
-// Code auto-generated; DO NOT EDIT
+// Code generated; DO NOT EDIT.
 
 import (
 	"errors"
@@ -32,17 +32,10 @@ func JoinProfileSQL(prefix string) string {
 
 
 
-// ProfileExists checks if a profile exists for a specific ID
-func ProfileExists(q db.DB, id string) (bool, error) {
-	exists := false
-	stmt := "SELECT exists(SELECT 1 FROM user_profiles WHERE id=$1 and deleted_at IS NULL)"
-	err := db.Get(q, &exists, stmt, id)
-	return exists, err
-}
 
 // Save creates or updates the article depending on the value of the id using
 // a transaction
-func (p *Profile) Save(q db.DB) error {
+func (p *Profile) Save(q db.Queryable) error {
 	if p.ID == "" {
 		return p.Create(q)
 	}
@@ -51,7 +44,7 @@ func (p *Profile) Save(q db.DB) error {
 }
 
 // Create persists a profile in the database
-func (p *Profile) Create(q db.DB) error {
+func (p *Profile) Create(q db.Queryable) error {
 	if p.ID != "" {
 		return errors.New("cannot persist a profile that already has an ID")
 	}
@@ -60,7 +53,7 @@ func (p *Profile) Create(q db.DB) error {
 }
 
 // doCreate persists a profile in the database using a Node
-func (p *Profile) doCreate(q db.DB) error {
+func (p *Profile) doCreate(q db.Queryable) error {
 	if p == nil {
 		return errors.New("profile not instanced")
 	}
@@ -79,7 +72,7 @@ func (p *Profile) doCreate(q db.DB) error {
 
 // Update updates most of the fields of a persisted profile
 // Excluded fields are id, created_at, deleted_at, etc.
-func (p *Profile) Update(q db.DB) error {
+func (p *Profile) Update(q db.Queryable) error {
 	if p.ID == "" {
 		return errors.New("cannot update a non-persisted profile")
 	}
@@ -88,7 +81,7 @@ func (p *Profile) Update(q db.DB) error {
 }
 
 // doUpdate updates a profile in the database
-func (p *Profile) doUpdate(q db.DB) error {
+func (p *Profile) doUpdate(q db.Queryable) error {
 	if p.ID == "" {
 		return errors.New("cannot update a non-persisted profile")
 	}
@@ -102,7 +95,7 @@ func (p *Profile) doUpdate(q db.DB) error {
 }
 
 // Delete removes a profile from the database
-func (p *Profile) Delete(q db.DB) error {
+func (p *Profile) Delete(q db.Queryable) error {
 	if p == nil {
 		return errors.New("profile not instanced")
 	}

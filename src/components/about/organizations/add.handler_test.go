@@ -121,7 +121,7 @@ func TestAddHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsert("*organizations.Organization")
 
 	// Mock the response & add expectations

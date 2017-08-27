@@ -251,7 +251,7 @@ func TestUpdateHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*education.Education", func(args mock.Arguments) {
 		edu := args.Get(0).(*education.Education)
 		*edu = *(testeducation.New())
@@ -295,7 +295,7 @@ func TestUpdateUnsetEndYear(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*education.Education", func(args mock.Arguments) {
 		edu := args.Get(0).(*education.Education)
 		edu.ID = "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"
@@ -334,7 +334,7 @@ func TestUpdateEndYearBeforeStartYear(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*education.Education", func(args mock.Arguments) {
 		edu := args.Get(0).(*education.Education)
 		edu.StartYear = future
@@ -369,7 +369,7 @@ func TestUpdateNoDBCon(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*education.Education", func(args mock.Arguments) {
 		exp := args.Get(0).(*education.Education)
 		*exp = *(testeducation.New())
@@ -404,7 +404,7 @@ func TestUpdateUnexisting(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*education.Education")
 
 	// Mock the request & add expectations
@@ -430,7 +430,7 @@ func TestUpdateUnexistingOrg(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*education.Education", func(args mock.Arguments) {
 		exp := args.Get(0).(*education.Education)
 		*exp = *(testeducation.New())
@@ -461,7 +461,7 @@ func TestUpdateGetOrgNoDBCon(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*education.Education", func(args mock.Arguments) {
 		exp := args.Get(0).(*education.Education)
 		*exp = *(testeducation.New())

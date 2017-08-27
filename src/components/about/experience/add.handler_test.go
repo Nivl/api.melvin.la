@@ -303,7 +303,7 @@ func TestAddHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsert("*experience.Experience")
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		o := args.Get(0).(*organizations.Organization)
@@ -345,7 +345,7 @@ func TestAddOrgNotFound(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*organizations.Organization")
 
 	// Mock the request & add expectations
@@ -379,7 +379,7 @@ func TestAddNoDBCon(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsertError("*experience.Experience")
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		o := args.Get(0).(*organizations.Organization)

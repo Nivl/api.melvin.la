@@ -31,7 +31,7 @@ func New() *education.Education {
 }
 
 // NewPersisted returns a persisted education
-func NewPersisted(t *testing.T, dbCon db.DB, edu *education.Education) *education.Education {
+func NewPersisted(t *testing.T, dbCon db.Queryable, edu *education.Education) *education.Education {
 	if edu == nil {
 		edu = &education.Education{}
 	}

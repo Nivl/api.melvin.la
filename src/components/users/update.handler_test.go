@@ -136,7 +136,7 @@ func TestUpdateHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectUpdate("*auth.User")
 	mockDB.ExpectUpdate("*users.Profile")
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
@@ -178,7 +178,7 @@ func TestUpdateInvalidPassword(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
 		p := args.Get(0).(*users.Profile)
 		*p = *profile
@@ -240,7 +240,7 @@ func TestUpdateUnexistingUser(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*users.Profile")
 
 	// Mock the request & add expectations
@@ -276,7 +276,7 @@ func TestUpdateAllTheFields(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectUpdate("*auth.User")
 	mockDB.ExpectUpdate("*users.Profile")
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
@@ -332,7 +332,7 @@ func TestUpdateUnsetAllTheFields(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectUpdate("*auth.User")
 	mockDB.ExpectUpdate("*users.Profile")
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {

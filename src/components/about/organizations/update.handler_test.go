@@ -169,7 +169,7 @@ func TestUpdateHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		org := args.Get(0).(*organizations.Organization)
 		org.ID = "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"
@@ -237,7 +237,7 @@ func TestUpdateNoDBCon(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*organizations.Organization", func(args mock.Arguments) {
 		exp := args.Get(0).(*organizations.Organization)
 		*exp = *(testorganizations.New())
@@ -270,7 +270,7 @@ func TestUpdateUnexisting(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*organizations.Organization")
 
 	// Mock the request & add expectations

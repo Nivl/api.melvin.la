@@ -64,7 +64,7 @@ func TestAddHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsert("*auth.User")
 	mockDB.ExpectInsert("*users.Profile")
 

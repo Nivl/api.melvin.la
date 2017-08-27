@@ -25,7 +25,7 @@ func New() *organizations.Organization {
 }
 
 // NewPersisted returns a new persisted organization with random data
-func NewPersisted(t *testing.T, dbCon db.DB, org *organizations.Organization) *organizations.Organization {
+func NewPersisted(t *testing.T, dbCon db.Queryable, org *organizations.Organization) *organizations.Organization {
 	if org == nil {
 		org = &organizations.Organization{}
 	}

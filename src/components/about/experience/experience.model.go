@@ -30,7 +30,7 @@ type ListExperience []*Experience
 
 // GetByID finds and returns an active experience by ID
 // Deleted object are not returned
-func GetByID(q db.DB, id string) (*Experience, error) {
+func GetByID(q db.Queryable, id string) (*Experience, error) {
 	e := &Experience{}
 	stmt := `
 	SELECT exp.*, ` + organizations.JoinSQL("org") + `
@@ -47,7 +47,7 @@ func GetByID(q db.DB, id string) (*Experience, error) {
 
 // GetAnyByID finds and returns an experience by ID
 // Deleted and orphan objects are returned
-func GetAnyByID(q db.DB, id string) (*Experience, error) {
+func GetAnyByID(q db.Queryable, id string) (*Experience, error) {
 	e := &Experience{}
 	stmt := `
 	SELECT exp.*, ` + organizations.JoinSQL("org") + `

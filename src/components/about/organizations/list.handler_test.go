@@ -147,7 +147,7 @@ func TestListAccess(t *testing.T) {
 
 func TestListNoBDCon(t *testing.T) {
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectSelectError("*organizations.Organizations")
 
 	// Mock the request & add expectations

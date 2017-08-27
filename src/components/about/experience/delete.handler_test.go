@@ -110,7 +110,7 @@ func TestDeleteHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectDeletion()
 	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
 		org := args.Get(0).(*experience.Experience)
@@ -143,7 +143,7 @@ func TestDeleteUnexistingExperience(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*experience.Experience")
 
 	// Mock the request & add expectations
@@ -168,7 +168,7 @@ func TestDeleteNoDBCon(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectDeletionError()
 	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
 		org := args.Get(0).(*experience.Experience)

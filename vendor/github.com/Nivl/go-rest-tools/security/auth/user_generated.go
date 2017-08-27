@@ -1,6 +1,6 @@
 package auth
 
-// Code auto-generated; DO NOT EDIT
+// Code generated; DO NOT EDIT.
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ func JoinUserSQL(prefix string) string {
 
 // GetUserByID finds and returns an active user by ID
 // Deleted object are not returned
-func GetUserByID(q db.DB, id string) (*User, error) {
+func GetUserByID(q db.Queryable, id string) (*User, error) {
 	u := &User{}
 	stmt := "SELECT * from users WHERE id=$1 and deleted_at IS NULL LIMIT 1"
 	err := q.Get(u, stmt, id)
@@ -39,24 +39,17 @@ func GetUserByID(q db.DB, id string) (*User, error) {
 
 // GetAnyUserByID finds and returns an user by ID.
 // Deleted object are returned
-func GetAnyUserByID(q db.DB, id string) (*User, error) {
+func GetAnyUserByID(q db.Queryable, id string) (*User, error) {
 	u := &User{}
 	stmt := "SELECT * from users WHERE id=$1 LIMIT 1"
 	err := q.Get(u, stmt, id)
 	return u, apierror.NewFromSQL(err)
 }
 
-// UserExists checks if a user exists for a specific ID
-func UserExists(q db.DB, id string) (bool, error) {
-	exists := false
-	stmt := "SELECT exists(SELECT 1 FROM users WHERE id=$1 and deleted_at IS NULL)"
-	err := db.Get(q, &exists, stmt, id)
-	return exists, err
-}
 
 // Save creates or updates the article depending on the value of the id using
 // a transaction
-func (u *User) Save(q db.DB) error {
+func (u *User) Save(q db.Queryable) error {
 	if u.ID == "" {
 		return u.Create(q)
 	}
@@ -65,7 +58,7 @@ func (u *User) Save(q db.DB) error {
 }
 
 // Create persists a user in the database
-func (u *User) Create(q db.DB) error {
+func (u *User) Create(q db.Queryable) error {
 	if u.ID != "" {
 		return errors.New("cannot persist a user that already has an ID")
 	}
@@ -74,7 +67,7 @@ func (u *User) Create(q db.DB) error {
 }
 
 // doCreate persists a user in the database using a Node
-func (u *User) doCreate(q db.DB) error {
+func (u *User) doCreate(q db.Queryable) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}
@@ -93,7 +86,7 @@ func (u *User) doCreate(q db.DB) error {
 
 // Update updates most of the fields of a persisted user
 // Excluded fields are id, created_at, deleted_at, etc.
-func (u *User) Update(q db.DB) error {
+func (u *User) Update(q db.Queryable) error {
 	if u.ID == "" {
 		return errors.New("cannot update a non-persisted user")
 	}
@@ -102,7 +95,7 @@ func (u *User) Update(q db.DB) error {
 }
 
 // doUpdate updates a user in the database
-func (u *User) doUpdate(q db.DB) error {
+func (u *User) doUpdate(q db.Queryable) error {
 	if u.ID == "" {
 		return errors.New("cannot update a non-persisted user")
 	}
@@ -116,7 +109,7 @@ func (u *User) doUpdate(q db.DB) error {
 }
 
 // Delete removes a user from the database
-func (u *User) Delete(q db.DB) error {
+func (u *User) Delete(q db.Queryable) error {
 	if u == nil {
 		return errors.New("user not instanced")
 	}

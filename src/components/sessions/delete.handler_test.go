@@ -108,7 +108,7 @@ func TestDeleteHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// return a session that match the session currently in use
 		sess := args.Get(0).(*auth.Session)
@@ -154,7 +154,7 @@ func TestDeleteOtherSession(t *testing.T) {
 	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// returns a session that matched the params and that is attached to the current user
 		sess := args.Get(0).(*auth.Session)
@@ -229,7 +229,7 @@ func TestDeleteSomeonesSession(t *testing.T) {
 	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// returns a session that matched the params and that is attached to an other user
 		sess := args.Get(0).(*auth.Session)
@@ -268,7 +268,7 @@ func TestDeleteUnexistingSession(t *testing.T) {
 	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*auth.Session")
 
 	// Mock the request & add expectations
@@ -296,7 +296,7 @@ func TestDeleteNoDBConOnDelete(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*auth.Session", func(args mock.Arguments) {
 		// return a session that match the session currently in use
 		sess := args.Get(0).(*auth.Session)
@@ -333,7 +333,7 @@ func TestDeleteNoDBConOnGet(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetError("*auth.Session")
 
 	// Mock the request & add expectations

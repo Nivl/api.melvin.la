@@ -4,8 +4,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/models"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/models"
 )
 
 var _models = &savedModels{
@@ -32,7 +32,7 @@ func (sm *savedModels) Push(t testing.TB, obj models.Deletable) {
 }
 
 // Push adds a new model to the list
-func (sm *savedModels) Purge(t testing.TB, q db.DB) {
+func (sm *savedModels) Purge(t testing.TB, q db.Queryable) {
 	sm.Lock()
 	defer sm.Unlock()
 
@@ -63,6 +63,6 @@ func SaveModels(t testing.TB, models ...models.Deletable) {
 }
 
 // PurgeModels removes all models stored for the given test
-func PurgeModels(t testing.TB, q db.DB) {
+func PurgeModels(t testing.TB, q db.Queryable) {
 	_models.Purge(t, q)
 }

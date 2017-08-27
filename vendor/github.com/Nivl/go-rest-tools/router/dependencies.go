@@ -11,7 +11,7 @@ import (
 
 // Dependencies represents all the dependencies of the API
 type Dependencies struct {
-	DB      db.DB
+	DB      db.Connection
 	Mailer  mailer.Mailer
 	Storage filestorage.FileStorage
 }

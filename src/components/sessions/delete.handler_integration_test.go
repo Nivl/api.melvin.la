@@ -3,15 +3,15 @@
 package sessions_test
 
 import (
+	"database/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 )
@@ -82,12 +82,8 @@ func TestDelete(t *testing.T) {
 				// We check that the user is still in DB but is flagged for deletion
 				var session auth.Session
 				stmt := "SELECT * FROM sessions WHERE id=$1 LIMIT 1"
-				err := db.Get(deps.DB, &session, stmt, tc.params.Token)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				assert.Empty(t, session.ID, "session should be deleted")
+				err := deps.DB.Get(&session, stmt, tc.params.Token)
+				assert.Equal(t, sql.ErrNoRows, err, "session should be deleted")
 			}
 		})
 	}

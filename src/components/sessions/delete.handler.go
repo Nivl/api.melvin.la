@@ -1,11 +1,12 @@
 package sessions
 
 import (
-	"github.com/Nivl/go-rest-tools/types/apierror"
+	"database/sql"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 )
 
 var deleteEndpoint = &router.Endpoint{
@@ -38,8 +39,9 @@ func Delete(req router.HTTPRequest, deps *router.Dependencies) error {
 
 	var session auth.Session
 	stmt := "SELECT * FROM sessions WHERE id=$1 AND deleted_at IS NULL LIMIT 1"
-	err := db.Get(deps.DB, &session, stmt, params.Token)
-	if err != nil {
+	err := deps.DB.Get(&session, stmt, params.Token)
+	// in case of not found we don't wan to return an error here
+	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 

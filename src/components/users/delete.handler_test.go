@@ -141,7 +141,7 @@ func TestDeleteHappyPath(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectDeletion()
 
 	// Mock the response & add expectations
@@ -237,7 +237,7 @@ func TestDeleteNoDBConOnDelete(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectDeletionError()
 
 	// Mock the request & add expectations

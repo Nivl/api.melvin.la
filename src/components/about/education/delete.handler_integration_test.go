@@ -11,6 +11,7 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education/testeducation"
@@ -51,9 +52,8 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusNoContent {
-				exists, err := education.Exists(dbCon, tc.params.ID)
-				assert.NoError(t, err, "Exists() should have not failed")
-				assert.False(t, exists, "the organization should no longer exists")
+				_, err := education.GetAnyByID(dbCon, tc.params.ID)
+				assert.True(t, apierror.IsNotFound(err), "GetByID() should have failed with an IsNotFound error")
 			}
 		})
 	}
