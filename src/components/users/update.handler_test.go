@@ -5,13 +5,16 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -97,41 +100,41 @@ func TestUpdateAccess(t *testing.T) {
 }
 
 func TestUpdateHappyPath(t *testing.T) {
-	handlerParams := &users.UpdateParams{
-		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
-		CurrentPassword: "valid password",
-		Email:           "new_email@domain.tld",
-	}
+	profile := testusers.NewProfile()
 
-	userPassword, err := auth.CryptPassword(handlerParams.CurrentPassword)
-	assert.NoError(t, err)
-	user := &auth.User{
-		ID:       handlerParams.ID,
-		Password: userPassword,
-		Name:     "user name",
-		Email:    "email@domain.tld",
+	handlerParams := &users.UpdateParams{
+		ID:               profile.User.ID,
+		CurrentPassword:  "fake",
+		Email:            "new_email@domain.tld",
+		FacebookUsername: ptrs.NewString("new_username"),
 	}
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
 	mockDB.ExpectUpdate("*auth.User")
+	mockDB.ExpectUpdate("*users.Profile")
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		p := args.Get(0).(*users.Profile)
+		*p = *profile
+	})
 
-	// Mock the response & add expectations
+	// Mock the response & add expectati ons
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectOk("*users.Payload", func(args mock.Arguments) {
-		data := args.Get(0).(*users.Payload)
-		assert.Equal(t, user.Name, data.Name, "the name should have not changed")
+	res.ExpectOk("*users.ProfilePayload", func(args mock.Arguments) {
+		data := args.Get(0).(*users.ProfilePayload)
+		assert.Equal(t, profile.User.Name, data.Name, "the name should have not changed")
 		assert.Equal(t, handlerParams.Email, data.Email, "email should have been updated")
+		assert.Equal(t, *handlerParams.FacebookUsername, data.FacebookUsername, "FacebookUsername should have been updated")
 	})
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Response").Return(res)
 	req.On("Params").Return(handlerParams)
-	req.On("User").Return(user)
+	req.On("User").Return(profile.User)
 
 	// call the handler
-	err = users.Update(req, &router.Dependencies{DB: mockDB})
+	err := users.Update(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
@@ -141,30 +144,32 @@ func TestUpdateHappyPath(t *testing.T) {
 }
 
 func TestUpdateInvalidPassword(t *testing.T) {
+	profile := testusers.NewProfile()
 	handlerParams := &users.UpdateParams{
-		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
+		ID:              profile.UserID,
 		CurrentPassword: "invalid password",
 		NewPassword:     "new password",
 	}
 
-	userPassword, err := auth.CryptPassword("valid password")
-	assert.NoError(t, err)
-	user := &auth.User{
-		ID:       handlerParams.ID,
-		Password: userPassword,
-	}
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		p := args.Get(0).(*users.Profile)
+		*p = *profile
+	})
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
-	req.On("User").Return(user)
+	req.On("User").Return(profile.User)
 
 	// call the handler
-	err = users.Update(req, &router.Dependencies{})
+	err := users.Update(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should not have fail")
 	req.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
 
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusUnauthorized, httpErr.HTTPStatus())
