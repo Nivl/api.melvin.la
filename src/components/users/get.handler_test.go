@@ -13,6 +13,7 @@ import (
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
+	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -76,35 +77,29 @@ func TestGetValidParams(t *testing.T) {
 }
 
 func TestGetOthersData(t *testing.T) {
+	userToGet := testusers.NewProfile()
+
 	handlerParams := &users.GetParams{
-		ID: "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
+		ID: userToGet.ID,
 	}
 	requester := &auth.User{
 		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}
-	userToGet := &auth.User{
-		ID:      handlerParams.ID,
-		Name:    "user name",
-		Email:   "email@domain.tld",
-		IsAdmin: false,
-	}
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
-		user := args.Get(0).(*auth.User)
-		user.ID = userToGet.ID
-		user.Name = userToGet.Name
-		user.Email = userToGet.Email
-		user.IsAdmin = userToGet.IsAdmin
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		user := args.Get(0).(*users.Profile)
+		*user = *userToGet
 	})
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectOk("*users.Payload", func(args mock.Arguments) {
-		pld := args.Get(0).(*users.Payload)
-		assert.Equal(t, userToGet.ID, pld.ID, "ID should have not changed")
-		assert.Equal(t, userToGet.Name, pld.Name, "Name should have not changed")
+	res.ExpectOk("*users.ProfilePayload", func(args mock.Arguments) {
+		pld := args.Get(0).(*users.ProfilePayload)
+		assert.Equal(t, userToGet.User.ID, pld.ID, "The user ID should not have changed")
+		assert.Equal(t, userToGet.Name, pld.Name, "Name should not have changed")
+		assert.Equal(t, *userToGet.LinkedIn, pld.LinkedIn, "the LinkedIn id should not have changed")
 		assert.Empty(t, pld.Email, "the email should not be returned to anyone")
 		assert.False(t, pld.IsAdmin, "user should not be an admin")
 	})
@@ -136,10 +131,19 @@ func TestGetOwnData(t *testing.T) {
 		IsAdmin: false,
 	}
 
+	// Mock the database & add expectations
+	mockDB := new(mockdb.DB)
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		profile := args.Get(0).(*users.Profile)
+		*profile = *(testusers.NewProfile())
+		profile.User = requester
+		profile.UserID = requester.ID
+	})
+
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectOk("*users.Payload", func(args mock.Arguments) {
-		pld := args.Get(0).(*users.Payload)
+	res.ExpectOk("*users.ProfilePayload", func(args mock.Arguments) {
+		pld := args.Get(0).(*users.ProfilePayload)
 		assert.Equal(t, requester.ID, pld.ID, "ID should have not changed")
 		assert.Equal(t, requester.Name, pld.Name, "Name should have not changed")
 		assert.Equal(t, requester.Email, pld.Email, "the email should be returned")
@@ -153,7 +157,7 @@ func TestGetOwnData(t *testing.T) {
 	req.On("User").Return(requester)
 
 	// call the handler
-	err := users.Get(req, &router.Dependencies{})
+	err := users.Get(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
@@ -165,18 +169,14 @@ func TestGetUnexistingUser(t *testing.T) {
 	handlerParams := &users.GetParams{
 		ID: "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
 	}
-	requester := &auth.User{
-		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
-	}
 
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
-	mockDB.ExpectGetNotFound("*auth.User")
+	mockDB.ExpectGetNotFound("*users.Profile")
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
 	req.On("Params").Return(handlerParams)
-	req.On("User").Return(requester)
 
 	// call the handler
 	err := users.Get(req, &router.Dependencies{DB: mockDB})

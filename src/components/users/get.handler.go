@@ -3,7 +3,6 @@ package users
 import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
-	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
 var getEndpoint = &router.Endpoint{
@@ -24,15 +23,18 @@ type GetParams struct {
 func Get(req router.HTTPRequest, deps *router.Dependencies) error {
 	params := req.Params().(*GetParams)
 
-	// if a user asks for their own data, we don't need to query the DB
-	if req.User() != nil && req.User().ID == params.ID {
-		return req.Response().Ok(NewPrivatePayload(req.User()))
-	}
- 
-	user, err := auth.GetUserByID(deps.DB, params.ID)
+	profile, err := GetByIDWithProfile(deps.DB, params.ID)
 	if err != nil {
 		return err
 	}
 
-	return req.Response().Ok(NewPayload(user))
+	var pld *ProfilePayload
+
+	if req.User() != nil && req.User().ID == params.ID {
+		pld = profile.ExportPrivate()
+	} else {
+		pld = profile.ExportPublic()
+	}
+
+	return req.Response().Ok(pld)
 }
