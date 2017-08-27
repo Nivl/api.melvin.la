@@ -43,19 +43,3 @@ func GetByIDWithProfile(q db.Queryable, id string) (*Profile, error) {
 	err := q.Get(u, stmt, id)
 	return u, apierror.NewFromSQL(err)
 }
-
-// GetAnyByIDWithProfile finds and returns an active user with their
-// profile by ID
-// Deleted object are returned
-func GetAnyByIDWithProfile(q db.Queryable, id string) (*Profile, error) {
-	u := &Profile{}
-	stmt := `
-	SELECT profile.*, ` + auth.JoinUserSQL("users") + `
-	FROM user_profiles profile
-	JOIN users
-	  ON users.id = profile.user_id
-	WHERE users.id=$1
-	LIMIT 1`
-	err := q.Get(u, stmt, id)
-	return u, apierror.NewFromSQL(err)
-}
