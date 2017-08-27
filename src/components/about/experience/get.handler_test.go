@@ -101,7 +101,7 @@ func TestGetHappyPath(t *testing.T) {
 			}
 
 			// Mock the database & add expectations
-			mockDB := new(mockdb.DB)
+			mockDB := &mockdb.Connection{}
 			mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
 				data := args.Get(0).(*experience.Experience)
 				*data = *exp
@@ -159,7 +159,7 @@ func TestGetUnexisting(t *testing.T) {
 	requester := testauth.NewUser()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*experience.Experience")
 
 	// Mock the request & add expectations
@@ -186,7 +186,7 @@ func TestGetNoBDCon(t *testing.T) {
 	requester := testauth.NewUser()
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetError("*experience.Experience")
 
 	// Mock the request & add expectations

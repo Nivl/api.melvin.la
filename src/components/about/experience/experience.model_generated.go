@@ -1,19 +1,19 @@
 package experience
 
-// Code auto-generated; DO NOT EDIT
+// Code generated; DO NOT EDIT.
 
 import (
 	"errors"
 	"fmt"
 
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
 
 // JoinSQL returns a string ready to be embed in a JOIN query
 func JoinSQL(prefix string) string {
-	fields := []string{"id", "created_at", "updated_at", "deleted_at", "organization_id", "job_title", "location", "description", "start_date", "end_date"}
+	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "organization_id", "job_title", "location", "description", "start_date", "end_date" }
 	output := ""
 
 	for i, field := range fields {
@@ -28,17 +28,14 @@ func JoinSQL(prefix string) string {
 	return output
 }
 
-// Exists checks if a experience exists for a specific ID
-func Exists(q db.DB, id string) (bool, error) {
-	exists := false
-	stmt := "SELECT exists(SELECT 1 FROM about_experience WHERE id=$1 and deleted_at IS NULL)"
-	err := db.Get(q, &exists, stmt, id)
-	return exists, err
-}
+
+
+
+
 
 // Save creates or updates the article depending on the value of the id using
 // a transaction
-func (e *Experience) Save(q db.DB) error {
+func (e *Experience) Save(q db.Queryable) error {
 	if e.ID == "" {
 		return e.Create(q)
 	}
@@ -47,7 +44,7 @@ func (e *Experience) Save(q db.DB) error {
 }
 
 // Create persists a experience in the database
-func (e *Experience) Create(q db.DB) error {
+func (e *Experience) Create(q db.Queryable) error {
 	if e.ID != "" {
 		return errors.New("cannot persist a experience that already has an ID")
 	}
@@ -56,7 +53,7 @@ func (e *Experience) Create(q db.DB) error {
 }
 
 // doCreate persists a experience in the database using a Node
-func (e *Experience) doCreate(q db.DB) error {
+func (e *Experience) doCreate(q db.Queryable) error {
 	if e == nil {
 		return errors.New("experience not instanced")
 	}
@@ -70,12 +67,12 @@ func (e *Experience) doCreate(q db.DB) error {
 	stmt := "INSERT INTO about_experience (id, created_at, updated_at, deleted_at, organization_id, job_title, location, description, start_date, end_date) VALUES (:id, :created_at, :updated_at, :deleted_at, :organization_id, :job_title, :location, :description, :start_date, :end_date)"
 	_, err := q.NamedExec(stmt, e)
 
-	return apierror.NewFromSQL(err)
+  return apierror.NewFromSQL(err)
 }
 
 // Update updates most of the fields of a persisted experience
 // Excluded fields are id, created_at, deleted_at, etc.
-func (e *Experience) Update(q db.DB) error {
+func (e *Experience) Update(q db.Queryable) error {
 	if e.ID == "" {
 		return errors.New("cannot update a non-persisted experience")
 	}
@@ -84,7 +81,7 @@ func (e *Experience) Update(q db.DB) error {
 }
 
 // doUpdate updates a experience in the database
-func (e *Experience) doUpdate(q db.DB) error {
+func (e *Experience) doUpdate(q db.Queryable) error {
 	if e.ID == "" {
 		return errors.New("cannot update a non-persisted experience")
 	}
@@ -98,7 +95,7 @@ func (e *Experience) doUpdate(q db.DB) error {
 }
 
 // Delete removes a experience from the database
-func (e *Experience) Delete(q db.DB) error {
+func (e *Experience) Delete(q db.Queryable) error {
 	if e == nil {
 		return errors.New("experience not instanced")
 	}

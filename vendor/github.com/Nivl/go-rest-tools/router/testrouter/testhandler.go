@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -24,11 +24,11 @@ type ConflictTestParams struct {
 // ConflictInsertTest test an handler and expects a 409 on an insert statement
 func ConflictInsertTest(t *testing.T, p *ConflictTestParams) {
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsertConflict(p.StructConflicting, p.FieldConflicting)
 
 	// Mock the request & add expectations
-	req := new(mockrouter.HTTPRequest)
+	req := &mockrouter.HTTPRequest{}
 	req.On("Params").Return(p.HandlerParams)
 
 	// call the handler
@@ -47,7 +47,7 @@ func ConflictInsertTest(t *testing.T, p *ConflictTestParams) {
 // ConflictUpdateTest test am handler and expects a 409 on an update statement
 func ConflictUpdateTest(t *testing.T, p *ConflictTestParams) {
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet(p.StructConflicting, func(args mock.Arguments) {
 		obj := args.Get(0).(db.Model)
 		obj.SetID("e9b51718-383b-42be-8720-0c8d7a99e978")

@@ -3,15 +3,15 @@
 package users_test
 
 import (
+	"database/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 )
@@ -64,12 +64,8 @@ func TestDelete(t *testing.T) {
 				// We check that the user has been deleted
 				var user auth.User
 				stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"
-				err := db.Get(deps.DB, &user, stmt, tc.params.ID)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				assert.Empty(t, user.ID, "User not deleted")
+				err := deps.DB.Get(&user, stmt, tc.params.ID)
+				assert.Equal(t, sql.ErrNoRows, err, "User not deleted")
 			}
 		})
 	}

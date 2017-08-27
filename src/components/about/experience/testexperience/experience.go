@@ -28,7 +28,7 @@ func New() *experience.Experience {
 	}
 }
 
-func NewPersisted(t *testing.T, dbCon db.DB, exp *experience.Experience) *experience.Experience {
+func NewPersisted(t *testing.T, dbCon db.Queryable, exp *experience.Experience) *experience.Experience {
 	if exp == nil {
 		exp = &experience.Experience{}
 	}

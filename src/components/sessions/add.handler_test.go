@@ -52,7 +52,7 @@ func TestAddValidData(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsert("*auth.Session")
 	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
 		u := args.Get(0).(*auth.User)
@@ -93,7 +93,7 @@ func TestAddUnexistingEmail(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*auth.User")
 
 	// Mock the request & add expectations
@@ -119,7 +119,7 @@ func TestAddWrongPassword(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
 		u := args.Get(0).(*auth.User)
 		u.ID = "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9"
@@ -152,7 +152,7 @@ func TestAddNoDbConOnGet(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetError("*auth.User")
 
 	// Mock the request & add expectations
@@ -177,7 +177,7 @@ func TestAddNoDBConOnSave(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectInsertError("*auth.Session")
 	mockDB.ExpectGet("*auth.User", func(args mock.Arguments) {
 		u := args.Get(0).(*auth.User)

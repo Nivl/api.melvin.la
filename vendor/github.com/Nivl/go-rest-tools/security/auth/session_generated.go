@@ -1,6 +1,6 @@
 package auth
 
-// Code auto-generated; DO NOT EDIT
+// Code generated; DO NOT EDIT.
 
 import (
 	"errors"
@@ -22,9 +22,8 @@ import (
 
 
 
-
 // doCreate persists a session in the database using a Node
-func (s *Session) doCreate(q db.DB) error {
+func (s *Session) doCreate(q db.Queryable) error {
 	if s == nil {
 		return errors.New("session not instanced")
 	}
@@ -46,7 +45,7 @@ func (s *Session) doCreate(q db.DB) error {
 
 
 // Delete removes a session from the database
-func (s *Session) Delete(q db.DB) error {
+func (s *Session) Delete(q db.Queryable) error {
 	if s == nil {
 		return errors.New("session not instanced")
 	}

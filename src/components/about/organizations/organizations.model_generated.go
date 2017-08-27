@@ -1,6 +1,6 @@
 package organizations
 
-// Code auto-generated; DO NOT EDIT
+// Code generated; DO NOT EDIT.
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ func JoinSQL(prefix string) string {
 
 // GetByID finds and returns an active organization by ID
 // Deleted object are not returned
-func GetByID(q db.DB, id string) (*Organization, error) {
+func GetByID(q db.Queryable, id string) (*Organization, error) {
 	o := &Organization{}
 	stmt := "SELECT * from about_organizations WHERE id=$1 and deleted_at IS NULL LIMIT 1"
 	err := q.Get(o, stmt, id)
@@ -39,24 +39,17 @@ func GetByID(q db.DB, id string) (*Organization, error) {
 
 // GetAnyByID finds and returns an organization by ID.
 // Deleted object are returned
-func GetAnyByID(q db.DB, id string) (*Organization, error) {
+func GetAnyByID(q db.Queryable, id string) (*Organization, error) {
 	o := &Organization{}
 	stmt := "SELECT * from about_organizations WHERE id=$1 LIMIT 1"
 	err := q.Get(o, stmt, id)
 	return o, apierror.NewFromSQL(err)
 }
 
-// Exists checks if a organization exists for a specific ID
-func Exists(q db.DB, id string) (bool, error) {
-	exists := false
-	stmt := "SELECT exists(SELECT 1 FROM about_organizations WHERE id=$1 and deleted_at IS NULL)"
-	err := db.Get(q, &exists, stmt, id)
-	return exists, err
-}
 
 // Save creates or updates the article depending on the value of the id using
 // a transaction
-func (o *Organization) Save(q db.DB) error {
+func (o *Organization) Save(q db.Queryable) error {
 	if o.ID == "" {
 		return o.Create(q)
 	}
@@ -65,7 +58,7 @@ func (o *Organization) Save(q db.DB) error {
 }
 
 // Create persists a organization in the database
-func (o *Organization) Create(q db.DB) error {
+func (o *Organization) Create(q db.Queryable) error {
 	if o.ID != "" {
 		return errors.New("cannot persist a organization that already has an ID")
 	}
@@ -74,7 +67,7 @@ func (o *Organization) Create(q db.DB) error {
 }
 
 // doCreate persists a organization in the database using a Node
-func (o *Organization) doCreate(q db.DB) error {
+func (o *Organization) doCreate(q db.Queryable) error {
 	if o == nil {
 		return errors.New("organization not instanced")
 	}
@@ -93,7 +86,7 @@ func (o *Organization) doCreate(q db.DB) error {
 
 // Update updates most of the fields of a persisted organization
 // Excluded fields are id, created_at, deleted_at, etc.
-func (o *Organization) Update(q db.DB) error {
+func (o *Organization) Update(q db.Queryable) error {
 	if o.ID == "" {
 		return errors.New("cannot update a non-persisted organization")
 	}
@@ -102,7 +95,7 @@ func (o *Organization) Update(q db.DB) error {
 }
 
 // doUpdate updates a organization in the database
-func (o *Organization) doUpdate(q db.DB) error {
+func (o *Organization) doUpdate(q db.Queryable) error {
 	if o.ID == "" {
 		return errors.New("cannot update a non-persisted organization")
 	}
@@ -116,7 +109,7 @@ func (o *Organization) doUpdate(q db.DB) error {
 }
 
 // Delete removes a organization from the database
-func (o *Organization) Delete(q db.DB) error {
+func (o *Organization) Delete(q db.Queryable) error {
 	if o == nil {
 		return errors.New("organization not instanced")
 	}

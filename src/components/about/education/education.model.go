@@ -31,7 +31,7 @@ type ListEducation []*Education
 
 // GetByID finds and returns an active education by ID
 // Deleted object are not returned
-func GetByID(q db.DB, id string) (*Education, error) {
+func GetByID(q db.Queryable, id string) (*Education, error) {
 	e := &Education{}
 	stmt := `
 	SELECT edu.*, ` + organizations.JoinSQL("org") + `
@@ -48,7 +48,7 @@ func GetByID(q db.DB, id string) (*Education, error) {
 
 // GetAnyByID finds and returns an education by ID
 // Deleted and orphan objects are returned
-func GetAnyByID(q db.DB, id string) (*Education, error) {
+func GetAnyByID(q db.Queryable, id string) (*Education, error) {
 	e := &Education{}
 	stmt := `
 	SELECT edu.*, ` + organizations.JoinSQL("org") + `

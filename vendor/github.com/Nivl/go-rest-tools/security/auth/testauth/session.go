@@ -9,21 +9,21 @@ import (
 )
 
 // NewAuth creates a new user and their session
-func NewAuth(t *testing.T, q db.DB) (*auth.User, *auth.Session) {
+func NewAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	user := NewPersistedUser(t, q, nil)
 	session := NewPersistedSession(t, q, user)
 	return user, session
 }
 
 // NewAdminAuth creates a new admin and their session
-func NewAdminAuth(t *testing.T, q db.DB) (*auth.User, *auth.Session) {
+func NewAdminAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	user := NewPersistedUser(t, q, &auth.User{IsAdmin: true})
 	session := NewPersistedSession(t, q, user)
 	return user, session
 }
 
 // NewSession creates a non-persisted session for the given user
-func NewSession(t *testing.T, q db.DB, user *auth.User) *auth.Session {
+func NewSession(t *testing.T, q db.Queryable, user *auth.User) *auth.Session {
 	session := &auth.Session{
 		UserID: user.ID,
 	}
@@ -37,7 +37,7 @@ func NewSession(t *testing.T, q db.DB, user *auth.User) *auth.Session {
 }
 
 // NewPersistedSession creates and persists a new session for the given user
-func NewPersistedSession(t *testing.T, q db.DB, user *auth.User) *auth.Session {
+func NewPersistedSession(t *testing.T, q db.Queryable, user *auth.User) *auth.Session {
 	session := &auth.Session{
 		UserID: user.ID,
 	}

@@ -1,10 +1,11 @@
 package sessions
 
 import (
+	"database/sql"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 )
 
@@ -29,8 +30,9 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 
 	var user auth.User
 	stmt := "SELECT * FROM users WHERE email=$1 LIMIT 1"
-	err := db.Get(deps.DB, &user, stmt, params.Email)
-	if err != nil {
+	err := deps.DB.Get(&user, stmt, params.Email)
+	// in case of not found we don't wan to return an error here
+	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 

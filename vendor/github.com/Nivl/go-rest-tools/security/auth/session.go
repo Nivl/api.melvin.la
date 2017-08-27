@@ -19,7 +19,7 @@ type Session struct {
 }
 
 // Exists check if a session exists in the database
-func (s *Session) Exists(q db.DB) (bool, error) {
+func (s *Session) Exists(q db.Queryable) (bool, error) {
 	if s == nil {
 		return false, apierror.NewServerError("session is nil")
 	}
@@ -39,7 +39,7 @@ func (s *Session) Exists(q db.DB) (bool, error) {
 					WHERE deleted_at IS NULL
 						AND id = $1
 						AND user_id = $2`
-	err := db.Get(q, &count, stmt, s.ID, s.UserID)
+	err := q.Get(&count, stmt, s.ID, s.UserID)
 	return (count > 0), err
 }
 
@@ -61,7 +61,7 @@ func SessionJoinSQL(prefix string) string {
 }
 
 // Save is an alias for Create since sessions are not updatable
-func (s *Session) Save(q db.DB) error {
+func (s *Session) Save(q db.Queryable) error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
 	}
@@ -70,7 +70,7 @@ func (s *Session) Save(q db.DB) error {
 }
 
 // Create persists a session in the database
-func (s *Session) Create(q db.DB) error {
+func (s *Session) Create(q db.Queryable) error {
 	if s == nil {
 		return apierror.NewServerError("session is nil")
 	}

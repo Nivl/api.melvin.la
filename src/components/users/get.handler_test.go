@@ -87,7 +87,7 @@ func TestGetOthersData(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
 		user := args.Get(0).(*users.Profile)
 		*user = *userToGet
@@ -132,7 +132,7 @@ func TestGetOwnData(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
 		profile := args.Get(0).(*users.Profile)
 		*profile = *(testusers.NewProfile())
@@ -171,7 +171,7 @@ func TestGetUnexistingUser(t *testing.T) {
 	}
 
 	// Mock the database & add expectations
-	mockDB := new(mockdb.DB)
+	mockDB := &mockdb.Connection{}
 	mockDB.ExpectGetNotFound("*users.Profile")
 
 	// Mock the request & add expectations

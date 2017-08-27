@@ -32,7 +32,7 @@ func NewAdmin() *auth.User {
 }
 
 // NewPersistedUser creates and persists a new user with "fake" as password
-func NewPersistedUser(t *testing.T, q db.DB, u *auth.User) *auth.User {
+func NewPersistedUser(t *testing.T, q db.Queryable, u *auth.User) *auth.User {
 	if u == nil {
 		u = &auth.User{}
 	}

@@ -1,6 +1,6 @@
 package education
 
-// Code auto-generated; DO NOT EDIT
+// Code generated; DO NOT EDIT.
 
 import (
 	"errors"
@@ -32,17 +32,10 @@ func JoinSQL(prefix string) string {
 
 
 
-// Exists checks if a education exists for a specific ID
-func Exists(q db.DB, id string) (bool, error) {
-	exists := false
-	stmt := "SELECT exists(SELECT 1 FROM about_education WHERE id=$1 and deleted_at IS NULL)"
-	err := db.Get(q, &exists, stmt, id)
-	return exists, err
-}
 
 // Save creates or updates the article depending on the value of the id using
 // a transaction
-func (e *Education) Save(q db.DB) error {
+func (e *Education) Save(q db.Queryable) error {
 	if e.ID == "" {
 		return e.Create(q)
 	}
@@ -51,7 +44,7 @@ func (e *Education) Save(q db.DB) error {
 }
 
 // Create persists a education in the database
-func (e *Education) Create(q db.DB) error {
+func (e *Education) Create(q db.Queryable) error {
 	if e.ID != "" {
 		return errors.New("cannot persist a education that already has an ID")
 	}
@@ -60,7 +53,7 @@ func (e *Education) Create(q db.DB) error {
 }
 
 // doCreate persists a education in the database using a Node
-func (e *Education) doCreate(q db.DB) error {
+func (e *Education) doCreate(q db.Queryable) error {
 	if e == nil {
 		return errors.New("education not instanced")
 	}
@@ -79,7 +72,7 @@ func (e *Education) doCreate(q db.DB) error {
 
 // Update updates most of the fields of a persisted education
 // Excluded fields are id, created_at, deleted_at, etc.
-func (e *Education) Update(q db.DB) error {
+func (e *Education) Update(q db.Queryable) error {
 	if e.ID == "" {
 		return errors.New("cannot update a non-persisted education")
 	}
@@ -88,7 +81,7 @@ func (e *Education) Update(q db.DB) error {
 }
 
 // doUpdate updates a education in the database
-func (e *Education) doUpdate(q db.DB) error {
+func (e *Education) doUpdate(q db.Queryable) error {
 	if e.ID == "" {
 		return errors.New("cannot update a non-persisted education")
 	}
@@ -102,7 +95,7 @@ func (e *Education) doUpdate(q db.DB) error {
 }
 
 // Delete removes a education from the database
-func (e *Education) Delete(q db.DB) error {
+func (e *Education) Delete(q db.Queryable) error {
 	if e == nil {
 		return errors.New("education not instanced")
 	}
