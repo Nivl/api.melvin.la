@@ -15,4 +15,4 @@ generate:
 	go install $(LDFLAGS) github.com/Nivl/api-cli
 
 .PHONY:
-	install
+	install migration generate
