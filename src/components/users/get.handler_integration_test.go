@@ -10,16 +10,16 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
-	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
+	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGet(t *testing.T) {
 	defer lifecycle.PurgeModels(t, deps.DB)
 
-	u1, s1 := testauth.NewAuth(t, deps.DB)
-	_, s2 := testauth.NewAuth(t, deps.DB)
+	u1, s1 := testusers.NewAuth(t, deps.DB)
+	_, s2 := testusers.NewAuth(t, deps.DB)
 
 	tests := []struct {
 		description string
@@ -65,7 +65,7 @@ func TestGet(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				var u users.Payload
+				var u users.ProfilePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
 				}

@@ -10,17 +10,18 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
+	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUpdate(t *testing.T) {
 	defer lifecycle.PurgeModels(t, deps.DB)
 
-	u1, s1 := testauth.NewAuth(t, deps.DB)
-	u2, s2 := testauth.NewAuth(t, deps.DB)
+	u1, s1 := testusers.NewAuth(t, deps.DB)
+	u2, s2 := testusers.NewAuth(t, deps.DB)
 
 	tests := []struct {
 		description string
@@ -64,6 +65,12 @@ func TestUpdate(t *testing.T) {
 			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", Email: u2.Email},
 			httptests.NewRequestAuth(s1),
 		},
+		{
+			"Updating facebook",
+			http.StatusOK,
+			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", FacebookUsername: ptrs.NewString("fb")},
+			httptests.NewRequestAuth(s1),
+		},
 		// Keep this one last for u1 as it changes the password
 		{
 			"Updating password",
@@ -79,17 +86,19 @@ func TestUpdate(t *testing.T) {
 			assert.Equal(t, tc.code, rec.Code)
 
 			if rec.Code == http.StatusOK {
-				var u users.Payload
+				var u users.ProfilePayload
 				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 					t.Fatal(err)
 				}
 
 				if tc.params.Name != "" {
-					assert.NotEmpty(t, tc.params.Name, u.Name)
+					assert.Equal(t, tc.params.Name, u.Name)
 				}
-
 				if tc.params.Email != "" {
-					assert.NotEmpty(t, tc.params.Email, u.Email)
+					assert.Equal(t, tc.params.Email, u.Email)
+				}
+				if tc.params.FacebookUsername != nil {
+					assert.Equal(t, *tc.params.FacebookUsername, u.FacebookUsername)
 				}
 
 				if tc.params.NewPassword != "" {
