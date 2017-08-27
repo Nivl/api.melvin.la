@@ -1,5 +1,7 @@
 package users
 
+import "github.com/Nivl/go-rest-tools/types/ptrs"
+
 // ProfilePayload represents the public information of a user
 type ProfilePayload struct {
 	FirstName        string `json:"first_name,omitempty"`
@@ -23,14 +25,14 @@ func (p *Profile) ExportPublic() *ProfilePayload {
 	}
 
 	return &ProfilePayload{
-		FirstName:        p.FirstName,
-		LastName:         p.LastName,
-		Picture:          p.Picture,
-		PhoneNumber:      p.PhoneNumber,
-		PublicEmail:      p.PublicEmail,
-		LinkedIn:         p.LinkedIn,
-		FacebookUsername: p.FacebookUsername,
-		TwitterUsername:  p.TwitterUsername,
+		FirstName:        ptrs.UnwrapString(p.FirstName),
+		LastName:         ptrs.UnwrapString(p.LastName),
+		Picture:          ptrs.UnwrapString(p.Picture),
+		PhoneNumber:      ptrs.UnwrapString(p.PhoneNumber),
+		PublicEmail:      ptrs.UnwrapString(p.PublicEmail),
+		LinkedIn:         ptrs.UnwrapString(p.LinkedIn),
+		FacebookUsername: ptrs.UnwrapString(p.FacebookUsername),
+		TwitterUsername:  ptrs.UnwrapString(p.TwitterUsername),
 		Payload:          NewPayload(p.User),
 	}
 }

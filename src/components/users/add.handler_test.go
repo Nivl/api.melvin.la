@@ -66,11 +66,12 @@ func TestAddHappyPath(t *testing.T) {
 	// Mock the database & add expectations
 	mockDB := new(mockdb.DB)
 	mockDB.ExpectInsert("*auth.User")
+	mockDB.ExpectInsert("*users.Profile")
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
-	res.ExpectCreated("*users.Payload", func(args mock.Arguments) {
-		user := args.Get(0).(*users.Payload)
+	res.ExpectCreated("*users.ProfilePayload", func(args mock.Arguments) {
+		user := args.Get(0).(*users.ProfilePayload)
 		assert.Equal(t, handlerParams.Name, user.Name)
 		assert.Equal(t, handlerParams.Email, user.Email)
 		assert.NotEmpty(t, user.ID)
