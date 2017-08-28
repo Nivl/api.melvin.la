@@ -39,10 +39,12 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	params := req.Params().(*UpdateParams)
 	currentUser := req.User()
 
+	// Admin are allowed to update any users
 	if !currentUser.IsAdmin && params.ID != currentUser.ID {
 		return apierror.NewForbidden()
 	}
 
+	// Retreive the user and the attached profile
 	profile, err := GetByIDWithProfile(deps.DB, params.ID)
 	if err != nil {
 		return err
@@ -55,6 +57,34 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 		}
 	}
 
+	// Copy the data from the params to the profile
+	if err := updateCopyData(profile, params); err != nil {
+		return err
+	}
+
+	// Create a transaction to keep the user and the profile in sync
+	tx, err := deps.DB.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// Save the new data
+	if err := profile.User.Save(tx); err != nil {
+		return err
+	}
+	if err := profile.Save(tx); err != nil {
+		return err
+	}
+
+	// Persist the changes
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return req.Response().Ok(profile.ExportPrivate())
+}
+
+func updateCopyData(profile *Profile, params *UpdateParams) error {
 	// Update the User Object
 	if params.Name != "" {
 		profile.User.Name = params.Name
@@ -113,14 +143,5 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 			profile.TwitterUsername = nil
 		}
 	}
-
-	// TODO(melvin): use a transaction
-	if err := profile.User.Save(deps.DB); err != nil {
-		return err
-	}
-	if err := profile.Save(deps.DB); err != nil {
-		return err
-	}
-
-	return req.Response().Ok(profile.ExportPrivate())
+	return nil
 }

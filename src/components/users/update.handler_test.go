@@ -137,12 +137,16 @@ func TestUpdateHappyPath(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := &mockdb.Connection{}
-	mockDB.ExpectUpdate("*auth.User")
-	mockDB.ExpectUpdate("*users.Profile")
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
 		p := args.Get(0).(*users.Profile)
 		*p = *profile
 	})
+	// mock the transaction
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdate("*users.Profile")
+	tx.ExpectCommit()
+	tx.ExpectRollback()
 
 	// Mock the response & add expectati ons
 	res := new(mockrouter.HTTPResponse)
@@ -165,6 +169,7 @@ func TestUpdateHappyPath(t *testing.T) {
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
 }
@@ -277,12 +282,16 @@ func TestUpdateAllTheFields(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := &mockdb.Connection{}
-	mockDB.ExpectUpdate("*auth.User")
-	mockDB.ExpectUpdate("*users.Profile")
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
 		p := args.Get(0).(*users.Profile)
 		*p = *profile
 	})
+	// mock the transaction
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdate("*users.Profile")
+	tx.ExpectCommit()
+	tx.ExpectRollback()
 
 	// Mock the response & add expectati ons
 	res := new(mockrouter.HTTPResponse)
@@ -311,6 +320,7 @@ func TestUpdateAllTheFields(t *testing.T) {
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
 }
@@ -333,12 +343,16 @@ func TestUpdateUnsetAllTheFields(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := &mockdb.Connection{}
-	mockDB.ExpectUpdate("*auth.User")
-	mockDB.ExpectUpdate("*users.Profile")
 	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
 		p := args.Get(0).(*users.Profile)
 		*p = *profile
 	})
+	// mock the transaction
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdate("*users.Profile")
+	tx.ExpectCommit()
+	tx.ExpectRollback()
 
 	// Mock the response & add expectati ons
 	res := new(mockrouter.HTTPResponse)
@@ -367,6 +381,152 @@ func TestUpdateUnsetAllTheFields(t *testing.T) {
 	// Assert everything
 	assert.NoError(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
+}
+
+func TestUpdateTransactionError(t *testing.T) {
+	profile := testusers.NewProfile()
+	handlerParams := &users.UpdateParams{
+		ID:              profile.UserID,
+		CurrentPassword: "fake",
+		NewPassword:     "new password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		p := args.Get(0).(*users.Profile)
+		*p = *profile
+	})
+	mockDB.ExpectTransactionError()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(profile.User)
+
+	// call the handler
+	err := users.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	req.AssertExpectations(t)
+	mockDB.AssertExpectations(t)
+
+	httpErr := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.HTTPStatus())
+}
+
+func TestUpdateConflict(t *testing.T) {
+	profile := testusers.NewProfile()
+	handlerParams := &users.UpdateParams{
+		ID:              profile.UserID,
+		CurrentPassword: "fake",
+		Name:            "new Name",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		p := args.Get(0).(*users.Profile)
+		*p = *profile
+	})
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdateConflict("*auth.User", "email")
+	tx.ExpectRollback()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(profile.User)
+
+	// call the handler
+	err := users.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusConflict, apiError.HTTPStatus())
+	assert.Equal(t, "email", apiError.Field())
+}
+
+func TestUpdateProfileError(t *testing.T) {
+	profile := testusers.NewProfile()
+	handlerParams := &users.UpdateParams{
+		ID:              profile.UserID,
+		CurrentPassword: "fake",
+		Name:            "new Name",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		p := args.Get(0).(*users.Profile)
+		*p = *profile
+	})
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdateError("*users.Profile")
+	tx.ExpectRollback()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(profile.User)
+
+	// call the handler
+	err := users.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
+
+func TestUpdateCommitError(t *testing.T) {
+	profile := testusers.NewProfile()
+	handlerParams := &users.UpdateParams{
+		ID:              profile.UserID,
+		CurrentPassword: "fake",
+		Name:            "new Name",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	mockDB.ExpectGet("*users.Profile", func(args mock.Arguments) {
+		p := args.Get(0).(*users.Profile)
+		*p = *profile
+	})
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdate("*users.Profile")
+	tx.ExpectCommitError()
+	tx.ExpectRollback()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+	req.On("User").Return(profile.User)
+
+	// call the handler
+	err := users.Update(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
 }

@@ -37,16 +37,26 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 		Password: encryptedPassword,
 	}
 
-	// TODO(melvin): use a transaction
-	// Creates the user
-	if err := user.Create(deps.DB); err != nil {
+	// Create a transaction to keep the user and the profile in sync
+	tx, err := deps.DB.Beginx()
+	if err != nil {
 		return err
 	}
-	// Creates the user's Profile
+	defer tx.Rollback()
+
+	// Create the user
+	if err := user.Create(tx); err != nil {
+		return err
+	}
+	// Create the profile
 	profile := &Profile{User: user, UserID: user.ID}
-	if err := profile.Create(deps.DB); err != nil {
+	if err := profile.Create(tx); err != nil {
 		return err
 	}
 
+	// Persist the data
+	if err := tx.Commit(); err != nil {
+		return err
+	}
 	return req.Response().Created(profile.ExportPrivate())
 }
