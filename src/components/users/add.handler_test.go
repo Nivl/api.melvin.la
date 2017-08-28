@@ -1,6 +1,7 @@
 package users_test
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
-	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -65,8 +66,11 @@ func TestAddHappyPath(t *testing.T) {
 
 	// Mock the database & add expectations
 	mockDB := &mockdb.Connection{}
-	mockDB.ExpectInsert("*auth.User")
-	mockDB.ExpectInsert("*users.Profile")
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdate("*users.Profile")
+	tx.ExpectCommit()
+	tx.ExpectRollback()
 
 	// Mock the response & add expectations
 	res := new(mockrouter.HTTPResponse)
@@ -89,21 +93,128 @@ func TestAddHappyPath(t *testing.T) {
 	// Assert everything
 	assert.Nil(t, err, "the handler should not have fail")
 	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
 	req.AssertExpectations(t)
 	res.AssertExpectations(t)
 }
 
 func TestAddConflict(t *testing.T) {
-	p := &testrouter.ConflictTestParams{
-		StructConflicting: "*auth.User",
-		FieldConflicting:  "email",
-		Handler:           users.Add,
-		HandlerParams: &users.AddParams{
-			Name:     "username",
-			Email:    "email@domain.tld",
-			Password: "valid password",
-		},
+	handlerParams := &users.AddParams{
+		Name:     "username",
+		Email:    "email@domain.tld",
+		Password: "valid password",
 	}
 
-	testrouter.ConflictInsertTest(t, p)
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdateConflict("*auth.User", "email")
+	tx.ExpectRollback()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := users.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusConflict, apiError.HTTPStatus())
+	assert.Equal(t, "email", apiError.Field())
+}
+
+func TestAddProfileError(t *testing.T) {
+	handlerParams := &users.AddParams{
+		Name:     "username",
+		Email:    "email@domain.tld",
+		Password: "valid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdateError("*users.Profile")
+	tx.ExpectRollback()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := users.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
+
+func TestAddCommitError(t *testing.T) {
+	handlerParams := &users.AddParams{
+		Name:     "username",
+		Email:    "email@domain.tld",
+		Password: "valid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	tx, _ := mockDB.ExpectTransaction()
+	tx.ExpectUpdate("*auth.User")
+	tx.ExpectUpdate("*users.Profile")
+	tx.ExpectCommitError()
+	tx.ExpectRollback()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := users.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	tx.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
+}
+
+func TestAddTransactionError(t *testing.T) {
+	handlerParams := &users.AddParams{
+		Name:     "username",
+		Email:    "email@domain.tld",
+		Password: "valid password",
+	}
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	mockDB.ExpectTransactionError()
+
+	// Mock the request & add expectations
+	req := new(mockrouter.HTTPRequest)
+	req.On("Params").Return(handlerParams)
+
+	// call the handler
+	err := users.Add(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.Error(t, err, "the handler should have fail")
+	mockDB.AssertExpectations(t)
+	req.AssertExpectations(t)
+
+	apiError := apierror.Convert(err)
+	assert.Equal(t, http.StatusInternalServerError, apiError.HTTPStatus())
 }
