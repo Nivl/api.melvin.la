@@ -54,10 +54,6 @@ func (p *Profile) Create(q db.Queryable) error {
 
 // doCreate persists a profile in the database using a Node
 func (p *Profile) doCreate(q db.Queryable) error {
-	if p == nil {
-		return errors.New("profile not instanced")
-	}
-
 	p.ID = uuid.NewV4().String()
 	p.UpdatedAt = db.Now()
 	if p.CreatedAt == nil {
@@ -96,10 +92,6 @@ func (p *Profile) doUpdate(q db.Queryable) error {
 
 // Delete removes a profile from the database
 func (p *Profile) Delete(q db.Queryable) error {
-	if p == nil {
-		return errors.New("profile not instanced")
-	}
-
 	if p.ID == "" {
 		return errors.New("profile has not been saved")
 	}

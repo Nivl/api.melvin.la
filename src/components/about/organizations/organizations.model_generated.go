@@ -68,10 +68,6 @@ func (o *Organization) Create(q db.Queryable) error {
 
 // doCreate persists a organization in the database using a Node
 func (o *Organization) doCreate(q db.Queryable) error {
-	if o == nil {
-		return errors.New("organization not instanced")
-	}
-
 	o.ID = uuid.NewV4().String()
 	o.UpdatedAt = db.Now()
 	if o.CreatedAt == nil {
@@ -110,10 +106,6 @@ func (o *Organization) doUpdate(q db.Queryable) error {
 
 // Delete removes a organization from the database
 func (o *Organization) Delete(q db.Queryable) error {
-	if o == nil {
-		return errors.New("organization not instanced")
-	}
-
 	if o.ID == "" {
 		return errors.New("organization has not been saved")
 	}

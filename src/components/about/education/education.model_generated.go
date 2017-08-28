@@ -54,10 +54,6 @@ func (e *Education) Create(q db.Queryable) error {
 
 // doCreate persists a education in the database using a Node
 func (e *Education) doCreate(q db.Queryable) error {
-	if e == nil {
-		return errors.New("education not instanced")
-	}
-
 	e.ID = uuid.NewV4().String()
 	e.UpdatedAt = db.Now()
 	if e.CreatedAt == nil {
@@ -96,10 +92,6 @@ func (e *Education) doUpdate(q db.Queryable) error {
 
 // Delete removes a education from the database
 func (e *Education) Delete(q db.Queryable) error {
-	if e == nil {
-		return errors.New("education not instanced")
-	}
-
 	if e.ID == "" {
 		return errors.New("education has not been saved")
 	}

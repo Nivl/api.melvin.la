@@ -54,10 +54,6 @@ func (e *Experience) Create(q db.Queryable) error {
 
 // doCreate persists a experience in the database using a Node
 func (e *Experience) doCreate(q db.Queryable) error {
-	if e == nil {
-		return errors.New("experience not instanced")
-	}
-
 	e.ID = uuid.NewV4().String()
 	e.UpdatedAt = db.Now()
 	if e.CreatedAt == nil {
@@ -96,10 +92,6 @@ func (e *Experience) doUpdate(q db.Queryable) error {
 
 // Delete removes a experience from the database
 func (e *Experience) Delete(q db.Queryable) error {
-	if e == nil {
-		return errors.New("experience not instanced")
-	}
-
 	if e.ID == "" {
 		return errors.New("experience has not been saved")
 	}

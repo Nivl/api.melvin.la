@@ -51,3 +51,8 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 func (t *Time) Equal(u *Time) bool {
 	return t.Time.Equal(u.Time)
 }
+
+// AddDate returns the time corresponding to adding the given number of years, months, and days to t.
+func (t *Time) AddDate(years int, months int, days int) *Time {
+	return &Time{Time: time.Now().AddDate(years, months, days)}
+}
