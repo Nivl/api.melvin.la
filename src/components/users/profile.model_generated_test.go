@@ -66,29 +66,43 @@ func TestProfileCreateWithID(t *testing.T) {
 	mockDB.AssertExpectations(t)
 }
 
-func TestProfileCreateWithDate(t *testing.T) {
+func TestProfileDoCreate(t *testing.T) {
+	mockDB := &mockdb.Queryable{}
+	mockDB.ExpectInsert("*users.Profile")
+
+	p := &Profile{}
+	err := p.doCreate(mockDB)
+
+	assert.NoError(t, err, "doCreate() should not have fail")
+	mockDB.AssertExpectations(t)
+	assert.NotEmpty(t, p.ID, "ID should have been set")
+	assert.NotNil(t, p.CreatedAt, "CreatedAt should have been set")
+	assert.NotNil(t, p.UpdatedAt, "UpdatedAt should have been set")
+}
+
+func TestProfileDoCreateWithDate(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectInsert("*users.Profile")
 
 	createdAt := db.Now().AddDate(0, 0, 1)
 	p := &Profile{CreatedAt: createdAt}
-	err := p.Create(mockDB)
+	err := p.doCreate(mockDB)
 
-	assert.NoError(t, err, "Create() should not have fail")
+	assert.NoError(t, err, "doCreate() should not have fail")
 	mockDB.AssertExpectations(t)
 	assert.NotEmpty(t, p.ID, "ID should have been set")
 	assert.True(t, p.CreatedAt.Equal(createdAt), "CreatedAt should not have been updated")
 	assert.NotNil(t, p.UpdatedAt, "UpdatedAt should have been set")
 }
 
-func TestProfileCreateFail(t *testing.T) {
+func TestProfileDoCreateFail(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectInsertError("*users.Profile")
 
 	p := &Profile{}
-	err := p.Create(mockDB)
+	err := p.doCreate(mockDB)
 
-	assert.Error(t, err, "Create() should have fail")
+	assert.Error(t, err, "doCreate() should have fail")
 	mockDB.AssertExpectations(t)
 }
 
@@ -116,15 +130,39 @@ func TestProfileUpdateWithoutID(t *testing.T) {
 	mockDB.AssertExpectations(t)
 }
 
-func TestProfileUpdateFail(t *testing.T) {
+
+func TestProfileDoUpdate(t *testing.T) {
+	mockDB := &mockdb.Queryable{}
+	mockDB.ExpectUpdate("*users.Profile")
+
+	p := &Profile{}
+	p.ID = uuid.NewV4().String()
+	err := p.doUpdate(mockDB)
+
+	assert.NoError(t, err, "doUpdate() should not have fail")
+	mockDB.AssertExpectations(t)
+	assert.NotEmpty(t, p.ID, "ID should have been set")
+	assert.NotNil(t, p.UpdatedAt, "UpdatedAt should have been set")
+}
+
+func TestProfileDoUpdateWithoutID(t *testing.T) {
+	mockDB := &mockdb.Queryable{}
+	p := &Profile{}
+	err := p.doUpdate(mockDB)
+
+	assert.Error(t, err, "doUpdate() should not have fail")
+	mockDB.AssertExpectations(t)
+}
+
+func TestProfileDoUpdateFail(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectUpdateError("*users.Profile")
 
 	p := &Profile{}
 	p.ID = uuid.NewV4().String()
-	err := p.Update(mockDB)
+	err := p.doUpdate(mockDB)
 
-	assert.Error(t, err, "Update() should have fail")
+	assert.Error(t, err, "doUpdate() should have fail")
 	mockDB.AssertExpectations(t)
 }
 

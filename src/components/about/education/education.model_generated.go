@@ -54,10 +54,6 @@ func (e *Education) Create(q db.Queryable) error {
 
 // doCreate persists a education in the database using a Node
 func (e *Education) doCreate(q db.Queryable) error {
-	if e == nil {
-		return errors.New("education not instanced")
-	}
-
 	e.ID = uuid.NewV4().String()
 	e.UpdatedAt = db.Now()
 	if e.CreatedAt == nil {

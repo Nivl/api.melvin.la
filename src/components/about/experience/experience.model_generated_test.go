@@ -66,29 +66,43 @@ func TestExperienceCreateWithID(t *testing.T) {
 	mockDB.AssertExpectations(t)
 }
 
-func TestExperienceCreateWithDate(t *testing.T) {
+func TestExperienceDoCreate(t *testing.T) {
+	mockDB := &mockdb.Queryable{}
+	mockDB.ExpectInsert("*experience.Experience")
+
+	e := &Experience{}
+	err := e.doCreate(mockDB)
+
+	assert.NoError(t, err, "doCreate() should not have fail")
+	mockDB.AssertExpectations(t)
+	assert.NotEmpty(t, e.ID, "ID should have been set")
+	assert.NotNil(t, e.CreatedAt, "CreatedAt should have been set")
+	assert.NotNil(t, e.UpdatedAt, "UpdatedAt should have been set")
+}
+
+func TestExperienceDoCreateWithDate(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectInsert("*experience.Experience")
 
 	createdAt := db.Now().AddDate(0, 0, 1)
 	e := &Experience{CreatedAt: createdAt}
-	err := e.Create(mockDB)
+	err := e.doCreate(mockDB)
 
-	assert.NoError(t, err, "Create() should not have fail")
+	assert.NoError(t, err, "doCreate() should not have fail")
 	mockDB.AssertExpectations(t)
 	assert.NotEmpty(t, e.ID, "ID should have been set")
 	assert.True(t, e.CreatedAt.Equal(createdAt), "CreatedAt should not have been updated")
 	assert.NotNil(t, e.UpdatedAt, "UpdatedAt should have been set")
 }
 
-func TestExperienceCreateFail(t *testing.T) {
+func TestExperienceDoCreateFail(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectInsertError("*experience.Experience")
 
 	e := &Experience{}
-	err := e.Create(mockDB)
+	err := e.doCreate(mockDB)
 
-	assert.Error(t, err, "Create() should have fail")
+	assert.Error(t, err, "doCreate() should have fail")
 	mockDB.AssertExpectations(t)
 }
 
@@ -116,15 +130,39 @@ func TestExperienceUpdateWithoutID(t *testing.T) {
 	mockDB.AssertExpectations(t)
 }
 
-func TestExperienceUpdateFail(t *testing.T) {
+
+func TestExperienceDoUpdate(t *testing.T) {
+	mockDB := &mockdb.Queryable{}
+	mockDB.ExpectUpdate("*experience.Experience")
+
+	e := &Experience{}
+	e.ID = uuid.NewV4().String()
+	err := e.doUpdate(mockDB)
+
+	assert.NoError(t, err, "doUpdate() should not have fail")
+	mockDB.AssertExpectations(t)
+	assert.NotEmpty(t, e.ID, "ID should have been set")
+	assert.NotNil(t, e.UpdatedAt, "UpdatedAt should have been set")
+}
+
+func TestExperienceDoUpdateWithoutID(t *testing.T) {
+	mockDB := &mockdb.Queryable{}
+	e := &Experience{}
+	err := e.doUpdate(mockDB)
+
+	assert.Error(t, err, "doUpdate() should not have fail")
+	mockDB.AssertExpectations(t)
+}
+
+func TestExperienceDoUpdateFail(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectUpdateError("*experience.Experience")
 
 	e := &Experience{}
 	e.ID = uuid.NewV4().String()
-	err := e.Update(mockDB)
+	err := e.doUpdate(mockDB)
 
-	assert.Error(t, err, "Update() should have fail")
+	assert.Error(t, err, "doUpdate() should have fail")
 	mockDB.AssertExpectations(t)
 }
 
