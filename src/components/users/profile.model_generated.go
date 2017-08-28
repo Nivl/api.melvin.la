@@ -96,10 +96,6 @@ func (p *Profile) doUpdate(q db.Queryable) error {
 
 // Delete removes a profile from the database
 func (p *Profile) Delete(q db.Queryable) error {
-	if p == nil {
-		return errors.New("profile not instanced")
-	}
-
 	if p.ID == "" {
 		return errors.New("profile has not been saved")
 	}

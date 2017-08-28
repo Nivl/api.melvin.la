@@ -96,10 +96,6 @@ func (e *Education) doUpdate(q db.Queryable) error {
 
 // Delete removes a education from the database
 func (e *Education) Delete(q db.Queryable) error {
-	if e == nil {
-		return errors.New("education not instanced")
-	}
-
 	if e.ID == "" {
 		return errors.New("education has not been saved")
 	}

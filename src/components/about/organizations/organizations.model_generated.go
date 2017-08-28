@@ -110,10 +110,6 @@ func (o *Organization) doUpdate(q db.Queryable) error {
 
 // Delete removes a organization from the database
 func (o *Organization) Delete(q db.Queryable) error {
-	if o == nil {
-		return errors.New("organization not instanced")
-	}
-
 	if o.ID == "" {
 		return errors.New("organization has not been saved")
 	}

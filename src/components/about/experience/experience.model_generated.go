@@ -96,10 +96,6 @@ func (e *Experience) doUpdate(q db.Queryable) error {
 
 // Delete removes a experience from the database
 func (e *Experience) Delete(q db.Queryable) error {
-	if e == nil {
-		return errors.New("experience not instanced")
-	}
-
 	if e.ID == "" {
 		return errors.New("experience has not been saved")
 	}

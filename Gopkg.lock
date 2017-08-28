@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
   packages = ["dependencies","logger","network/http/basicauth","network/http/httptests","notifiers/mailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/slices","types/strngs"]
-  revision = "8575eedf61a8a373688958147fa40f119ad8256e"
+  revision = "e175386461782e7cd2ec2539f3d9db3878600193"
 
 [[projects]]
   branch = "master"
@@ -143,7 +143,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "fe98bfd2e89a9285ca13df4260a3ea2e66589bea"
+  revision = "7940d22908577b9021e0931c99b3a1d7a12e0d0e"
 
 [[projects]]
   name = "google.golang.org/appengine"
