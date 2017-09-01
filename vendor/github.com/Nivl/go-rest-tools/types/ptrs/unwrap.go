@@ -46,3 +46,12 @@ func UnwrapInt(val *int) int {
 	}
 	return *val
 }
+
+// UnwrapBool takes a pointer and return it's value.
+// If the pointer is nil, false is returned
+func UnwrapBool(val *bool) bool {
+	if val == nil {
+		return false
+	}
+	return *val
+}
