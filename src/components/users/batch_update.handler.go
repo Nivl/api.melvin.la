@@ -40,7 +40,6 @@ func BatchUpdate(req router.HTTPRequest, deps *router.Dependencies) error {
 		profiles = append(profiles, p)
 	}
 
-	// todo(melvin): Create profiles.ExportPrivate
 	return req.Response().Ok(profiles.ExportPrivate())
 }
 
