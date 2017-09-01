@@ -73,7 +73,7 @@ func (profiles Profiles) ExportPrivate() *ProfilesPayload {
 	pld := &ProfilesPayload{}
 	pld.Results = make([]*ProfilePayload, len(profiles))
 	for i, p := range profiles {
-		pld.Results[i] = p.ExportPublic()
+		pld.Results[i] = p.ExportPrivate()
 	}
 	return pld
 }
