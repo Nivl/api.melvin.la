@@ -1,0 +1,46 @@
+### Update several users [PATCH]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: basic [base64encoded userID:access_token]
+
+    + Attributes
+        + featured_user (string) - UUID of the new featured user
+
++ Response 200 (application/json)
+
+    The resources has been updated.
+
+    + Attributes (Users)
+
++ Response 400 (application/json)
+
+    A value is missing or contains the wrong data.
+
+    + Attributes (DefaultError)
+
++ Response 401 (application/json)
+
+    The requester is not authenticated.
+
+    + Attributes (Error401)
+
++ Response 403 (application/json)
+
+    The requester does not have the permission to update this resource.
+
+    + Attributes (Error403)
+
++ Response 404 (application/json)
+
+    The resource does not exists
+
+    + Attributes (Error404)
+
++ Response 500 (application/json)
+
+    The server experenced an internal error.
+
+    + Attributes (Error500)

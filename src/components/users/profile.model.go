@@ -23,10 +23,14 @@ type Profile struct {
 	LinkedIn         *string `db:"linkedin_custom_url"`
 	FacebookUsername *string `db:"facebook_username"`
 	TwitterUsername  *string `db:"twitter_username"`
+	IsFeatured       *bool   `db:"is_featured"`
 
 	// Embedded models
 	*auth.User `db:"users"`
 }
+
+// Profiles represents a list of Profile
+type Profiles []*Profile
 
 // GetByIDWithProfile finds and returns an active user with their profile by ID
 // Deleted object are not returned
@@ -41,5 +45,21 @@ func GetByIDWithProfile(q db.Queryable, id string) (*Profile, error) {
 	  AND users.deleted_at IS NULL
 	LIMIT 1`
 	err := q.Get(u, stmt, id)
+	return u, apierror.NewFromSQL(err)
+}
+
+// GetFeaturedProfile finds and returns the featured user
+// Deleted object are not returned
+func GetFeaturedProfile(q db.Queryable) (*Profile, error) {
+	u := &Profile{}
+	stmt := `
+	SELECT profile.*, ` + auth.JoinUserSQL("users") + `
+	FROM user_profiles profile
+	JOIN users
+	  ON users.id = profile.user_id
+	WHERE users.is_featured IS true
+	  AND users.deleted_at IS NULL
+	LIMIT 1`
+	err := q.Get(u, stmt)
 	return u, apierror.NewFromSQL(err)
 }
