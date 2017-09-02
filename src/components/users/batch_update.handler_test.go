@@ -211,11 +211,16 @@ func TestBatchUpdateFeaturedUser(t *testing.T) {
 	res.ExpectOk("*users.ProfilesPayload", func(args mock.Arguments) {
 		data := args.Get(0).(*users.ProfilesPayload)
 		if assert.Equal(t, 2, len(data.Results), "wrong number of results") {
-			assert.Equal(t, currentFeatured.User.ID, data.Results[0].ID, "Wrong 1st profile returned")
-			assert.False(t, data.Results[0].IsFeatured, "IsFeatured should not be set")
-
-			assert.Equal(t, profileToFeature.User.ID, data.Results[1].ID, "Wrong 2nd profile returned")
-			assert.True(t, data.Results[1].IsFeatured, "IsFeatured should be set to true")
+			if data.Results[0].ID == currentFeatured.User.ID {
+				assert.False(t, data.Results[0].IsFeatured, "IsFeatured should not be set")
+				assert.Equal(t, profileToFeature.User.ID, data.Results[1].ID, "Wrong 2nd profile returned")
+				assert.True(t, data.Results[1].IsFeatured, "IsFeatured should be set to true")
+			} else {
+				assert.Equal(t, currentFeatured.User.ID, data.Results[1].ID, "Wrong 1st profile returned")
+				assert.False(t, data.Results[1].IsFeatured, "IsFeatured should not be set")
+				assert.Equal(t, profileToFeature.User.ID, data.Results[0].ID, "Wrong 2nd profile returned")
+				assert.True(t, data.Results[0].IsFeatured, "IsFeatured should be set to true")
+			}
 		}
 	})
 
