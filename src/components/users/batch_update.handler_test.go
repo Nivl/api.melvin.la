@@ -127,6 +127,9 @@ func TestBatchUpdateFirstFeaturedUser(t *testing.T) {
 		if assert.Equal(t, 1, len(data.Results), "wrong number of results") {
 			assert.Equal(t, profileToFeature.User.ID, data.Results[0].ID, "Wrong profile returned")
 			assert.True(t, data.Results[0].IsFeatured, "IsFeatured should be set to true")
+
+			// check privacy
+			assert.Equal(t, profileToFeature.User.Email, data.Results[0].Email, "Email should contain the user email")
 		}
 	})
 
