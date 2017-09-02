@@ -75,6 +75,12 @@ func NewPersistedProfile(t *testing.T, q db.Queryable, p *users.Profile) *users.
 
 // NewAuth creates a new user and their session
 func NewAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
+	p, session := NewAuthProfile(t, q)
+	return p.User, session
+}
+
+// NewAuthProfile creates a new profile, user, and their session
+func NewAuthProfile(t *testing.T, q db.Queryable) (*users.Profile, *auth.Session) {
 	user, session := testauth.NewAuth(t, q)
 	p := NewProfile()
 	p.ID = ""
@@ -83,7 +89,7 @@ func NewAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	if err := p.Create(q); err != nil {
 		t.Fatalf("failed to create a new auth with profile: %s", err)
 	}
-	return user, session
+	return p, session
 }
 
 // NewAdminAuth creates a new admin and their session
