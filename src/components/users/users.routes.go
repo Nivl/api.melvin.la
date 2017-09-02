@@ -12,6 +12,7 @@ const (
 	EndpointDelete
 	EndpointGet
 	EndpointUploadPicture
+	EndpointBatchUpdate
 )
 
 // Endpoints is a list of endpoints for this components
@@ -21,6 +22,7 @@ var Endpoints = router.Endpoints{
 	EndpointDelete:        deleteEndpoint,
 	EndpointGet:           getEndpoint,
 	EndpointUploadPicture: uploadPictureEndpoint,
+	EndpointBatchUpdate:   batchUpdateEndpoint,
 }
 
 // SetRoutes is used to set all the routes of the article

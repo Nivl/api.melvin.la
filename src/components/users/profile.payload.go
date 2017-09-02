@@ -12,6 +12,7 @@ type ProfilePayload struct {
 	LinkedIn         string `json:"linkedin_custom_url,omitempty"`
 	FacebookUsername string `json:"facebook_username,omitempty"`
 	TwitterUsername  string `json:"twitter_username,omitempty"`
+	IsFeatured       bool   `json:"is_featured,omitempty"`
 
 	*Payload // User payload
 }
@@ -33,6 +34,7 @@ func (p *Profile) ExportPublic() *ProfilePayload {
 		LinkedIn:         ptrs.UnwrapString(p.LinkedIn),
 		FacebookUsername: ptrs.UnwrapString(p.FacebookUsername),
 		TwitterUsername:  ptrs.UnwrapString(p.TwitterUsername),
+		IsFeatured:       ptrs.UnwrapBool(p.IsFeatured),
 		Payload:          NewPayload(p.User),
 	}
 }
@@ -46,5 +48,32 @@ func (p *Profile) ExportPrivate() *ProfilePayload {
 
 	pld := p.ExportPublic()
 	pld.Payload = NewPrivatePayload(p.User)
+	return pld
+}
+
+// ProfilesPayload represents a list of Profiles that can be
+// safely returned to the clients
+type ProfilesPayload struct {
+	Results []*ProfilePayload `json:"results"`
+}
+
+// ExportPublic returns a ProfilesPayload containing only the fields that are safe to
+// be seen by anyone
+func (profiles Profiles) ExportPublic() *ProfilesPayload {
+	pld := &ProfilesPayload{}
+	pld.Results = make([]*ProfilePayload, len(profiles))
+	for i, p := range profiles {
+		pld.Results[i] = p.ExportPublic()
+	}
+	return pld
+}
+
+// ExportPrivate returns a ProfilesPayload containing all the fields
+func (profiles Profiles) ExportPrivate() *ProfilesPayload {
+	pld := &ProfilesPayload{}
+	pld.Results = make([]*ProfilePayload, len(profiles))
+	for i, p := range profiles {
+		pld.Results[i] = p.ExportPrivate()
+	}
 	return pld
 }
