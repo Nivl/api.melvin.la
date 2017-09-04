@@ -57,7 +57,7 @@ func GetFeaturedProfile(q db.Queryable) (*Profile, error) {
 	FROM user_profiles profile
 	JOIN users
 	  ON users.id = profile.user_id
-	WHERE users.is_featured IS true
+	WHERE profile.is_featured IS true
 	  AND users.deleted_at IS NULL
 	LIMIT 1`
 	err := q.Get(u, stmt)
