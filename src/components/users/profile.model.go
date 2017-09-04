@@ -7,7 +7,7 @@ import (
 )
 
 // Profile represents the public information of a user
-//go:generate api-cli generate model Profile -t user_profiles -e Get,GetAny --single=false
+//go:generate api-cli generate model Profile -t user_profiles -e Get,GetAny,JoinSQL --single=false
 type Profile struct {
 	ID        string   `db:"id"`
 	CreatedAt *db.Time `db:"created_at"`

@@ -4,29 +4,14 @@ package users
 
 import (
 	"errors"
-	"fmt"
+	
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
 
-// JoinProfileSQL returns a string ready to be embed in a JOIN query
-func JoinProfileSQL(prefix string) string {
-	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "user_id", "picture", "phone_number", "public_email", "linkedin_custom_url", "facebook_username", "twitter_username", "is_featured" }
-	output := ""
 
-	for i, field := range fields {
-		if i != 0 {
-			output += ", "
-		}
-
-		fullName := fmt.Sprintf("%s.%s", prefix, field)
-		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
-	}
-
-	return output
-}
 
 
 
