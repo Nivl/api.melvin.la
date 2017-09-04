@@ -1,9 +1,13 @@
-package users
+package users_test
 
 import (
 	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/router"
@@ -12,7 +16,9 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestListInvalidParams(t *testing.T) {
@@ -49,7 +55,7 @@ func TestListInvalidParams(t *testing.T) {
 		},
 	}
 
-	g := Endpoints[EndpointList].Guard
+	g := users.Endpoints[users.EndpointList].Guard
 	testguard.InvalidParams(t, g, testCases)
 }
 
@@ -71,7 +77,7 @@ func TestListValidParams(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			t.Parallel()
 
-			endpts := Endpoints[EndpointList]
+			endpts := users.Endpoints[users.EndpointList]
 			_, err := endpts.Guard.ParseParams(tc.sources, nil)
 			assert.NoError(t, err)
 		})
@@ -97,78 +103,8 @@ func TestListAccess(t *testing.T) {
 		},
 	}
 
-	g := Endpoints[EndpointList].Guard
+	g := users.Endpoints[users.EndpointList].Guard
 	testguard.AccessTest(t, g, testCases)
-}
-
-func TestListParamsGetSort(t *testing.T) {
-	// sugar
-	shouldFail := true
-
-	testCases := []struct {
-		description string
-		fields      string
-		expected    string
-		shouldFail  bool
-	}{
-		{
-			"No fields should return the default sorting",
-			"",
-			"is_featured ASC,created_at ASC",
-			!shouldFail,
-		},
-		{
-			"Order by ,, should return the default sorting",
-			",,",
-			"is_featured ASC,created_at ASC",
-			!shouldFail,
-		},
-		{
-			"Order by ,,,,,,, should return the default sorting",
-			",,,,,,,",
-			"is_featured ASC,created_at ASC",
-			!shouldFail,
-		},
-		{
-			"Order by ,,,name,,,, should sort by name",
-			",,,name,,,,",
-			"name ASC",
-			!shouldFail,
-		},
-		{
-			"Order by -name should work",
-			"-name",
-			"name DESC",
-			!shouldFail,
-		},
-		{
-			"Order by is_featured and -name should work",
-			"is_featured,-name",
-			"is_featured ASC,name DESC",
-			!shouldFail,
-		},
-		{
-			"Order by not_a_field should fail",
-			"not_a_field",
-			"",
-			shouldFail,
-		},
-	}
-
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.description, func(t *testing.T) {
-			t.Parallel()
-
-			output, err := listParamsGetSort(tc.fields)
-			if tc.shouldFail {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expected, output)
-			}
-		})
-	}
 }
 
 func TestListNoBDCon(t *testing.T) {
@@ -178,10 +114,10 @@ func TestListNoBDCon(t *testing.T) {
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
-	req.On("Params").Return(&ListParams{})
+	req.On("Params").Return(&users.ListParams{})
 
 	// call the handler
-	err := List(req, &router.Dependencies{DB: mockDB})
+	err := users.List(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should have fail")
@@ -199,10 +135,10 @@ func TestListInvalidSort(t *testing.T) {
 
 	// Mock the request & add expectations
 	req := new(mockrouter.HTTPRequest)
-	req.On("Params").Return(&ListParams{Sort: "not_a_field"})
+	req.On("Params").Return(&users.ListParams{Sort: "not_a_field"})
 
 	// call the handler
-	err := List(req, &router.Dependencies{DB: mockDB})
+	err := users.List(req, &router.Dependencies{DB: mockDB})
 
 	// Assert everything
 	assert.Error(t, err, "the handler should have fail")
@@ -212,4 +148,40 @@ func TestListInvalidSort(t *testing.T) {
 	httpErr := apierror.Convert(err)
 	assert.Equal(t, http.StatusBadRequest, httpErr.HTTPStatus())
 	assert.Equal(t, "sort", httpErr.Field())
+}
+
+func TestListPrivacy(t *testing.T) {
+	totalProfiles := 5
+
+	// Mock the database & add expectations
+	mockDB := &mockdb.Connection{}
+	mockDB.ExpectSelect("*users.Profiles", func(args mock.Arguments) {
+		out := args.Get(0).(*users.Profiles)
+		for i := 0; i < totalProfiles; i++ {
+			*out = append(*out, testusers.NewProfile())
+		}
+	})
+
+	res := &mockrouter.HTTPResponse{}
+	res.ExpectOk("*users.ProfilesPayload", func(args mock.Arguments) {
+		pld := args.Get(0).(*users.ProfilesPayload)
+		require.Equal(t, totalProfiles, len(pld.Results), "Wrong number of profiles returned")
+		for _, p := range pld.Results {
+			assert.NotEmpty(t, p.Email, "The email should be visible")
+		}
+	})
+
+	// Mock the request & add expectations
+	req := &mockrouter.HTTPRequest{}
+	req.On("Params").Return(&users.ListParams{})
+	req.On("Response").Return(res)
+
+	// call the handler
+	err := users.List(req, &router.Dependencies{DB: mockDB})
+
+	// Assert everything
+	assert.NoError(t, err, "the handler should not have fail")
+	mockDB.AssertExpectations(t)
+	res.AssertExpectations(t)
+	req.AssertExpectations(t)
 }
