@@ -36,7 +36,7 @@ func TestIntegrationGetFeatured(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, featuredProfile.ID, profile.ID, "Wrong profile returned")
+		assert.Equal(t, featuredProfile.User.ID, profile.ID, "Wrong profile returned")
 		assert.Empty(t, profile.Email, "the Email should be private")
 	}
 }
