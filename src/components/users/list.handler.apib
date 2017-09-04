@@ -1,9 +1,9 @@
-### List all organization [GET]
+### List all users [GET]
 
 + Parameters
-    + deleted: false (boolean,optional) - Return the deleted resources
     + page: 1 (number,optional) - Page to get
     + per_page: 100 (number,optional) - Number of element to get
+    + sort: is_featured,created_at (string,optional) - Field used for sorting the results (created_at, name, featured). Adding a "-" in front of a name will doing a reverse ordering (ex: -created_at). Several fields can be provided using a comma as separator (ex. featured,-name)
 
 + Request (application/json)
     + Headers
@@ -14,7 +14,7 @@
 
     The query succeed
 
-    + Attributes (Organizations)
+    + Attributes (Users)
 
 
 + Response 400 (application/json)

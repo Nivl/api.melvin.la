@@ -11,6 +11,7 @@ const (
 	EndpointUpdate
 	EndpointDelete
 	EndpointGet
+	EndpointList
 	EndpointUploadPicture
 	EndpointBatchUpdate
 )
@@ -21,6 +22,7 @@ var Endpoints = router.Endpoints{
 	EndpointUpdate:        updateEndpoint,
 	EndpointDelete:        deleteEndpoint,
 	EndpointGet:           getEndpoint,
+	EndpointList:          listEndpoint,
 	EndpointUploadPicture: uploadPictureEndpoint,
 	EndpointBatchUpdate:   batchUpdateEndpoint,
 }
