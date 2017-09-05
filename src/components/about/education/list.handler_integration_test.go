@@ -4,7 +4,6 @@ package education_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -286,15 +285,6 @@ func TestIntegrationListOrdering(t *testing.T) {
 			StartYear: d.start,
 			EndYear:   end,
 		})
-	}
-
-	fmt.Println("Wanted:")
-	for _, e := range eduWanted {
-		if e.EndYear != nil {
-			fmt.Printf("%s (%d - %d)\n", e.ID, e.StartYear, *e.EndYear)
-		} else {
-			fmt.Printf("%s (%d - present)\n", e.ID, e.StartYear)
-		}
 	}
 
 	// We set the default params manually otherwise it will send 0
