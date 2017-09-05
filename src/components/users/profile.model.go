@@ -4,15 +4,16 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 )
 
 // Profile represents the public information of a user
 //go:generate api-cli generate model Profile -t user_profiles -e Get,GetAny,JoinSQL --single=false
 type Profile struct {
-	ID        string   `db:"id"`
-	CreatedAt *db.Time `db:"created_at"`
-	UpdatedAt *db.Time `db:"updated_at"`
-	DeletedAt *db.Time `db:"deleted_at"`
+	ID        string             `db:"id"`
+	CreatedAt *datetime.DateTime `db:"created_at"`
+	UpdatedAt *datetime.DateTime `db:"updated_at"`
+	DeletedAt *datetime.DateTime `db:"deleted_at"`
 
 	UserID           string  `db:"user_id"`
 	FirstName        *string `json:"first_name"`

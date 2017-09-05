@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -69,9 +70,9 @@ func (o *Organization) Create(q db.Queryable) error {
 // doCreate persists a organization in the database using a Node
 func (o *Organization) doCreate(q db.Queryable) error {
 	o.ID = uuid.NewV4().String()
-	o.UpdatedAt = db.Now()
+	o.UpdatedAt = datetime.Now()
 	if o.CreatedAt == nil {
-		o.CreatedAt = db.Now()
+		o.CreatedAt = datetime.Now()
 	}
 
 	stmt := "INSERT INTO about_organizations (id, created_at, updated_at, deleted_at, name, short_name, logo, website) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :short_name, :logo, :website)"
@@ -96,7 +97,7 @@ func (o *Organization) doUpdate(q db.Queryable) error {
 		return errors.New("cannot update a non-persisted organization")
 	}
 
-	o.UpdatedAt = db.Now()
+	o.UpdatedAt = datetime.Now()
 
 	stmt := "UPDATE about_organizations SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, name=:name, short_name=:short_name, logo=:logo, website=:website WHERE id=:id"
 	_, err := q.NamedExec(stmt, o)

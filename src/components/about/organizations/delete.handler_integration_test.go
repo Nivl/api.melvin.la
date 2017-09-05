@@ -27,7 +27,7 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 	adminAuth := httptests.NewRequestAuth(admSession)
 	basicOrg := testorganizations.NewPersisted(t, dbCon, nil)
 	trashedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
-		DeletedAt: db.Now(),
+		DeletedAt: datetime.Now(),
 	})
 
 	tests := []struct {

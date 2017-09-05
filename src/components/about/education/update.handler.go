@@ -99,7 +99,7 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	}
 	if params.InTrash != nil {
 		if *params.InTrash && edu.DeletedAt == nil {
-			edu.DeletedAt = db.Now()
+			edu.DeletedAt = datetime.Now()
 		} else {
 			edu.DeletedAt = nil
 		}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -68,14 +69,10 @@ func (u *User) Create(q db.Queryable) error {
 
 // doCreate persists a user in the database using a Node
 func (u *User) doCreate(q db.Queryable) error {
-	if u == nil {
-		return errors.New("user not instanced")
-	}
-
 	u.ID = uuid.NewV4().String()
-	u.UpdatedAt = db.Now()
+	u.UpdatedAt = datetime.Now()
 	if u.CreatedAt == nil {
-		u.CreatedAt = db.Now()
+		u.CreatedAt = datetime.Now()
 	}
 
 	stmt := "INSERT INTO users (id, created_at, updated_at, deleted_at, name, email, password, is_admin) VALUES (:id, :created_at, :updated_at, :deleted_at, :name, :email, :password, :is_admin)"
@@ -100,7 +97,7 @@ func (u *User) doUpdate(q db.Queryable) error {
 		return errors.New("cannot update a non-persisted user")
 	}
 
-	u.UpdatedAt = db.Now()
+	u.UpdatedAt = datetime.Now()
 
 	stmt := "UPDATE users SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, name=:name, email=:email, password=:password, is_admin=:is_admin WHERE id=:id"
 	_, err := q.NamedExec(stmt, u)
@@ -110,10 +107,6 @@ func (u *User) doUpdate(q db.Queryable) error {
 
 // Delete removes a user from the database
 func (u *User) Delete(q db.Queryable) error {
-	if u == nil {
-		return errors.New("user not instanced")
-	}
-
 	if u.ID == "" {
 		return errors.New("user has not been saved")
 	}

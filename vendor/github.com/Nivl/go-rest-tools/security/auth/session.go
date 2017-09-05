@@ -5,15 +5,16 @@ import (
 
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 )
 
 // Session is a structure representing a session that can be saved in the database
 //go:generate api-cli generate model Session -t sessions -e Save,Create,Update,doUpdate,JoinSQL,Get,GetAny,Exists --single=false
 type Session struct {
-	ID        string   `db:"id"`
-	CreatedAt *db.Time `db:"created_at"`
-	UpdatedAt *db.Time `db:"updated_at"`
-	DeletedAt *db.Time `db:"deleted_at"`
+	ID        string             `db:"id"`
+	CreatedAt *datetime.DateTime `db:"created_at"`
+	UpdatedAt *datetime.DateTime `db:"updated_at"`
+	DeletedAt *datetime.DateTime `db:"deleted_at"`
 
 	UserID string `db:"user_id"`
 }

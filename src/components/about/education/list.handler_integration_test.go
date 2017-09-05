@@ -13,7 +13,7 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
@@ -32,19 +32,19 @@ func TestIntegrationListFiltering(t *testing.T) {
 
 	// adding a deleted education
 	testeducation.NewPersisted(t, dbCon, &education.Education{
-		DeletedAt: db.Now(),
+		DeletedAt: datetime.Now(),
 	})
 
 	// adding an orphan education
 	orphan := testeducation.NewPersisted(t, dbCon, nil)
-	orphan.Organization.DeletedAt = db.Now()
+	orphan.Organization.DeletedAt = datetime.Now()
 	orphan.Organization.Update(dbCon)
 
 	// Adding an orphan that is also deleted
 	orphanDeleted := testeducation.NewPersisted(t, dbCon, &education.Education{
-		DeletedAt: db.Now(),
+		DeletedAt: datetime.Now(),
 	})
-	orphanDeleted.Organization.DeletedAt = db.Now()
+	orphanDeleted.Organization.DeletedAt = datetime.Now()
 	orphanDeleted.Organization.Update(dbCon)
 
 	_, adminSession := testauth.NewAdminAuth(t, dbCon)

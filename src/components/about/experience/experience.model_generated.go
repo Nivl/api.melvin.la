@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -55,9 +56,9 @@ func (e *Experience) Create(q db.Queryable) error {
 // doCreate persists a experience in the database using a Node
 func (e *Experience) doCreate(q db.Queryable) error {
 	e.ID = uuid.NewV4().String()
-	e.UpdatedAt = db.Now()
+	e.UpdatedAt = datetime.Now()
 	if e.CreatedAt == nil {
-		e.CreatedAt = db.Now()
+		e.CreatedAt = datetime.Now()
 	}
 
 	stmt := "INSERT INTO about_experience (id, created_at, updated_at, deleted_at, organization_id, job_title, location, description, start_date, end_date) VALUES (:id, :created_at, :updated_at, :deleted_at, :organization_id, :job_title, :location, :description, :start_date, :end_date)"
@@ -82,7 +83,7 @@ func (e *Experience) doUpdate(q db.Queryable) error {
 		return errors.New("cannot update a non-persisted experience")
 	}
 
-	e.UpdatedAt = db.Now()
+	e.UpdatedAt = datetime.Now()
 
 	stmt := "UPDATE about_experience SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, organization_id=:organization_id, job_title=:job_title, location=:location, description=:description, start_date=:start_date, end_date=:end_date WHERE id=:id"
 	_, err := q.NamedExec(stmt, e)

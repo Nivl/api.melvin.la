@@ -8,8 +8,8 @@ import (
 	"strconv"
 
 	"github.com/Nivl/go-rest-tools/router/formfile"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/date"
 )
 
 const (
@@ -142,8 +142,8 @@ func (p *Param) SetValue(source url.Values) error {
 		case reflect.Struct:
 			// All the special cases
 			switch p.value.Type().String() {
-			case "*db.Date":
-				d, err := db.NewDate(value)
+			case "*date.Date":
+				d, err := date.New(value)
 				if err != nil {
 					return apierror.NewBadRequest(opts.Name, ErrMsgInvalidDate)
 				}

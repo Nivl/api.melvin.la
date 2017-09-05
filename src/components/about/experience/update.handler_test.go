@@ -17,6 +17,7 @@ import (
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/date"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/stretchr/testify/assert"
@@ -206,7 +207,7 @@ func TestUpdateHappyPath(t *testing.T) {
 		JobTitle:    ptrs.NewString("JobTitle"),
 		Location:    ptrs.NewString("Location"),
 		Description: ptrs.NewString("Description"),
-		StartDate:   db.Today(),
+		StartDate:   date.Today(),
 		InTrash:     ptrs.NewBool(true),
 	}
 
@@ -260,7 +261,7 @@ func TestUpdateUnsetEndDate(t *testing.T) {
 	mockDB.ExpectGet("*experience.Experience", func(args mock.Arguments) {
 		exp := args.Get(0).(*experience.Experience)
 		exp.ID = "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"
-		exp.EndDate = db.Today()
+		exp.EndDate = date.Today()
 	})
 	mockDB.ExpectUpdate("*experience.Experience")
 
@@ -324,7 +325,7 @@ func TestUpdateNoDBCon(t *testing.T) {
 		JobTitle:    ptrs.NewString("JobTitle"),
 		Location:    ptrs.NewString("Location"),
 		Description: ptrs.NewString("Description"),
-		StartDate:   db.Today(),
+		StartDate:   date.Today(),
 		InTrash:     ptrs.NewBool(true),
 	}
 
@@ -358,7 +359,7 @@ func TestUpdateUnexisting(t *testing.T) {
 		JobTitle:    ptrs.NewString("JobTitle"),
 		Location:    ptrs.NewString("Location"),
 		Description: ptrs.NewString("Description"),
-		StartDate:   db.Today(),
+		StartDate:   date.Today(),
 		InTrash:     ptrs.NewBool(true),
 	}
 

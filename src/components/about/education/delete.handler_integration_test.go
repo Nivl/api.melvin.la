@@ -10,8 +10,8 @@ import (
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education/testeducation"
@@ -26,7 +26,7 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 	adminAuth := httptests.NewRequestAuth(admSession)
 	basicExp := testeducation.NewPersisted(t, dbCon, nil)
 	trashedExp := testeducation.NewPersisted(t, dbCon, &education.Education{
-		DeletedAt: db.Now(),
+		DeletedAt: datetime.Now(),
 	})
 
 	tests := []struct {

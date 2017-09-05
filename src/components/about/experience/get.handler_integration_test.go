@@ -28,7 +28,7 @@ func TestIntegrationGet(t *testing.T) {
 	basicExp := testexperience.NewPersisted(t, dbCon, nil)
 
 	orphanExp := testexperience.NewPersisted(t, dbCon, nil)
-	orphanExp.Organization.DeletedAt = db.Now()
+	orphanExp.Organization.DeletedAt = datetime.Now()
 	orphanExp.Organization.Update(dbCon)
 
 	tests := []struct {

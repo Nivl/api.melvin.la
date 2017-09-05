@@ -5,13 +5,13 @@ package education
 import (
 	"testing"
 
-		"github.com/Nivl/go-rest-tools/storage/db"
-
 		"github.com/stretchr/testify/assert"
 
 		"github.com/satori/go.uuid"
 
 		"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+
+	"github.com/Nivl/go-rest-tools/types/datetime"
 )
 
 
@@ -84,7 +84,7 @@ func TestEducationDoCreateWithDate(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectInsert("*education.Education")
 
-	createdAt := db.Now().AddDate(0, 0, 1)
+	createdAt := datetime.Now().AddDate(0, 0, 1)
 	e := &Education{CreatedAt: createdAt}
 	err := e.doCreate(mockDB)
 
