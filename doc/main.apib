@@ -20,55 +20,11 @@ API used to run melvin.la
 + token (required, string)
 + user_id (required, string)
 
-## Organization
+:[Organizations](../src/components/about/organizations/organizations.payload.apib)
 
-+ id (required, string)
-+ created_at (string)
-+ updated_at (string)
-+ deleted_at (string)
-+ name (required, string)
-+ short_name (string)
-+ website (string)
-+ logo (string)
+:[Experience](../src/components/about/experience/experience.payload.apib)
 
-## Organizations
-
-+ results (array[Organization])
-
-## Experience
-
-+ id (required, string)
-+ created_at (string)
-+ updated_at (string)
-+ deleted_at (string)
-+ job_title (required, string)
-+ location (string)
-+ description (string)
-+ start_date (required, string)
-+ end_date (string)
-+ organization (required, Organization)
-
-## ListExperience
-
-+ results (array[Experience])
-
-## Education
-
-+ id (required, string)
-+ created_at (string)
-+ updated_at (string)
-+ deleted_at (string)
-+ degree (required, string)
-+ gpa (string)
-+ location (string)
-+ description (string)
-+ start_year (required, number)
-+ end_year (number)
-+ organization (required, Organization)
-
-## ListEducation
-
-+ results (array[Experience])
+:[Education](../src/components/about/education/education.payload.apib)
 
 ## DefaultError
 
