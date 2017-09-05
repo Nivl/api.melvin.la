@@ -288,15 +288,6 @@ func TestIntegrationListOrdering(t *testing.T) {
 		})
 	}
 
-	fmt.Println("Wanted:")
-	for _, e := range eduWanted {
-		if e.EndYear != nil {
-			fmt.Printf("%s (%d - %d)\n", e.ID, e.StartYear, *e.EndYear)
-		} else {
-			fmt.Printf("%s (%d - present)\n", e.ID, e.StartYear)
-		}
-	}
-
 	// We set the default params manually otherwise it will send 0
 	params := &education.ListParams{
 		HandlerParams: paginator.HandlerParams{
