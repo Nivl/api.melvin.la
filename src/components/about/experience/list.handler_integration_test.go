@@ -12,7 +12,7 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/date"
 	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
@@ -278,10 +278,10 @@ func TestIntegrationListOrdering(t *testing.T) {
 	expWanted := make([]*experience.Experience, len(dates))
 
 	for _, d := range dates {
-		start, _ := db.NewDate(d.start)
-		var end *db.Date
+		start, _ := date.New(d.start)
+		var end *date.Date
 		if d.end != "" {
-			end, _ = db.NewDate(d.end)
+			end, _ = date.New(d.end)
 		}
 
 		expWanted[d.order] = testexperience.NewPersisted(t, dbCon, &experience.Experience{

@@ -3,8 +3,8 @@ package experience
 import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/date"
 	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
@@ -21,15 +21,15 @@ var updateEndpoint = &router.Endpoint{
 
 // UpdateParams represents the request params accepted by the Update handler
 type UpdateParams struct {
-	ID             string   `from:"url" json:"id" params:"required,uuid"`
-	OrganizationID *string  `from:"form" json:"organization_id" params:"noempty,uuid" maxlen:"255"`
-	JobTitle       *string  `from:"form" json:"job_title" params:"noempty,trim" maxlen:"255"`
-	Location       *string  `from:"form" json:"location" params:"noempty,trim" maxlen:"255"`
-	Description    *string  `from:"form" json:"description" params:"noempty,trim" maxlen:"10000"`
-	StartDate      *db.Date `from:"form" json:"start_date"`
-	EndDate        *db.Date `from:"form" json:"end_date"`
-	InTrash        *bool    `from:"form" json:"in_trash"`
-	UnsetEndDate   bool     `from:"form" json:"unset_end_date" default:"false"`
+	ID             string     `from:"url" json:"id" params:"required,uuid"`
+	OrganizationID *string    `from:"form" json:"organization_id" params:"noempty,uuid" maxlen:"255"`
+	JobTitle       *string    `from:"form" json:"job_title" params:"noempty,trim" maxlen:"255"`
+	Location       *string    `from:"form" json:"location" params:"noempty,trim" maxlen:"255"`
+	Description    *string    `from:"form" json:"description" params:"noempty,trim" maxlen:"10000"`
+	StartDate      *date.Date `from:"form" json:"start_date"`
+	EndDate        *date.Date `from:"form" json:"end_date"`
+	InTrash        *bool      `from:"form" json:"in_trash"`
+	UnsetEndDate   bool       `from:"form" json:"unset_end_date" default:"false"`
 }
 
 // Update represent an API handler to update an organization

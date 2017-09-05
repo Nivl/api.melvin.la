@@ -14,7 +14,6 @@ import (
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/types/date"
@@ -219,7 +218,7 @@ func TestUpdateHappyPath(t *testing.T) {
 		exp.JobTitle = "old JobTitle"
 		exp.Location = "old Location"
 		exp.Description = "old Description"
-		exp.StartDate, _ = db.NewDate("2016-01")
+		exp.StartDate, _ = date.New("2016-01")
 	})
 	mockDB.ExpectUpdate("*experience.Experience")
 
@@ -288,8 +287,8 @@ func TestUpdateUnsetEndDate(t *testing.T) {
 }
 
 func TestUpdateEndDateBeforeStartDate(t *testing.T) {
-	now, _ := db.NewDate("2017-08")
-	future, _ := db.NewDate("2018-08")
+	now, _ := date.New("2017-08")
+	future, _ := date.New("2018-08")
 
 	handlerParams := &experience.UpdateParams{
 		EndDate: now,
