@@ -4,7 +4,7 @@ package education
 
 import (
 	"errors"
-	"fmt"
+	
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/types/datetime"
@@ -12,22 +12,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// JoinSQL returns a string ready to be embed in a JOIN query
-func JoinSQL(prefix string) string {
-	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "organization_id", "degree", "gpa", "location", "description", "start_year", "end_year" }
-	output := ""
 
-	for i, field := range fields {
-		if i != 0 {
-			output += ", "
-		}
-
-		fullName := fmt.Sprintf("%s.%s", prefix, field)
-		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
-	}
-
-	return output
-}
 
 
 
