@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -55,9 +56,9 @@ func (e *Education) Create(q db.Queryable) error {
 // doCreate persists a education in the database using a Node
 func (e *Education) doCreate(q db.Queryable) error {
 	e.ID = uuid.NewV4().String()
-	e.UpdatedAt = db.Now()
+	e.UpdatedAt = datetime.Now()
 	if e.CreatedAt == nil {
-		e.CreatedAt = db.Now()
+		e.CreatedAt = datetime.Now()
 	}
 
 	stmt := "INSERT INTO about_education (id, created_at, updated_at, deleted_at, organization_id, degree, gpa, location, description, start_year, end_year) VALUES (:id, :created_at, :updated_at, :deleted_at, :organization_id, :degree, :gpa, :location, :description, :start_year, :end_year)"
@@ -82,7 +83,7 @@ func (e *Education) doUpdate(q db.Queryable) error {
 		return errors.New("cannot update a non-persisted education")
 	}
 
-	e.UpdatedAt = db.Now()
+	e.UpdatedAt = datetime.Now()
 
 	stmt := "UPDATE about_education SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, organization_id=:organization_id, degree=:degree, gpa=:gpa, location=:location, description=:description, start_year=:start_year, end_year=:end_year WHERE id=:id"
 	_, err := q.NamedExec(stmt, e)

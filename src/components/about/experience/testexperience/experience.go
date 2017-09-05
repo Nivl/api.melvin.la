@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/date"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
@@ -17,12 +19,12 @@ func New() *experience.Experience {
 
 	return &experience.Experience{
 		ID:             uuid.NewV4().String(),
-		CreatedAt:      db.Now(),
-		UpdatedAt:      db.Now(),
+		CreatedAt:      datetime.Now(),
+		UpdatedAt:      datetime.Now(),
 		JobTitle:       uniuri.New(),
 		Description:    uniuri.New(),
 		Location:       uniuri.New(),
-		StartDate:      db.Today(),
+		StartDate:      date.Today(),
 		OrganizationID: org.ID,
 		Organization:   org,
 	}
@@ -42,7 +44,7 @@ func NewPersisted(t *testing.T, dbCon db.Queryable, exp *experience.Experience) 
 	}
 
 	if exp.StartDate == nil {
-		exp.StartDate = db.Today()
+		exp.StartDate = date.Today()
 	}
 
 	if exp.Organization != nil && exp.OrganizationID == "" {

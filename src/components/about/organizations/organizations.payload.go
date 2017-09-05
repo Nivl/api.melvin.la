@@ -1,20 +1,20 @@
 package organizations
 
 import (
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
 )
 
 // Payload represents an article to be returned to the clients
 type Payload struct {
-	ID        string   `json:"id"`
-	CreatedAt *db.Time `json:"created_at,omitempty"`
-	UpdatedAt *db.Time `json:"updated_at,omitempty"`
-	DeletedAt *db.Time `json:"deleted_at,omitempty"`
-	Name      string   `json:"name"`
-	ShortName string   `json:"short_name,omitempty"`
-	Logo      string   `json:"logo,omitempty"`
-	Website   string   `json:"website,omitempty"`
+	ID        string             `json:"id"`
+	CreatedAt *datetime.DateTime `json:"created_at,omitempty"`
+	UpdatedAt *datetime.DateTime `json:"updated_at,omitempty"`
+	DeletedAt *datetime.DateTime `json:"deleted_at,omitempty"`
+	Name      string             `json:"name"`
+	ShortName string             `json:"short_name,omitempty"`
+	Logo      string             `json:"logo,omitempty"`
+	Website   string             `json:"website,omitempty"`
 }
 
 // ExportPublic returns an Organization payload trimmed from all sensitive

@@ -1,17 +1,17 @@
 package education
 
 import (
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
 // Payload represents
 type Payload struct {
-	ID        string   `json:"id"`
-	CreatedAt *db.Time `json:"created_at,omitempty"`
-	UpdatedAt *db.Time `json:"updated_at,omitempty"`
-	DeletedAt *db.Time `json:"deleted_at,omitempty"`
+	ID        string             `json:"id"`
+	CreatedAt *datetime.DateTime `json:"created_at,omitempty"`
+	UpdatedAt *datetime.DateTime `json:"updated_at,omitempty"`
+	DeletedAt *datetime.DateTime `json:"deleted_at,omitempty"`
 
 	Degree      string `json:"degree"`
 	GPA         string `json:"gpa,omitempty"`

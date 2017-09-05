@@ -11,7 +11,8 @@ import (
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/date"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
@@ -28,7 +29,7 @@ func TestIntegrationAdd(t *testing.T) {
 	adminAuth := httptests.NewRequestAuth(admSession)
 	org := testorganizations.NewPersisted(t, dbCon, nil)
 	deletedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
-		DeletedAt: db.Now(),
+		DeletedAt: datetime.Now(),
 	})
 
 	tests := []struct {
@@ -44,7 +45,7 @@ func TestIntegrationAdd(t *testing.T) {
 				JobTitle:       uniuri.New(),
 				Location:       uniuri.New(),
 				Description:    uniuri.New(),
-				StartDate:      db.Today(),
+				StartDate:      date.Today(),
 			},
 		},
 		{
@@ -55,7 +56,7 @@ func TestIntegrationAdd(t *testing.T) {
 				JobTitle:       uniuri.New(),
 				Location:       uniuri.New(),
 				Description:    uniuri.New(),
-				StartDate:      db.Today(),
+				StartDate:      date.Today(),
 			},
 		},
 	}

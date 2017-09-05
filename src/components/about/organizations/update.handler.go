@@ -3,7 +3,7 @@ package organizations
 import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 )
 
 var updateEndpoint = &router.Endpoint{
@@ -45,7 +45,7 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	}
 	if params.InTrash != nil {
 		if *params.InTrash && org.DeletedAt == nil {
-			org.DeletedAt = db.Now()
+			org.DeletedAt = datetime.Now()
 		} else {
 			org.DeletedAt = nil
 		}

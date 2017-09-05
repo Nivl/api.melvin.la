@@ -1,22 +1,23 @@
 package experience
 
 import (
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/date"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
 // Payload represents
 type Payload struct {
-	ID        string   `json:"id"`
-	CreatedAt *db.Time `json:"created_at,omitempty"`
-	UpdatedAt *db.Time `json:"updated_at,omitempty"`
-	DeletedAt *db.Time `json:"deleted_at,omitempty"`
+	ID        string             `json:"id"`
+	CreatedAt *datetime.DateTime `json:"created_at,omitempty"`
+	UpdatedAt *datetime.DateTime `json:"updated_at,omitempty"`
+	DeletedAt *datetime.DateTime `json:"deleted_at,omitempty"`
 
-	JobTitle    string   `json:"job_title"`
-	Location    string   `json:"location,omitempty"`
-	Description string   `json:"description,omitempty"`
-	StartDate   *db.Date `json:"start_date"`
-	EndDate     *db.Date `json:"end_date,omitempty"`
+	JobTitle    string     `json:"job_title"`
+	Location    string     `json:"location,omitempty"`
+	Description string     `json:"description,omitempty"`
+	StartDate   *date.Date `json:"start_date"`
+	EndDate     *date.Date `json:"end_date,omitempty"`
 
 	Organization *organizations.Payload `json:"organization,omitempty"`
 }

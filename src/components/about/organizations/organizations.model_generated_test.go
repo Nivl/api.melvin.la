@@ -5,13 +5,13 @@ package organizations
 import (
 	"testing"
 
-		"github.com/Nivl/go-rest-tools/storage/db"
-
 		"github.com/stretchr/testify/assert"
 
 		"github.com/satori/go.uuid"
 
 		"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+
+	"github.com/Nivl/go-rest-tools/types/datetime"
 )
 
 
@@ -84,7 +84,7 @@ func TestOrganizationDoCreateWithDate(t *testing.T) {
 	mockDB := &mockdb.Queryable{}
 	mockDB.ExpectInsert("*organizations.Organization")
 
-	createdAt := db.Now().AddDate(0, 0, 1)
+	createdAt := datetime.Now().AddDate(0, 0, 1)
 	o := &Organization{CreatedAt: createdAt}
 	err := o.doCreate(mockDB)
 

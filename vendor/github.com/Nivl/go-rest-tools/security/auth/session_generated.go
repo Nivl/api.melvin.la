@@ -7,6 +7,7 @@ import (
 	
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )
@@ -24,14 +25,10 @@ import (
 
 // doCreate persists a session in the database using a Node
 func (s *Session) doCreate(q db.Queryable) error {
-	if s == nil {
-		return errors.New("session not instanced")
-	}
-
 	s.ID = uuid.NewV4().String()
-	s.UpdatedAt = db.Now()
+	s.UpdatedAt = datetime.Now()
 	if s.CreatedAt == nil {
-		s.CreatedAt = db.Now()
+		s.CreatedAt = datetime.Now()
 	}
 
 	stmt := "INSERT INTO sessions (id, created_at, updated_at, deleted_at, user_id) VALUES (:id, :created_at, :updated_at, :deleted_at, :user_id)"
@@ -46,10 +43,6 @@ func (s *Session) doCreate(q db.Queryable) error {
 
 // Delete removes a session from the database
 func (s *Session) Delete(q db.Queryable) error {
-	if s == nil {
-		return errors.New("session not instanced")
-	}
-
 	if s.ID == "" {
 		return errors.New("session has not been saved")
 	}

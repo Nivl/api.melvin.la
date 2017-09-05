@@ -3,16 +3,17 @@ package education
 import (
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
 // Education represents an education
 //go:generate api-cli generate model Education -t about_education -e Get,GetAny
 type Education struct {
-	ID        string   `db:"id"`
-	CreatedAt *db.Time `db:"created_at"`
-	UpdatedAt *db.Time `db:"updated_at"`
-	DeletedAt *db.Time `db:"deleted_at"`
+	ID        string             `db:"id"`
+	CreatedAt *datetime.DateTime `db:"created_at"`
+	UpdatedAt *datetime.DateTime `db:"updated_at"`
+	DeletedAt *datetime.DateTime `db:"deleted_at"`
 
 	OrganizationID string `db:"organization_id"`
 	Degree         string `db:"degree"`

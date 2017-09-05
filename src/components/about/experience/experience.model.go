@@ -3,23 +3,25 @@ package experience
 import (
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/date"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
 // Experience represents a work experience
 //go:generate api-cli generate model Experience -t about_experience -e Get,GetAny
 type Experience struct {
-	ID        string   `db:"id"`
-	CreatedAt *db.Time `db:"created_at"`
-	UpdatedAt *db.Time `db:"updated_at"`
-	DeletedAt *db.Time `db:"deleted_at"`
+	ID        string             `db:"id"`
+	CreatedAt *datetime.DateTime `db:"created_at"`
+	UpdatedAt *datetime.DateTime `db:"updated_at"`
+	DeletedAt *datetime.DateTime `db:"deleted_at"`
 
-	OrganizationID string   `db:"organization_id"`
-	JobTitle       string   `db:"job_title"`
-	Location       string   `db:"location"`
-	Description    string   `db:"description"`
-	StartDate      *db.Date `db:"start_date"`
-	EndDate        *db.Date `db:"end_date"`
+	OrganizationID string     `db:"organization_id"`
+	JobTitle       string     `db:"job_title"`
+	Location       string     `db:"location"`
+	Description    string     `db:"description"`
+	StartDate      *date.Date `db:"start_date"`
+	EndDate        *date.Date `db:"end_date"`
 
 	// Embedded models
 	*organizations.Organization `db:"org"`

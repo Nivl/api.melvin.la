@@ -1,4 +1,4 @@
-package db
+package date
 
 import (
 	"database/sql/driver"
@@ -23,8 +23,8 @@ func Today() *Date {
 	return &Date{Time: time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
 }
 
-// NewDate accepts "year-month" or "year-month-day"
-func NewDate(date string) (*Date, error) {
+// New accepts "year-month" or "year-month-day"
+func New(date string) (*Date, error) {
 	// If we only have year-month, then we add "-day"
 	if strings.Count(date, "-") == 1 {
 		date += "-01"

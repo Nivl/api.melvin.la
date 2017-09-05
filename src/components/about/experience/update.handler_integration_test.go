@@ -8,11 +8,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/storage/db"
-
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/types/date"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
@@ -31,7 +31,7 @@ func TestIntegrationUpdate(t *testing.T) {
 	noop := testexperience.NewPersisted(t, dbCon, nil)
 	changeAll := testexperience.NewPersisted(t, dbCon, nil)
 	toUntrash := testexperience.NewPersisted(t, dbCon, &experience.Experience{
-		DeletedAt: db.Now(),
+		DeletedAt: datetime.Now(),
 	})
 
 	tests := []struct {
@@ -49,8 +49,8 @@ func TestIntegrationUpdate(t *testing.T) {
 				JobTitle:    ptrs.NewString("job title"),
 				Description: ptrs.NewString("description"),
 				Location:    ptrs.NewString("Location"),
-				StartDate:   db.Today(),
-				EndDate:     db.Today(),
+				StartDate:   date.Today(),
+				EndDate:     date.Today(),
 				InTrash:     ptrs.NewBool(true),
 			},
 		},
@@ -133,7 +133,7 @@ func TestIntegrationUpdateOrganization(t *testing.T) {
 
 	newOrg := testorganizations.NewPersisted(t, dbCon, nil)
 	orphan := testexperience.NewPersisted(t, dbCon, nil)
-	orphan.Organization.DeletedAt = db.Now()
+	orphan.Organization.DeletedAt = datetime.Now()
 	orphan.Organization.Update(dbCon)
 
 	params := &experience.UpdateParams{

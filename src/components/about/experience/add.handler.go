@@ -5,7 +5,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
-	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/date"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
@@ -25,12 +25,12 @@ const ErrMsgInvalidEndDate = "cannot be before start_date"
 
 // AddParams represents the params accepted by the Add endpoint
 type AddParams struct {
-	OrganizationID string   `from:"form" json:"organization_id" params:"required,uuid" maxlen:"255"`
-	JobTitle       string   `from:"form" json:"job_title" params:"required,trim" maxlen:"255"`
-	Location       string   `from:"form" json:"location" params:"required,trim" maxlen:"255"`
-	Description    string   `from:"form" json:"description" params:"required,trim" maxlen:"10000"`
-	StartDate      *db.Date `from:"form" json:"start_date" params:"required"`
-	EndDate        *db.Date `from:"form" json:"end_date"`
+	OrganizationID string     `from:"form" json:"organization_id" params:"required,uuid" maxlen:"255"`
+	JobTitle       string     `from:"form" json:"job_title" params:"required,trim" maxlen:"255"`
+	Location       string     `from:"form" json:"location" params:"required,trim" maxlen:"255"`
+	Description    string     `from:"form" json:"description" params:"required,trim" maxlen:"10000"`
+	StartDate      *date.Date `from:"form" json:"start_date" params:"required"`
+	EndDate        *date.Date `from:"form" json:"end_date"`
 }
 
 // IsValid implements the params.CustomValidation interface

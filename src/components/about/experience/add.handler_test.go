@@ -8,9 +8,9 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/params"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/date"
 	"github.com/dchest/uniuri"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -299,7 +299,7 @@ func TestAddHappyPath(t *testing.T) {
 		JobTitle:       "Title",
 		Location:       "Los Angeles area, CA",
 		Description:    "description of the work done",
-		StartDate:      db.Today(),
+		StartDate:      date.Today(),
 	}
 
 	// Mock the database & add expectations
@@ -341,7 +341,7 @@ func TestAddOrgNotFound(t *testing.T) {
 		JobTitle:       "Title",
 		Location:       "Los Angeles area, CA",
 		Description:    "description of the work done",
-		StartDate:      db.Today(),
+		StartDate:      date.Today(),
 	}
 
 	// Mock the database & add expectations
@@ -375,7 +375,7 @@ func TestAddNoDBCon(t *testing.T) {
 		JobTitle:       "Title",
 		Location:       "Los Angeles area, CA",
 		Description:    "description of the work done",
-		StartDate:      db.Today(),
+		StartDate:      date.Today(),
 	}
 
 	// Mock the database & add expectations

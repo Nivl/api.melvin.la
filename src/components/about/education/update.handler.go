@@ -5,8 +5,8 @@ import (
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
-	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 
@@ -99,7 +99,7 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	}
 	if params.InTrash != nil {
 		if *params.InTrash && edu.DeletedAt == nil {
-			edu.DeletedAt = db.Now()
+			edu.DeletedAt = datetime.Now()
 		} else {
 			edu.DeletedAt = nil
 		}

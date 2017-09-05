@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/types/ptrs"
 	"github.com/dchest/uniuri"
@@ -15,8 +16,8 @@ import (
 func New() *organizations.Organization {
 	return &organizations.Organization{
 		ID:        uuid.NewV4().String(),
-		CreatedAt: db.Now(),
-		UpdatedAt: db.Now(),
+		CreatedAt: datetime.Now(),
+		UpdatedAt: datetime.Now(),
 		Name:      uniuri.New(),
 		ShortName: ptrs.NewString(uniuri.New()),
 		Website:   ptrs.NewString("http://" + uniuri.New() + ".com"),

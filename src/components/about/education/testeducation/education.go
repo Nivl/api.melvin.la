@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
@@ -18,8 +19,8 @@ func New() *education.Education {
 
 	return &education.Education{
 		ID:             uuid.NewV4().String(),
-		CreatedAt:      db.Now(),
-		UpdatedAt:      db.Now(),
+		CreatedAt:      datetime.Now(),
+		UpdatedAt:      datetime.Now(),
 		Degree:         uniuri.New(),
 		GPA:            uniuri.NewLen(4),
 		Location:       uniuri.New(),
