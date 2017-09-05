@@ -3,17 +3,27 @@ package organizations
 // Code generated; DO NOT EDIT.
 
 import (
+	"strings"
+
 	"testing"
 
-		"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 
-		"github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 
-		"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 
 	"github.com/Nivl/go-rest-tools/types/datetime"
 )
 
+func TestJoinSQL(t *testing.T) {
+	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "name", "short_name", "logo", "website" }
+	totalFields := len(fields)
+	output := JoinSQL("tofind")
+
+	assert.Equal(t, totalFields*2, strings.Count(output, "tofind."), "wrong number of fields returned")
+	assert.True(t, strings.HasSuffix(output, "\""), "JoinSQL() output should end with a \"")
+}
 
 func TestOrganizationSaveNew(t *testing.T) {
 	mockDB := &mockdb.Queryable{}

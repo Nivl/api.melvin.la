@@ -3,16 +3,19 @@ package users
 // Code generated; DO NOT EDIT.
 
 import (
+	
+
 	"testing"
 
-		"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 
-		"github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 
-		"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 
 	"github.com/Nivl/go-rest-tools/types/datetime"
 )
+
 
 
 func TestProfileSaveNew(t *testing.T) {

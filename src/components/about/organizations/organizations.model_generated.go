@@ -4,7 +4,10 @@ package organizations
 
 import (
 	"errors"
+	
 	"fmt"
+	"strings"
+	
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/types/datetime"
@@ -17,16 +20,11 @@ func JoinSQL(prefix string) string {
 	fields := []string{ "id", "created_at", "updated_at", "deleted_at", "name", "short_name", "logo", "website" }
 	output := ""
 
-	for i, field := range fields {
-		if i != 0 {
-			output += ", "
-		}
-
+	for _, field := range fields {
 		fullName := fmt.Sprintf("%s.%s", prefix, field)
-		output += fmt.Sprintf("%s \"%s\"", fullName, fullName)
+		output += fmt.Sprintf("%s \"%s\", ", fullName, fullName)
 	}
-
-	return output
+	return strings.TrimSuffix(output, ", ")
 }
 
 // GetByID finds and returns an active organization by ID
