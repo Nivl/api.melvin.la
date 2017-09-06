@@ -17,7 +17,7 @@ import (
 )
 
 func TestIntegrationGetFeatured(t *testing.T) {
-	dbCon := deps.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	featuredProfile, _ := testusers.NewAuthProfile(t, dbCon)

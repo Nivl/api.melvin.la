@@ -17,7 +17,7 @@ import (
 )
 
 func TestbatchUpdateIsFeatured(t *testing.T) {
-	dbCon := deps.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	a1, as1 := testusers.NewAdminAuth(t, dbCon)
@@ -37,7 +37,7 @@ func TestbatchUpdateIsFeatured(t *testing.T) {
 }
 
 func TestbatchUpdateReplaceFeatured(t *testing.T) {
-	dbCon := deps.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	a1, as1 := testusers.NewAdminAuth(t, dbCon)
