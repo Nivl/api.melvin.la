@@ -17,8 +17,10 @@ import (
 )
 
 func TestAdd(t *testing.T) {
-	defer lifecycle.PurgeModels(t, deps.DB)
-	u1 := testauth.NewPersistedUser(t, deps.DB, nil)
+	dbCon := deps.DB()
+
+	defer lifecycle.PurgeModels(t, dbCon)
+	u1 := testauth.NewPersistedUser(t, dbCon, nil)
 
 	tests := []struct {
 		description string
@@ -57,7 +59,7 @@ func TestAdd(t *testing.T) {
 				assert.Equal(t, u1.ID, session.UserID)
 
 				// clean the test
-				(&auth.Session{ID: session.Token}).Delete(deps.DB)
+				(&auth.Session{ID: session.Token}).Delete(dbCon)
 			}
 		})
 	}

@@ -16,10 +16,11 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	defer lifecycle.PurgeModels(t, deps.DB)
+	dbCon := deps.DB()
+	defer lifecycle.PurgeModels(t, dbCon)
 
-	u1, s1 := testusers.NewAuth(t, deps.DB)
-	_, s2 := testusers.NewAuth(t, deps.DB)
+	u1, s1 := testusers.NewAuth(t, dbCon)
+	_, s2 := testusers.NewAuth(t, dbCon)
 
 	tests := []struct {
 		description string

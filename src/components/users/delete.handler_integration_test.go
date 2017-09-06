@@ -17,10 +17,11 @@ import (
 )
 
 func TestDelete(t *testing.T) {
-	defer lifecycle.PurgeModels(t, deps.DB)
+	dbCon := deps.DB()
+	defer lifecycle.PurgeModels(t, dbCon)
 
-	u1, s1 := testauth.NewAuth(t, deps.DB)
-	_, s2 := testauth.NewAuth(t, deps.DB)
+	u1, s1 := testauth.NewAuth(t, dbCon)
+	_, s2 := testauth.NewAuth(t, dbCon)
 
 	tests := []struct {
 		description string
@@ -64,7 +65,7 @@ func TestDelete(t *testing.T) {
 				// We check that the user has been deleted
 				var user auth.User
 				stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"
-				err := deps.DB.Get(&user, stmt, tc.params.ID)
+				err := dbCon.Get(&user, stmt, tc.params.ID)
 				assert.Equal(t, sql.ErrNoRows, err, "User not deleted")
 			}
 		})

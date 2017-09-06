@@ -17,17 +17,18 @@ import (
 )
 
 func TestDelete(t *testing.T) {
-	defer lifecycle.PurgeModels(t, deps.DB)
+	dbCon := deps.DB()
+	defer lifecycle.PurgeModels(t, dbCon)
 
 	// Do not delete safeSession
-	u1, safeSession := testauth.NewAuth(t, deps.DB)
+	u1, safeSession := testauth.NewAuth(t, dbCon)
 
 	// We create a couple of sessions for the same user
-	toDelete2 := testauth.NewPersistedSession(t, deps.DB, u1)
-	toDelete3 := testauth.NewPersistedSession(t, deps.DB, u1)
+	toDelete2 := testauth.NewPersistedSession(t, dbCon, u1)
+	toDelete3 := testauth.NewPersistedSession(t, dbCon, u1)
 
 	// We create a other session attached to an other user
-	_, randomSession := testauth.NewAuth(t, deps.DB)
+	_, randomSession := testauth.NewAuth(t, dbCon)
 
 	tests := []struct {
 		description string
@@ -82,7 +83,7 @@ func TestDelete(t *testing.T) {
 				// We check that the user is still in DB but is flagged for deletion
 				var session auth.Session
 				stmt := "SELECT * FROM sessions WHERE id=$1 LIMIT 1"
-				err := deps.DB.Get(&session, stmt, tc.params.Token)
+				err := dbCon.Get(&session, stmt, tc.params.Token)
 				assert.Equal(t, sql.ErrNoRows, err, "session should be deleted")
 			}
 		})
