@@ -5,6 +5,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
+	"github.com/Nivl/go-rest-tools/logger/mocklogger"
+	"github.com/Nivl/go-rest-tools/notifiers/mailer/mockmailer"
+	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-rest-tools/storage/filestorage/mockfilestorage"
+
+	"github.com/Nivl/go-rest-tools/dependencies/mockdependencies"
 	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,8 +24,17 @@ func TestRouteNotFound(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	apiDeps := &mockdependencies.Dependencies{}
+	apiDeps.On("FileStorage", mock.Anything).Return(&mockfilestorage.FileStorage{}, nil)
+	apiDeps.On("DB").Return(&mockdb.Connection{})
+	apiDeps.On("Mailer").Return(&mockmailer.Mailer{})
+
+	logger := &mocklogger.Logger{}
+	logger.On("Errorf", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	apiDeps.On("Logger").Return(logger)
+
 	rec := httptest.NewRecorder()
-	api.GetRouter().ServeHTTP(rec, req)
+	api.GetRouter(apiDeps).ServeHTTP(rec, req)
 
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	assert.Equal(t, "application/json; charset=utf-8", rec.Header().Get("Content-Type"))

@@ -15,30 +15,33 @@ import (
 type Endpoints []*Endpoint
 
 // Activate adds the endpoints to the router
-func (endpoints Endpoints) Activate(router *mux.Router) {
+func (endpoints Endpoints) Activate(router *mux.Router, apiDeps dependencies.Dependencies) {
 	for _, endpoint := range endpoints {
 		router.
 			Methods(endpoint.Verb).
 			Path(endpoint.Path).
-			Handler(Handler(endpoint))
+			Handler(Handler(endpoint, apiDeps))
 	}
 }
 
 // Handler makes it possible to use a RouteHandler where a http.Handler is required
-func Handler(e *Endpoint) http.Handler {
+func Handler(e *Endpoint, apiDeps dependencies.Dependencies) http.Handler {
 	HTTPHandler := func(resWriter http.ResponseWriter, req *http.Request) {
-		deps, depsErr := NewDefaultDependenciesWithContext(req.Context())
-		// we need deps for the response, so if it fails we get only the main
-		// deps that we will use for the response, then we'll use that response
-		// to return a 500
-		if depsErr != nil {
-			deps = NewNoFailersDependencies()
+		// storageErr will be checked later on. Since the storage is not
+		// needed to throw an error, we first init the request, then we will use
+		// that request to return (and log) the error
+		fileStorage, storageErr := apiDeps.FileStorage(req.Context())
+
+		handlerDeps := &Dependencies{
+			DB:      apiDeps.DB(),
+			Storage: fileStorage,
+			Mailer:  apiDeps.Mailer(),
 		}
 		request := &Request{
 			id:     uuid.NewV4().String()[:8],
 			http:   req,
-			res:    NewResponse(resWriter, deps),
-			logger: dependencies.NewLogger(),
+			res:    NewResponse(resWriter, handlerDeps),
+			logger: apiDeps.Logger(),
 		}
 		defer request.handlePanic()
 
@@ -46,8 +49,8 @@ func Handler(e *Endpoint) http.Handler {
 		request.res.Header().Set("X-Request-Id", request.id)
 
 		// if we failed getting the dependencies, we return a 500
-		if depsErr != nil {
-			request.res.Error(depsErr, request)
+		if storageErr != nil {
+			request.res.Error(storageErr, request)
 			return
 		}
 
@@ -61,7 +64,7 @@ func Handler(e *Endpoint) http.Handler {
 			session := &auth.Session{ID: sessionID, UserID: userID}
 
 			if session.ID != "" && session.UserID != "" {
-				exists, err := session.Exists(deps.DB)
+				exists, err := session.Exists(handlerDeps.DB)
 				if err != nil {
 					request.res.Error(err, request)
 					return
@@ -72,7 +75,7 @@ func Handler(e *Endpoint) http.Handler {
 				}
 				request.session = session
 				// we get the user and make sure it (still) exists
-				request.user, err = auth.GetUserByID(deps.DB, session.UserID)
+				request.user, err = auth.GetUserByID(handlerDeps.DB, session.UserID)
 				if err != nil {
 					if apierror.IsNotFound(err) {
 						err = apierror.NewNotFoundField("Authorization", "session not found")
@@ -106,7 +109,7 @@ func Handler(e *Endpoint) http.Handler {
 		}
 
 		// Execute the actual route handler
-		err := e.Handler(request, deps)
+		err := e.Handler(request, handlerDeps)
 		if err != nil {
 			request.res.Error(err, request)
 		}

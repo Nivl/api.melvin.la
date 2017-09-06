@@ -1,75 +1,47 @@
 package dependencies
 
 import (
+	"context"
+
+	"github.com/Nivl/go-rest-tools/logger"
+	"github.com/Nivl/go-rest-tools/notifiers/mailer"
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/Nivl/go-rest-tools/storage/db/sqlx"
-	"github.com/bsphere/le_go"
+	"github.com/Nivl/go-rest-tools/storage/filestorage"
 )
 
-// DB represents an open connection with write access to the database
-var DB db.Connection
+// Dependencies represents the dependency of the api
+type Dependencies interface {
+	// SetDB creates a connection to a SQL database
+	SetDB(uri string) error
 
-// InitPostgres inits the connection to the database
-func InitPostgres(uri string) error {
-	var err error
-	DB, err = sqlx.New(uri)
-	return err
-}
+	// DB returns the current SQL connection
+	DB() db.Connection
 
-// Logentries represents an open connection to logentries
-var Logentries *le_go.Logger
+	// SetLogentries creates a connection to logentries
+	SetLogentries(token string) error
 
-// InitLogentries inits the connection to logentries
-func InitLogentries(token string) {
-	le, err := le_go.Connect(token)
-	if err != nil {
-		panic(err)
-	}
-	Logentries = le
-}
+	// Logger returns the default logger following this order:
+	// Logentries
+	// BasicLogger
+	Logger() logger.Logger
 
-// Sendgrid is a sendgrid email client
-var Sendgrid *SendgridParams
+	// SetSendgrid creates a mailer using sendgrid
+	SetSendgrid(apiKey, from, to, stacktraceUUID string) error
 
-// SendgridParams represents the configuration of Sendgrid
-type SendgridParams struct {
-	APIKey         string
-	From           string
-	To             string
-	StacktraceUUID string
-}
+	// Mailer returns the default mailer following this order:
+	// Sendgrid
+	// Noop
+	Mailer() mailer.Mailer
 
-// InitSendgrid creates a mailer that uses Sendgrid
-func InitSendgrid(config *SendgridParams) {
-	Sendgrid = config
-}
+	// SetGCP sets up Google Cloud Platform
+	SetGCP(apiKey, projectName, bucket string) error
 
-// GCP represents the configuration of Google Cloud
-type GCP struct {
-	APIKey      string
-	ProjectName string
-	Bucket      string
-}
+	// SetCloudinary setups Cloudinary as Storage provider
+	SetCloudinary(apiKey, secret, bucket string) error
 
-// GoogleCloud contains the Google Cloud configuration
-var GoogleCloud *GCP
-
-// InitGCP setups Google Cloud Platform
-func InitGCP(config *GCP) {
-	GoogleCloud = config
-}
-
-// CloudinaryParams represents the configuration of Cloudinary
-type CloudinaryParams struct {
-	APIKey string
-	Secret string
-	Bucket string
-}
-
-// Cloudinary contains Cloudinary's configuration
-var Cloudinary *CloudinaryParams
-
-// InitCloudinary setups Cloudinary
-func InitCloudinary(config *CloudinaryParams) {
-	Cloudinary = config
+	// FileStorage returns the default filestorage following this order
+	// GCP
+	// Cloudinary
+	// Filesystem
+	FileStorage(ctx context.Context) (filestorage.FileStorage, error)
 }

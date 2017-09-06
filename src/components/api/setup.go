@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/Nivl/go-rest-tools/dependencies"
-	"github.com/kelseyhightower/envconfig"
 )
 
 // Args represents the app args
@@ -24,47 +23,34 @@ type Args struct {
 }
 
 // Setup parses the env, sets the app globals and returns the params
-func Setup() (*Args, error) {
-	var params Args
-	if err := envconfig.Process("", &params); err != nil {
-		return nil, err
-	}
-
-	if err := dependencies.InitPostgres(params.PostgresURI); err != nil {
-		return nil, err
+func Setup(params *Args, deps dependencies.Dependencies) error {
+	if err := deps.SetDB(params.PostgresURI); err != nil {
+		return err
 	}
 
 	if params.LogEntriesToken != "" {
-		dependencies.InitLogentries(params.LogEntriesToken)
+		if err := deps.SetLogentries(params.LogEntriesToken); err != nil {
+			return err
+		}
 	}
 
 	if params.EmailAPIKey != "" {
-		p := &dependencies.SendgridParams{
-			APIKey:         params.EmailAPIKey,
-			From:           params.EmailFrom,
-			To:             params.EmailTo,
-			StacktraceUUID: params.EmailStacktraceUUID,
+		if err := deps.SetSendgrid(params.EmailAPIKey, params.EmailFrom, params.EmailTo, params.EmailStacktraceUUID); err != nil {
+			return err
 		}
-		dependencies.InitSendgrid(p)
 	}
 
 	if params.GCPAPIKey != "" {
-		p := &dependencies.GCP{
-			APIKey:      params.GCPAPIKey,
-			ProjectName: params.GCPProject,
-			Bucket:      params.GCPBucket,
+		if err := deps.SetGCP(params.GCPAPIKey, params.GCPProject, params.GCPBucket); err != nil {
+			return err
 		}
-		dependencies.InitGCP(p)
 	}
 
 	if params.CloudinaryAPIKey != "" {
-		p := &dependencies.CloudinaryParams{
-			APIKey: params.CloudinaryAPIKey,
-			Secret: params.CloudinarySecret,
-			Bucket: params.CloudinaryBucket,
+		if err := deps.SetCloudinary(params.CloudinaryAPIKey, params.CloudinarySecret, params.CloudinaryBucket); err != nil {
+			return err
 		}
-		dependencies.InitCloudinary(p)
 	}
 
-	return &params, nil
+	return nil
 }

@@ -1,6 +1,7 @@
 package organizations
 
 import (
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/gorilla/mux"
 )
@@ -23,7 +24,7 @@ var Endpoints = router.Endpoints{
 	EndpointUploadLogo: uploadLogoEndpoint,
 }
 
-// SetRoutes is used to set all the routes of the article
-func SetRoutes(r *mux.Router) {
-	Endpoints.Activate(r)
+// SetRoutes is used to set all the organization routes
+func SetRoutes(r *mux.Router, deps dependencies.Dependencies) {
+	Endpoints.Activate(r, deps)
 }
