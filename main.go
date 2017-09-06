@@ -3,20 +3,12 @@ package main
 import (
 	"net/http"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/gorilla/handlers"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/melvin-laplanche/ml-api/src/components/api"
 )
 
 func main() {
-	params := &api.Args{}
-	if err := envconfig.Process("", params); err != nil {
-		panic(err)
-	}
-
-	deps := &dependencies.APIDependencies{}
-	err := api.Setup(params, deps)
+	params, deps, err := api.DefaultSetup()
 	if err != nil {
 		panic(err)
 	}

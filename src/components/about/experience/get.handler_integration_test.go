@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/types/datetime"
@@ -19,7 +18,7 @@ import (
 )
 
 func TestIntegrationGet(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	_, userSession := testauth.NewAuth(t, dbCon)

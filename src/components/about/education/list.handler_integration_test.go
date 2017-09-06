@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
@@ -21,7 +20,7 @@ import (
 )
 
 func TestIntegrationListFiltering(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	totalBasicExp := 35
@@ -186,7 +185,7 @@ func TestIntegrationListFiltering(t *testing.T) {
 }
 
 func TestIntegrationListPagination(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	totalExp := 35
@@ -258,7 +257,7 @@ func TestIntegrationListPagination(t *testing.T) {
 }
 
 func TestIntegrationListOrdering(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	dates := []struct {

@@ -10,7 +10,6 @@ import (
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-rest-tools/types/datetime"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
@@ -20,7 +19,7 @@ import (
 )
 
 func TestIntegrationDeleteHappyPath(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)

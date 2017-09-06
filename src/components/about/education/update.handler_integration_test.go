@@ -10,7 +10,6 @@ import (
 
 	"github.com/dchest/uniuri"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/types/datetime"
@@ -23,7 +22,7 @@ import (
 )
 
 func TestIntegrationUpdate(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
@@ -136,7 +135,7 @@ func TestIntegrationUpdate(t *testing.T) {
 }
 
 func TestIntegrationUpdateOrganization(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	newOrg := testorganizations.NewPersisted(t, dbCon, nil)

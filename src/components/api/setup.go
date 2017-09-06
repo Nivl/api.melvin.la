@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/Nivl/go-rest-tools/dependencies"
+	"github.com/kelseyhightower/envconfig"
 )
 
 // Args represents the app args
@@ -20,6 +21,18 @@ type Args struct {
 	GCPProject          string `envconfig:"gcp_project"`
 	GCPBucket           string `envconfig:"gcp_bucket"`
 	Debug               bool   `default:"false"`
+}
+
+// DefaultSetup parses the env and returns the args and dependencies
+func DefaultSetup() (*Args, dependencies.Dependencies, error) {
+	params := &Args{}
+	if err := envconfig.Process("", params); err != nil {
+		return nil, nil, err
+	}
+
+	deps := &dependencies.APIDependencies{}
+	err := Setup(params, deps)
+	return params, deps, err
 }
 
 // Setup parses the env, sets the app globals and returns the params

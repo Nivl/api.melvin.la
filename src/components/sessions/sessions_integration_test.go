@@ -3,15 +3,20 @@
 package sessions_test
 
 import (
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/router"
 	"github.com/melvin-laplanche/ml-api/src/components/api"
 )
 
-var deps *router.Dependencies
+var (
+	deps dependencies.Dependencies
+)
 
 func init() {
-	api.Setup()
-	deps, _ = router.NewDefaultDependencies()
-	httptests.DefaultRouter = api.GetRouter()
+	var err error
+	_, deps, err = api.DefaultSetup()
+	if err != nil {
+		panic(err)
+	}
+	httptests.DefaultRouter = api.GetRouter(deps)
 }

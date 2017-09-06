@@ -9,12 +9,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/fs"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +21,7 @@ import (
 
 func TestIntegrationUploadHappyPath(t *testing.T) {
 	cwd, _ := os.Getwd()
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)

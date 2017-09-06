@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/types/datetime"
@@ -22,7 +21,7 @@ import (
 )
 
 func TestIntegrationAdd(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
@@ -30,7 +29,7 @@ func TestIntegrationAdd(t *testing.T) {
 	org := testorganizations.NewPersisted(t, dbCon, nil)
 	deletedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{
 		DeletedAt: datetime.Now(),
-	}) 
+	})
 
 	tests := []struct {
 		description string
