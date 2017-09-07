@@ -1,4 +1,4 @@
-FROM golang:1.8
+FROM golang:1.9
 
 # install depedencies
 RUN go get bitbucket.org/liamstask/goose/cmd/goose
