@@ -135,6 +135,20 @@ func TestUpdateInvalidParams(t *testing.T) {
 			},
 		},
 		{
+			Description: "Should fail on end_year before than start year",
+			MsgMatch:    education.ErrMsgEndYearBeforeStart,
+			FieldName:   "end_year",
+			Sources: map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"aa44ca86-553e-4e16-8c30-2e50e63f7eaa"},
+				},
+				"form": url.Values{
+					"start_year": []string{"2015"},
+					"end_year":   []string{"2013"},
+				},
+			},
+		},
+		{
 			Description: "Should fail on not nil but invalid in_trash",
 			MsgMatch:    params.ErrMsgInvalidBoolean,
 			FieldName:   "in_trash",
