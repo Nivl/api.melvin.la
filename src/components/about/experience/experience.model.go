@@ -9,7 +9,7 @@ import (
 )
 
 // Experience represents a work experience
-//go:generate api-cli generate model Experience -t about_experience -e Get,GetAny
+//go:generate api-cli generate model Experience -t about_experience -e Get,GetAny,JoinSQL
 type Experience struct {
 	ID        string             `db:"id"`
 	CreatedAt *datetime.DateTime `db:"created_at"`

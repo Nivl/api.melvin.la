@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
-	args, err := api.Setup()
+	params, deps, err := api.DefaultSetup()
 	if err != nil {
 		panic(err)
 	}
 
-	r := api.GetRouter()
-	port := ":" + args.Port
+	r := api.GetRouter(deps)
+	port := ":" + params.Port
 
 	handler := handlers.CORS(api.AllowedOrigins, api.AllowedMethods, api.AllowedHeaders)
 	http.ListenAndServe(port, handler(r))

@@ -10,8 +10,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
-  packages = ["dependencies","logger","network/http/basicauth","network/http/httptests","notifiers/mailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/date","types/datetime","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/slices","types/strngs"]
-  revision = "df8a87ccc8e6ea9f03937aecfda274b2da14e034"
+  packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","paginator","router","router/formfile","router/formfile/mockformfile","router/formfile/testformfile","router/guard","router/guard/testguard","router/mockrouter","router/params","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/date","types/datetime","types/filetype","types/models","types/models/lifecycle","types/ptrs","types/slices","types/strngs"]
+  revision = "adabce4e40dba39a06d3e55b59acdff12797d860"
 
 [[projects]]
   branch = "master"
@@ -143,7 +143,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "519500316f39a9934d1d88615a1a047035a4bae5"
+  revision = "38eaa396bab4275c0aedee767d0d674ef2b50994"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -166,6 +166,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "47967cd840b5f1a9750e0560c8b87d4798ad67dc1f1fd9126dbe759a284239b3"
+  inputs-digest = "3a1422d7e45784cfb256d38841bec88e040bf24fbec655e4be0bb04c35ec7aba"
   solver-name = "gps-cdcl"
   solver-version = 1

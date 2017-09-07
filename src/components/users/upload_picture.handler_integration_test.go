@@ -9,7 +9,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/storage/fs"
@@ -21,7 +20,7 @@ import (
 
 func TestIntegrationUploadHappyPath(t *testing.T) {
 	cwd, _ := os.Getwd()
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testusers.NewAdminAuth(t, dbCon)

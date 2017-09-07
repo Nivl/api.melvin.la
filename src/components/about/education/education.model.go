@@ -8,7 +8,7 @@ import (
 )
 
 // Education represents an education
-//go:generate api-cli generate model Education -t about_education -e Get,GetAny
+//go:generate api-cli generate model Education -t about_education -e Get,GetAny,JoinSQL
 type Education struct {
 	ID        string             `db:"id"`
 	CreatedAt *datetime.DateTime `db:"created_at"`

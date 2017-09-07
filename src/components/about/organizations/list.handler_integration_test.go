@@ -11,7 +11,6 @@ import (
 
 	"github.com/satori/go.uuid"
 
-	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
@@ -24,7 +23,7 @@ import (
 
 // TestIntegrationListPagination tests the pagination
 func TestIntegrationListPagination(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
 	_, admSession := testauth.NewAdminAuth(t, dbCon)
@@ -84,7 +83,7 @@ func TestIntegrationListPagination(t *testing.T) {
 
 // TestIntegrationListOrdering tests the ordering
 func TestIntegrationListOrdering(t *testing.T) {
-	dbCon := dependencies.DB
+	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	// Creates the data
