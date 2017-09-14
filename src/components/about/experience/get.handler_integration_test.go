@@ -21,8 +21,8 @@ func TestIntegrationGet(t *testing.T) {
 	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
-	_, userSession := testauth.NewAuth(t, dbCon)
-	_, adminSession := testauth.NewAdminAuth(t, dbCon)
+	_, userSession := testauth.NewPersistedAuth(t, dbCon)
+	_, adminSession := testauth.NewPersistedAdminAuth(t, dbCon)
 
 	basicExp := testexperience.NewPersisted(t, dbCon, nil)
 

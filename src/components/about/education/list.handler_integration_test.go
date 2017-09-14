@@ -45,7 +45,7 @@ func TestIntegrationListFiltering(t *testing.T) {
 	orphanDeleted.Organization.DeletedAt = datetime.Now()
 	orphanDeleted.Organization.Update(dbCon)
 
-	_, adminSession := testauth.NewAdminAuth(t, dbCon)
+	_, adminSession := testauth.NewPersistedAdminAuth(t, dbCon)
 
 	tests := []struct {
 		description   string

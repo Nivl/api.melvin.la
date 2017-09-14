@@ -20,8 +20,8 @@ func TestDelete(t *testing.T) {
 	dbCon := deps.DB()
 	defer lifecycle.PurgeModels(t, dbCon)
 
-	u1, s1 := testauth.NewAuth(t, dbCon)
-	_, s2 := testauth.NewAuth(t, dbCon)
+	u1, s1 := testauth.NewPersistedAuth(t, dbCon)
+	_, s2 := testauth.NewPersistedAuth(t, dbCon)
 
 	tests := []struct {
 		description string

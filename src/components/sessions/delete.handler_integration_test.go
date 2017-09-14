@@ -21,14 +21,14 @@ func TestDelete(t *testing.T) {
 	defer lifecycle.PurgeModels(t, dbCon)
 
 	// Do not delete safeSession
-	u1, safeSession := testauth.NewAuth(t, dbCon)
+	u1, safeSession := testauth.NewPersistedAuth(t, dbCon)
 
 	// We create a couple of sessions for the same user
 	toDelete2 := testauth.NewPersistedSession(t, dbCon, u1)
 	toDelete3 := testauth.NewPersistedSession(t, dbCon, u1)
 
 	// We create a other session attached to an other user
-	_, randomSession := testauth.NewAuth(t, dbCon)
+	_, randomSession := testauth.NewPersistedAuth(t, dbCon)
 
 	tests := []struct {
 		description string

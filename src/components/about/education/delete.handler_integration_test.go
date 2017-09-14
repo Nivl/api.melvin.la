@@ -21,7 +21,7 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 	basicExp := testeducation.NewPersisted(t, dbCon, nil)
 	trashedExp := testeducation.NewPersisted(t, dbCon, &education.Education{

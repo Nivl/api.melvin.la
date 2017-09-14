@@ -26,7 +26,7 @@ func TestIntegrationListPagination(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
 	for i := 0; i < 35; i++ {
@@ -105,7 +105,7 @@ func TestIntegrationListOrdering(t *testing.T) {
 	expectedNames.Sort()
 
 	// auth of the request
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
 	// We set the default params manually otherwise it will send 0
