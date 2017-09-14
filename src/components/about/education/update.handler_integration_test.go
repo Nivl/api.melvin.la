@@ -12,9 +12,9 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education/testeducation"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
@@ -25,7 +25,7 @@ func TestIntegrationUpdate(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
 	noop := testeducation.NewPersisted(t, dbCon, nil)
@@ -148,7 +148,7 @@ func TestIntegrationUpdateOrganization(t *testing.T) {
 		OrganizationID: ptrs.NewString(newOrg.ID),
 	}
 
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	rec := callUpdate(t, params, httptests.NewRequestAuth(admSession))
 
 	if assert.Equal(t, http.StatusOK, rec.Code) {

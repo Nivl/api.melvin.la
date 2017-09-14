@@ -1,7 +1,5 @@
 package ptrs
 
-import "time"
-
 // NewBool takes a bool and returns a pointer to a new bool of the same value
 func NewBool(v bool) *bool {
 	b := v
@@ -10,12 +8,6 @@ func NewBool(v bool) *bool {
 
 // NewInt takes an int and returns a pointer to a new int of the same value
 func NewInt(v int) *int {
-	i := v
-	return &i
-}
-
-// NewWeekday takes an int and returns a pointer to a new int of the same value
-func NewWeekday(v time.Weekday) *time.Weekday {
 	i := v
 	return &i
 }

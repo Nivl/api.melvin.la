@@ -1,6 +1,6 @@
 package users
 
-import "github.com/Nivl/go-rest-tools/types/ptrs"
+import "github.com/Nivl/go-types/ptrs"
 
 // ProfilePayload represents the public information of a user
 type ProfilePayload struct {

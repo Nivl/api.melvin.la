@@ -5,12 +5,12 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/date"
+	"github.com/Nivl/go-types/date"
 	"github.com/dchest/uniuri"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -188,7 +188,7 @@ func TestAddInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid start date",
-			MsgMatch:    params.ErrMsgInvalidDate,
+			MsgMatch:    date.ErrMsgInvalidFormat,
 			FieldName:   "start_date",
 			Sources: map[string]url.Values{
 				"form": url.Values{

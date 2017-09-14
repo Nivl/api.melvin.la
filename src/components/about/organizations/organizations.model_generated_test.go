@@ -13,7 +13,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 )
 
 func TestJoinSQL(t *testing.T) {

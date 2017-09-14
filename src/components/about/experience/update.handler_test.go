@@ -9,15 +9,15 @@ import (
 
 	"github.com/satori/go.uuid"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/date"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/date"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -71,7 +71,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid start_date",
-			MsgMatch:    params.ErrMsgInvalidDate,
+			MsgMatch:    date.ErrMsgInvalidFormat,
 			FieldName:   "start_date",
 			Sources: map[string]url.Values{
 				"url": url.Values{
@@ -84,7 +84,7 @@ func TestUpdateInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid end_date",
-			MsgMatch:    params.ErrMsgInvalidDate,
+			MsgMatch:    date.ErrMsgInvalidFormat,
 			FieldName:   "end_date",
 			Sources: map[string]url.Values{
 				"url": url.Values{

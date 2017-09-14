@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/Nivl/go-params/perror"
+
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/lib/pq"
 )
@@ -35,6 +37,19 @@ func NewFromSQL(err error) error {
 			return err
 		}
 	}
+	return err
+}
+
+// NewFromError returns an api error based on an error
+// the provided error will be returned if it doesn't match any known error
+func NewFromError(err error) error {
+	err = NewFromSQL(err)
+
+	switch e := err.(type) {
+	case perror.Error:
+		return NewBadRequest(e.Field(), e.Error())
+	}
+
 	return err
 }
 

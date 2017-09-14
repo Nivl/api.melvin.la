@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/formfile"
-	"github.com/Nivl/go-rest-tools/router/params"
+	"github.com/Nivl/go-params/formfile"
+	"github.com/Nivl/go-params"
 	"github.com/gorilla/mux"
 )
 
@@ -41,7 +41,7 @@ func (ri *RequestInfo) ParseParams() {
 	}
 
 	var sources map[string]url.Values
-	p := params.NewParams(ri.Params)
+	p := params.New(ri.Params)
 	sources, ri.fileParams = p.Extract()
 
 	for k, v := range sources["url"] {

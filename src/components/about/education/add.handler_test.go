@@ -7,7 +7,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-rest-tools/router/params"
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/dchest/uniuri"

@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
@@ -22,7 +22,7 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 	basicOrg := testorganizations.NewPersisted(t, dbCon, nil)
 	trashedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{

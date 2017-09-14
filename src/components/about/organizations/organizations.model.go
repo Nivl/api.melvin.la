@@ -1,6 +1,6 @@
 package organizations
 
-import "github.com/Nivl/go-rest-tools/types/datetime"
+import "github.com/Nivl/go-types/datetime"
 
 // Organization is a structure representing an organization that can be saved in the database
 //go:generate api-cli generate model Organization -t about_organizations

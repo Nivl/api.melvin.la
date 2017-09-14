@@ -15,7 +15,7 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
@@ -27,7 +27,7 @@ func TestIntegrationListPagination(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
 	for i := 0; i < 35; i++ {
@@ -117,7 +117,7 @@ func TestIntegrationListSorting(t *testing.T) {
 	expectedNames.Sort()
 
 	// auth of the request
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
 	// We set the default params manually otherwise it will send 0

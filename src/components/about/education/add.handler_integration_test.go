@@ -11,7 +11,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
@@ -24,7 +24,7 @@ func TestIntegrationAdd(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 	org := testorganizations.NewPersisted(t, dbCon, nil)
 	deletedOrg := testorganizations.NewPersisted(t, dbCon, &organizations.Organization{

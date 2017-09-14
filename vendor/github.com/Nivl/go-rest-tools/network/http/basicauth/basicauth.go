@@ -46,7 +46,7 @@ func ParseAuthHeader(auths []string, typeWanted, realmWanted string) (string, st
 
 			//  if a realm is not wanted we should not have more that 2 params
 			// (the type and the encoded string)
-			if nbArg != 2 && realmWanted == "" {
+			if realmWanted == "" && nbArg != 2 {
 				continue
 			}
 			realmWantedStr := fmt.Sprintf(`realm="%s"`, realmWanted)

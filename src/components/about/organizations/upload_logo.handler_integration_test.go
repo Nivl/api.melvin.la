@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
+	"github.com/Nivl/go-params/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/fs"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
@@ -24,7 +24,7 @@ func TestIntegrationUploadHappyPath(t *testing.T) {
 	dbCon := deps.DB()
 
 	defer lifecycle.PurgeModels(t, dbCon)
-	_, admSession := testauth.NewAdminAuth(t, dbCon)
+	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 	org := testorganizations.NewPersisted(t, dbCon, nil)
 

@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/formfile"
+	"github.com/Nivl/go-params/formfile"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/storage/filestorage"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/filetype"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/filetype"
+	"github.com/Nivl/go-types/ptrs"
 )
 
 var uploadPictureEndpoint = &router.Endpoint{

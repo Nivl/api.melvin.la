@@ -11,10 +11,10 @@ import (
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/date"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/date"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience/testexperience"
 	"github.com/stretchr/testify/assert"
@@ -46,7 +46,7 @@ func TestIntegrationListFiltering(t *testing.T) {
 	orphanDeleted.Organization.DeletedAt = datetime.Now()
 	orphanDeleted.Organization.Update(dbCon)
 
-	_, adminSession := testauth.NewAdminAuth(t, dbCon)
+	_, adminSession := testauth.NewPersistedAdminAuth(t, dbCon)
 
 	tests := []struct {
 		description   string

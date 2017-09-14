@@ -4,8 +4,8 @@ import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/date"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/date"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 )
 

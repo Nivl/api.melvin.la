@@ -4,7 +4,7 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 )
 
 // Profile represents the public information of a user

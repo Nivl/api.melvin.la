@@ -4,13 +4,13 @@ package organizations
 
 import (
 	"errors"
-	
+
 	"fmt"
 	"strings"
-	
+
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	uuid "github.com/satori/go.uuid"
 )

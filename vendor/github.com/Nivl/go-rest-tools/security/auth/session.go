@@ -5,7 +5,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 )
 
 // Session is a structure representing a session that can be saved in the database
