@@ -8,32 +8,39 @@ import (
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 )
 
-// NewAuth creates a new user and their session
-func NewAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
+// NewAuth creates a non-persisted user and their session
+func NewAuth() (*auth.User, *auth.Session) {
+	user := NewUser()
+	session := NewSession(user)
+	return user, session
+}
+
+// NewPersistedAuth creates a persisted new user and their session
+func NewPersistedAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	user := NewPersistedUser(t, q, nil)
 	session := NewPersistedSession(t, q, user)
 	return user, session
 }
 
-// NewAdminAuth creates a new admin and their session
-func NewAdminAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
+// NewAdminAuth creates a new non-persisted admin and their session
+func NewAdminAuth() (*auth.User, *auth.Session) {
+	user, session := NewAuth()
+	user.IsAdmin = true
+	return user, session
+}
+
+// NewPersistedAdminAuth creates a new admin and their session
+func NewPersistedAdminAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 	user := NewPersistedUser(t, q, &auth.User{IsAdmin: true})
 	session := NewPersistedSession(t, q, user)
 	return user, session
 }
 
 // NewSession creates a non-persisted session for the given user
-func NewSession(t *testing.T, q db.Queryable, user *auth.User) *auth.Session {
-	session := &auth.Session{
+func NewSession(user *auth.User) *auth.Session {
+	return &auth.Session{
 		UserID: user.ID,
 	}
-
-	if err := session.Create(q); err != nil {
-		t.Fatal(err)
-	}
-
-	lifecycle.SaveModels(t, session)
-	return session
 }
 
 // NewPersistedSession creates and persists a new session for the given user

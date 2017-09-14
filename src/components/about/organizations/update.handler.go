@@ -3,7 +3,7 @@ package organizations
 import (
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 )
 
 var updateEndpoint = &router.Endpoint{

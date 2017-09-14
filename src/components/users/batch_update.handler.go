@@ -5,7 +5,7 @@ import (
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/apierror"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/ptrs"
 )
 
 var batchUpdateEndpoint = &router.Endpoint{

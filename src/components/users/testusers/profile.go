@@ -7,7 +7,7 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	uuid "github.com/satori/go.uuid"
@@ -81,7 +81,7 @@ func NewAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
 
 // NewAuthProfile creates a new profile, user, and their session
 func NewAuthProfile(t *testing.T, q db.Queryable) (*users.Profile, *auth.Session) {
-	user, session := testauth.NewAuth(t, q)
+	user, session := testauth.NewPersistedAuth(t, q)
 	p := NewProfile()
 	p.ID = ""
 	p.User = user
@@ -94,7 +94,7 @@ func NewAuthProfile(t *testing.T, q db.Queryable) (*users.Profile, *auth.Session
 
 // NewAdminAuth creates a new admin and their session
 func NewAdminAuth(t *testing.T, q db.Queryable) (*auth.User, *auth.Session) {
-	user, session := testauth.NewAdminAuth(t, q)
+	user, session := testauth.NewPersistedAdminAuth(t, q)
 	p := NewProfile()
 	p.ID = ""
 	p.User = user

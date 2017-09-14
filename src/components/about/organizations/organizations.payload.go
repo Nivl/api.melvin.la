@@ -1,8 +1,8 @@
 package organizations
 
 import (
-	"github.com/Nivl/go-rest-tools/types/datetime"
-	"github.com/Nivl/go-rest-tools/types/ptrs"
+	"github.com/Nivl/go-types/datetime"
+	"github.com/Nivl/go-types/ptrs"
 )
 
 // Payload represents an article to be returned to the clients

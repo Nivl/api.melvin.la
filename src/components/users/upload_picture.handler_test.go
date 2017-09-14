@@ -6,18 +6,20 @@ import (
 	"os"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/satori/go.uuid"
 
+	"github.com/Nivl/go-params"
+	"github.com/Nivl/go-params/formfile/mockformfile"
+	"github.com/Nivl/go-params/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/router"
-	"github.com/Nivl/go-rest-tools/router/formfile/mockformfile"
-	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-rest-tools/router/params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/storage/filestorage/mockfilestorage"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/Nivl/go-types/filetype"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
@@ -48,6 +50,8 @@ func TestUploadPictureAccess(t *testing.T) {
 }
 
 func TestUploadPictureInvalidParams(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	// defer mockCtrl.Finish()
 
 	// create the multipart data
 	cwd, _ := os.Getwd()
@@ -57,14 +61,14 @@ func TestUploadPictureInvalidParams(t *testing.T) {
 	imageHeader, imageFile := testformfile.NewMultipartData(t, cwd, "black_pixel.png")
 	defer imageFile.Close()
 
-	validFileHolder := new(mockformfile.FileHolder)
-	validFileHolder.On("FormFile", "picture").Return(imageFile, imageHeader, nil)
+	validFileHolder := mockformfile.NewMockFileHolder(mockCtrl)
+	validFileHolder.EXPECT().FormFile("picture").Return(imageFile, imageHeader, nil)
 
-	noFileHolder := new(mockformfile.FileHolder)
-	noFileHolder.On("FormFile", "picture").Return(nil, nil, http.ErrMissingFile)
+	noFileHolder := mockformfile.NewMockFileHolder(mockCtrl)
+	noFileHolder.EXPECT().FormFile("picture").Return(nil, nil, http.ErrMissingFile)
 
-	invalidFileHolder := new(mockformfile.FileHolder)
-	invalidFileHolder.On("FormFile", "picture").Return(licenseFile, licenseHeader, nil)
+	invalidFileHolder := mockformfile.NewMockFileHolder(mockCtrl)
+	invalidFileHolder.EXPECT().FormFile("picture").Return(licenseFile, licenseHeader, nil)
 
 	testCases := []testguard.InvalidParamsTestCase{
 		{
@@ -100,7 +104,7 @@ func TestUploadPictureInvalidParams(t *testing.T) {
 		},
 		{
 			Description: "Should fail on invalid picture",
-			MsgMatch:    params.ErrMsgInvalidImage,
+			MsgMatch:    filetype.ErrMsgUnsuportedImageFormat,
 			FieldName:   "picture",
 			FileHolder:  invalidFileHolder,
 			Sources: map[string]url.Values{
@@ -141,13 +145,15 @@ func TestUploadPictureValidParams(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.description, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
 			t.Parallel()
 
 			imageHeader, imageFile := testformfile.NewMultipartData(t, cwd, tc.filename)
 			defer imageFile.Close()
 
-			fileholder := new(mockformfile.FileHolder)
-			fileholder.On("FormFile", "picture").Return(imageFile, imageHeader, nil)
+			fileholder := mockformfile.NewMockFileHolder(mockCtrl)
+			fileholder.EXPECT().FormFile("picture").Return(imageFile, imageHeader, nil)
 
 			endpts := users.Endpoints[users.EndpointUploadPicture]
 			data, err := endpts.Guard.ParseParams(tc.sources, fileholder)

@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/Nivl/go-rest-tools/router/formfile"
-	"github.com/Nivl/go-rest-tools/router/params"
+	"github.com/Nivl/go-params"
+	"github.com/Nivl/go-params/formfile"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 )
@@ -30,9 +30,9 @@ func (g *Guard) ParseParams(sources map[string]url.Values, fileHolder formfile.F
 
 	// We give p the same type as g.ParamStruct
 	p := reflect.New(reflect.TypeOf(g.ParamStruct).Elem()).Interface()
-	err := params.NewParams(p).Parse(sources, fileHolder)
+	err := params.New(p).Parse(sources, fileHolder)
 	if err != nil {
-		return nil, err
+		return nil, apierror.NewFromError(err)
 	}
 	return p, nil
 }

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/Nivl/go-rest-tools/types/datetime"
+	"github.com/Nivl/go-types/datetime"
 	"golang.org/x/crypto/bcrypt"
 )
 

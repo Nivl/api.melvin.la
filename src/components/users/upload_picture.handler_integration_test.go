@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/router/formfile/testformfile"
+	"github.com/Nivl/go-params/formfile/testformfile"
 	"github.com/Nivl/go-rest-tools/storage/fs"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/users"

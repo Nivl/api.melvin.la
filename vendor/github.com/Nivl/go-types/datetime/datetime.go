@@ -54,5 +54,5 @@ func (t *DateTime) Equal(u *DateTime) bool {
 
 // AddDate returns the time corresponding to adding the given number of years, months, and days to t.
 func (t *DateTime) AddDate(years int, months int, days int) *DateTime {
-	return &DateTime{Time: time.Now().AddDate(years, months, days)}
+	return &DateTime{Time: t.Time.AddDate(years, months, days)}
 }

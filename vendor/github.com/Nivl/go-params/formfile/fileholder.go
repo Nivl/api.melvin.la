@@ -1,3 +1,5 @@
+//go:generate mockgen -destination mockformfile/fileholder.go -package mockformfile github.com/Nivl/go-params/formfile FileHolder
+
 package formfile
 
 import "mime/multipart"

@@ -1,12 +1,17 @@
 package filetype
 
 import (
+	"errors"
 	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"io"
 )
+
+// ErrMsgUnsuportedImageFormat represents the error message returned for an
+// unsupported image type
+var ErrMsgUnsuportedImageFormat = "unsuported image format"
 
 // ImageDecoder is a type that represents an image decoder
 type ImageDecoder func(r io.Reader) (image.Image, error)
@@ -25,7 +30,7 @@ func IsImage(r io.ReadSeeker) (bool, string, error) {
 	}
 	validator, found := validType[mimeType]
 	if !found {
-		return false, "", nil
+		return false, "", errors.New(ErrMsgUnsuportedImageFormat)
 	}
 	isValid, err := validator(r)
 	return isValid, mimeType, err
@@ -33,22 +38,22 @@ func IsImage(r io.ReadSeeker) (bool, string, error) {
 
 // IsPNG validates a PNG file
 func IsPNG(r io.ReadSeeker) (bool, error) {
-	return validateImage(r, png.Decode)
+	return ValidateImage(r, png.Decode)
 }
 
 // IsJPG validates a JPG file
 func IsJPG(r io.ReadSeeker) (bool, error) {
-	return validateImage(r, jpeg.Decode)
+	return ValidateImage(r, jpeg.Decode)
 }
 
 // IsGIF validates a GIF file
 func IsGIF(r io.ReadSeeker) (bool, error) {
-	return validateImage(r, gif.Decode)
+	return ValidateImage(r, gif.Decode)
 }
 
-// validateImage check if an images has a valid format
+// ValidateImage check if an images has a valid format
 // Update when this gets done: https://github.com/golang/go/issues/18098
-func validateImage(r io.ReadSeeker, decode ImageDecoder) (bool, error) {
+func ValidateImage(r io.ReadSeeker, decode ImageDecoder) (bool, error) {
 	initialPos, err := r.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return false, err
