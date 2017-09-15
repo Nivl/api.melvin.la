@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"database/sql"
+	"net/http"
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
@@ -10,7 +11,7 @@ import (
 )
 
 var addEndpoint = &router.Endpoint{
-	Verb:    "POST",
+	Verb:    http.MethodPost,
 	Path:    "/sessions",
 	Handler: Add,
 	Guard: &guard.Guard{

@@ -1,11 +1,13 @@
 package users
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 )
 
 var getFeaturedEndpoint = &router.Endpoint{
-	Verb:    "GET",
+	Verb:    http.MethodGet,
 	Path:    "/users/featured",
 	Handler: GetFeatured,
 }

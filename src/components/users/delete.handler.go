@@ -1,14 +1,16 @@
 package users
 
 import (
-	"github.com/Nivl/go-rest-tools/types/apierror"
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/types/apierror"
 )
 
 var deleteEndpoint = &router.Endpoint{
-	Verb:    "DELETE",
+	Verb:    http.MethodDelete,
 	Path:    "/users/{id}",
 	Handler: Delete,
 	Guard: &guard.Guard{

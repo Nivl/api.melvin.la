@@ -1,6 +1,10 @@
 package api
 
-import "github.com/gorilla/handlers"
+import (
+	"net/http"
+
+	"github.com/gorilla/handlers"
+)
 
 // AllowedOrigins is a list containing all origins allowed to hit the API
 var AllowedOrigins = handlers.AllowedOrigins([]string{
@@ -11,7 +15,7 @@ var AllowedOrigins = handlers.AllowedOrigins([]string{
 
 // AllowedMethods is a list containing all HTTP verb accepted by the API
 var AllowedMethods = handlers.AllowedMethods([]string{
-	"GET", "POST", "PATCH", "DELETE",
+	http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete,
 })
 
 // AllowedHeaders is a list custom headers accepted by the API

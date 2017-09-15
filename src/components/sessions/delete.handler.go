@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"database/sql"
+	"net/http"
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
@@ -10,7 +11,7 @@ import (
 )
 
 var deleteEndpoint = &router.Endpoint{
-	Verb:    "DELETE",
+	Verb:    http.MethodDelete,
 	Path:    "/sessions/{token}",
 	Handler: Delete,
 	Guard: &guard.Guard{

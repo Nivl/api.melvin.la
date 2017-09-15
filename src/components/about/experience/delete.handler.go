@@ -1,12 +1,14 @@
 package experience
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 )
 
 var deleteEndpoint = &router.Endpoint{
-	Verb:    "DELETE",
+	Verb:    http.MethodDelete,
 	Path:    "/about/experience/{id}",
 	Handler: Delete,
 	Guard: &guard.Guard{

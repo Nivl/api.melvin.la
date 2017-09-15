@@ -2,6 +2,7 @@ package education
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
@@ -11,7 +12,7 @@ import (
 )
 
 var updateEndpoint = &router.Endpoint{
-	Verb:    "PATCH",
+	Verb:    http.MethodPatch,
 	Path:    "/about/education/{id}",
 	Handler: Update,
 	Guard: &guard.Guard{

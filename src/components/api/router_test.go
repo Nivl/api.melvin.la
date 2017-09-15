@@ -19,7 +19,7 @@ import (
 
 // Test that an un-existing route returns JSON and a 404
 func TestRouteNotFound(t *testing.T) {
-	req, err := http.NewRequest("GET", "/404", nil)
+	req, err := http.NewRequest(http.MethodGet, "/404", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

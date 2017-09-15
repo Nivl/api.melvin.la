@@ -2,6 +2,7 @@ package education
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
@@ -9,7 +10,7 @@ import (
 )
 
 var addEndpoint = &router.Endpoint{
-	Verb:    "POST",
+	Verb:    http.MethodPost,
 	Path:    "/about/education",
 	Handler: Add,
 	Guard: &guard.Guard{

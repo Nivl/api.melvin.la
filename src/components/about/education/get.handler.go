@@ -1,12 +1,14 @@
 package education
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 )
 
 var getEndpoint = &router.Endpoint{
-	Verb:    "GET",
+	Verb:    http.MethodGet,
 	Path:    "/about/education/{id}",
 	Handler: Get,
 	Guard: &guard.Guard{

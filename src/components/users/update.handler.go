@@ -1,6 +1,8 @@
 package users
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
@@ -8,7 +10,7 @@ import (
 )
 
 var updateEndpoint = &router.Endpoint{
-	Verb:    "PATCH",
+	Verb:    http.MethodPatch,
 	Path:    "/users/{id}",
 	Handler: Update,
 	Guard: &guard.Guard{
