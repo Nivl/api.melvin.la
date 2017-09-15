@@ -1,13 +1,15 @@
 package organizations
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-types/datetime"
 )
 
 var updateEndpoint = &router.Endpoint{
-	Verb:    "PATCH",
+	Verb:    http.MethodPatch,
 	Path:    "/about/organizations/{id}",
 	Handler: Update,
 	Guard: &guard.Guard{

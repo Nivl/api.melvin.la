@@ -1,13 +1,15 @@
 package users
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 )
 
 var addEndpoint = &router.Endpoint{
-	Verb:    "POST",
+	Verb:    http.MethodPost,
 	Path:    "/users",
 	Handler: Add,
 	Guard: &guard.Guard{

@@ -2,9 +2,10 @@ package users
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-params/formfile"
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/storage/filestorage"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -13,7 +14,7 @@ import (
 )
 
 var uploadPictureEndpoint = &router.Endpoint{
-	Verb:    "PUT",
+	Verb:    http.MethodPut,
 	Path:    "/users/{id}/picture",
 	Handler: UploadPicture,
 	Guard: &guard.Guard{

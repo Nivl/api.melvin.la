@@ -1,6 +1,7 @@
 package education
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/paginator"
@@ -11,7 +12,7 @@ import (
 )
 
 var listEndpoint = &router.Endpoint{
-	Verb:    "GET",
+	Verb:    http.MethodGet,
 	Path:    "/about/education",
 	Handler: List,
 	Guard: &guard.Guard{

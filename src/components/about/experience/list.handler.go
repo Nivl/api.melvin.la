@@ -1,6 +1,7 @@
 package experience
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/paginator"
@@ -10,7 +11,7 @@ import (
 )
 
 var listEndpoint = &router.Endpoint{
-	Verb:    "GET",
+	Verb:    http.MethodGet,
 	Path:    "/about/experience",
 	Handler: List,
 	Guard: &guard.Guard{

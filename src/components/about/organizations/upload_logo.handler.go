@@ -2,9 +2,10 @@ package organizations
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-params/formfile"
+	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/storage/filestorage"
 	"github.com/Nivl/go-types/filetype"
@@ -12,7 +13,7 @@ import (
 )
 
 var uploadLogoEndpoint = &router.Endpoint{
-	Verb:    "PUT",
+	Verb:    http.MethodPut,
 	Path:    "/about/organizations/{id}/logo",
 	Handler: UploadLogo,
 	Guard: &guard.Guard{

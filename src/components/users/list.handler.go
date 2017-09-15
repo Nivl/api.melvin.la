@@ -2,6 +2,7 @@ package users
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -13,7 +14,7 @@ import (
 )
 
 var listEndpoint = &router.Endpoint{
-	Verb:    "GET",
+	Verb:    http.MethodGet,
 	Path:    "/users",
 	Handler: List,
 	Guard: &guard.Guard{

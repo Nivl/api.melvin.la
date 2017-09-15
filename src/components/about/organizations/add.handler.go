@@ -1,10 +1,14 @@
 package organizations
 
-import "github.com/Nivl/go-rest-tools/router"
-import "github.com/Nivl/go-rest-tools/router/guard"
+import (
+	"net/http"
+
+	"github.com/Nivl/go-rest-tools/router"
+	"github.com/Nivl/go-rest-tools/router/guard"
+)
 
 var addEndpoint = &router.Endpoint{
-	Verb:    "POST",
+	Verb:    http.MethodPost,
 	Path:    "/about/organizations",
 	Handler: Add,
 	Guard: &guard.Guard{

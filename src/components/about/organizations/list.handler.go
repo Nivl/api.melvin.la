@@ -2,6 +2,7 @@ package organizations
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/router"
@@ -9,7 +10,7 @@ import (
 )
 
 var listEndpoint = &router.Endpoint{
-	Verb:    "GET",
+	Verb:    http.MethodGet,
 	Path:    "/about/organizations",
 	Handler: List,
 	Guard: &guard.Guard{

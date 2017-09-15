@@ -1,6 +1,8 @@
 package experience
 
 import (
+	"net/http"
+
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -10,7 +12,7 @@ import (
 )
 
 var updateEndpoint = &router.Endpoint{
-	Verb:    "PATCH",
+	Verb:    http.MethodPatch,
 	Path:    "/about/experience/{id}",
 	Handler: Update,
 	Guard: &guard.Guard{
