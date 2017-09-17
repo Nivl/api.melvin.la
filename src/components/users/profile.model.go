@@ -16,8 +16,8 @@ type Profile struct {
 	DeletedAt *datetime.DateTime `db:"deleted_at"`
 
 	UserID           string  `db:"user_id"`
-	FirstName        *string `json:"first_name"`
-	LastName         *string `json:"last_name"`
+	FirstName        *string `db:"first_name"`
+	LastName         *string `db:"last_name"`
 	Picture          *string `db:"picture"`
 	PhoneNumber      *string `db:"phone_number"`
 	PublicEmail      *string `db:"public_email"`

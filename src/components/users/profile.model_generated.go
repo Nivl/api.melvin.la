@@ -4,7 +4,7 @@ package users
 
 import (
 	"errors"
-
+	
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-types/datetime"
@@ -46,7 +46,7 @@ func (p *Profile) doCreate(q db.Queryable) error {
 		p.CreatedAt = datetime.Now()
 	}
 
-	stmt := "INSERT INTO user_profiles (id, created_at, updated_at, deleted_at, user_id, picture, phone_number, public_email, linkedin_custom_url, facebook_username, twitter_username, is_featured) VALUES (:id, :created_at, :updated_at, :deleted_at, :user_id, :picture, :phone_number, :public_email, :linkedin_custom_url, :facebook_username, :twitter_username, :is_featured)"
+	stmt := "INSERT INTO user_profiles (id, created_at, updated_at, deleted_at, user_id, first_name, last_name, picture, phone_number, public_email, linkedin_custom_url, facebook_username, twitter_username, is_featured) VALUES (:id, :created_at, :updated_at, :deleted_at, :user_id, :first_name, :last_name, :picture, :phone_number, :public_email, :linkedin_custom_url, :facebook_username, :twitter_username, :is_featured)"
 	_, err := q.NamedExec(stmt, p)
 
   return apierror.NewFromSQL(err)
@@ -70,7 +70,7 @@ func (p *Profile) doUpdate(q db.Queryable) error {
 
 	p.UpdatedAt = datetime.Now()
 
-	stmt := "UPDATE user_profiles SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, user_id=:user_id, picture=:picture, phone_number=:phone_number, public_email=:public_email, linkedin_custom_url=:linkedin_custom_url, facebook_username=:facebook_username, twitter_username=:twitter_username, is_featured=:is_featured WHERE id=:id"
+	stmt := "UPDATE user_profiles SET id=:id, created_at=:created_at, updated_at=:updated_at, deleted_at=:deleted_at, user_id=:user_id, first_name=:first_name, last_name=:last_name, picture=:picture, phone_number=:phone_number, public_email=:public_email, linkedin_custom_url=:linkedin_custom_url, facebook_username=:facebook_username, twitter_username=:twitter_username, is_featured=:is_featured WHERE id=:id"
 	_, err := q.NamedExec(stmt, p)
 
 	return apierror.NewFromSQL(err)

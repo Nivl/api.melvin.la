@@ -28,8 +28,10 @@ func TestGetFeaturedHappyPath(t *testing.T) {
 	res := new(mockrouter.HTTPResponse)
 	res.ExpectOk("*users.ProfilePayload", func(args mock.Arguments) {
 		pld := args.Get(0).(*users.ProfilePayload)
-		assert.Equal(t, featuredUser.User.ID, pld.ID, "The user ID should not have changed")
-		assert.Equal(t, featuredUser.Name, pld.Name, "Name should not have changed")
+		assert.Equal(t, featuredUser.User.ID, pld.ID, "the user ID should not have changed")
+		assert.Equal(t, featuredUser.Name, pld.Name, "the Name should not have changed")
+		assert.Equal(t, *featuredUser.LastName, pld.LastName, "the LastName should not have changed")
+		assert.Equal(t, *featuredUser.FirstName, pld.FirstName, "the FirstName should not have changed")
 		assert.Equal(t, *featuredUser.LinkedIn, pld.LinkedIn, "the LinkedIn id should not have changed")
 		assert.Empty(t, pld.Email, "the email should not be returned to anyone")
 	})

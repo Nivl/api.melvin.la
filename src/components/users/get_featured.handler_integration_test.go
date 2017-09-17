@@ -38,6 +38,8 @@ func TestIntegrationGetFeatured(t *testing.T) {
 
 		assert.Equal(t, featuredProfile.User.ID, profile.ID, "Wrong profile returned")
 		assert.Empty(t, profile.Email, "the Email should be private")
+		assert.Equal(t, *featuredProfile.LastName, profile.LastName, "Wrong LastName returned")
+		assert.Equal(t, *featuredProfile.FirstName, profile.FirstName, "Wrong FirstName returned")
 	}
 }
 
