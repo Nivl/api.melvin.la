@@ -16,6 +16,7 @@ type Message struct {
 func NewMessage(templateID string) *Message {
 	return &Message{
 		TemplateID: templateID,
+		Vars:       map[string]string{},
 	}
 }
 
