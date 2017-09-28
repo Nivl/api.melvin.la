@@ -23,13 +23,13 @@ func (_m *Mailer) Send(msg *mailer.Message) error {
 	return r0
 }
 
-// SendStackTrace provides a mock function with given fields: trace, endpoint, message, id
-func (_m *Mailer) SendStackTrace(trace []byte, endpoint string, message string, id string) error {
-	ret := _m.Called(trace, endpoint, message, id)
+// SendStackTrace provides a mock function with given fields: trace, message, context
+func (_m *Mailer) SendStackTrace(trace []byte, message string, context map[string]string) error {
+	ret := _m.Called(trace, message, context)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func([]byte, string, string, string) error); ok {
-		r0 = rf(trace, endpoint, message, id)
+	if rf, ok := ret.Get(0).(func([]byte, string, map[string]string) error); ok {
+		r0 = rf(trace, message, context)
 	} else {
 		r0 = ret.Error(0)
 	}
