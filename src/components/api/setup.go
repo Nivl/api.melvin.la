@@ -21,6 +21,7 @@ type Args struct {
 	GCPProject          string `envconfig:"gcp_project"`
 	GCPBucket           string `envconfig:"gcp_bucket"`
 	Debug               bool   `default:"false"`
+	SentryDSN           string `envconfig:"sentry_dsn"`
 }
 
 // DefaultSetup parses the env and returns the args and dependencies
@@ -61,6 +62,12 @@ func Setup(params *Args, deps dependencies.Dependencies) error {
 
 	if params.CloudinaryAPIKey != "" {
 		if err := deps.SetCloudinary(params.CloudinaryAPIKey, params.CloudinarySecret, params.CloudinaryBucket); err != nil {
+			return err
+		}
+	}
+
+	if params.SentryDSN != "" {
+		if err := deps.SetSentry(params.SentryDSN); err != nil {
 			return err
 		}
 	}

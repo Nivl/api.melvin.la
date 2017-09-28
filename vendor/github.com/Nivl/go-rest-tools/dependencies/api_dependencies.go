@@ -2,10 +2,12 @@ package dependencies
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Nivl/go-rest-tools/dependencies/gcp"
 	"github.com/Nivl/go-rest-tools/logger"
 	"github.com/Nivl/go-rest-tools/notifiers/mailer"
+	"github.com/Nivl/go-rest-tools/notifiers/reporter"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/storage/db/sqlx"
 	"github.com/Nivl/go-rest-tools/storage/filestorage"
@@ -22,8 +24,9 @@ type APIDependencies struct {
 	gcp        gcp.GCP
 	cloudinary filestorage.FileStorage
 
-	logger logger.Logger
-	mailer mailer.Mailer
+	logger   logger.Logger
+	mailer   mailer.Mailer
+	reporter reporter.Creator
 }
 
 // SetDB creates a connection to a SQL database
@@ -104,4 +107,34 @@ func (deps *APIDependencies) FileStorage(ctx context.Context) (filestorage.FileS
 		return deps.cloudinary, nil
 	}
 	return filestorage.NewFSStorage()
+}
+
+// SetSentry creates a reporter using Sentry
+func (deps *APIDependencies) SetSentry(con string) error {
+	var err error
+	deps.reporter, err = reporter.NewSentryCreator(con)
+	return err
+}
+
+// EnableEmailReporting sets the current mailer as reporter
+func (deps *APIDependencies) EnableEmailReporting(con string) error {
+	if deps.mailer == nil {
+		return errors.New("no mailer set")
+	}
+
+	var err error
+	deps.reporter, err = reporter.NewMailerCreator(deps.mailer)
+	return err
+}
+
+// Reporter returns the default reporter creator following this order:
+// Sentry
+// Email
+// Noop
+func (deps *APIDependencies) Reporter() reporter.Creator {
+	if deps.reporter == nil {
+		deps.reporter, _ = reporter.NewNoopCreator()
+	}
+
+	return deps.reporter
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Nivl/go-rest-tools/logger"
+	"github.com/Nivl/go-rest-tools/notifiers/reporter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/gorilla/mux"
 )
@@ -28,6 +29,9 @@ type HTTPRequest interface {
 
 	// Logger returns the logger used by the request
 	Logger() logger.Logger
+
+	// Reporter returns the reporter used by the request
+	Reporter() reporter.Reporter
 
 	// Signature returns the signature of the request
 	// Ex. POST /users
@@ -59,6 +63,7 @@ type Request struct {
 	session      *auth.Session
 	_contentType string
 	logger       logger.Logger
+	reporter     reporter.Reporter
 }
 
 // User returns the user that made the request
@@ -90,6 +95,11 @@ func (req *Request) Response() HTTPResponse {
 // Logger returns the logger used by the request
 func (req *Request) Logger() logger.Logger {
 	return req.logger
+}
+
+// Reporter returns the reporter used by the request
+func (req *Request) Reporter() reporter.Reporter {
+	return req.reporter
 }
 
 func (req *Request) String() string {
