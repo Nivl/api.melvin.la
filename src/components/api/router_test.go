@@ -9,6 +9,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/logger/mocklogger"
 	"github.com/Nivl/go-rest-tools/notifiers/mailer/mockmailer"
+	"github.com/Nivl/go-rest-tools/notifiers/reporter/mockreporter"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/storage/filestorage/mockfilestorage"
 
@@ -28,6 +29,7 @@ func TestRouteNotFound(t *testing.T) {
 	apiDeps.On("FileStorage", mock.Anything).Return(&mockfilestorage.FileStorage{}, nil)
 	apiDeps.On("DB").Return(&mockdb.Connection{})
 	apiDeps.On("Mailer").Return(&mockmailer.Mailer{})
+	apiDeps.On("Reporter").Return(&mockreporter.Reporter{})
 
 	logger := &mocklogger.Logger{}
 	logger.On("Errorf", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)

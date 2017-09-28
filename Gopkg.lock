@@ -16,8 +16,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
-  packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","notifiers/reporter","paginator","router","router/guard","router/guard/testguard","router/mockrouter","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/models","types/models/lifecycle"]
-  revision = "23f82d451dbeea5a6c98b0139763abe8351b34e9"
+  packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","notifiers/reporter","notifiers/reporter/mockreporter","paginator","router","router/guard","router/guard/testguard","router/mockrouter","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/models","types/models/lifecycle"]
+  revision = "8ed5cde39ff4f420a446ff2ef8b6db7e3678d7d8"
 
 [[projects]]
   branch = "master"
@@ -196,6 +196,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "822cc355c11c9e8d58091f0d4592eb3e7312baadce38c536fa54316b432a0b7a"
+  inputs-digest = "802bf404387fc14813a515471c11c566f5f74bdcac45397d6be11ee475a22fb5"
   solver-name = "gps-cdcl"
   solver-version = 1
