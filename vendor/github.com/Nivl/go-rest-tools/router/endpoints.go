@@ -1,7 +1,9 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/basicauth"
@@ -27,10 +29,10 @@ func (endpoints Endpoints) Activate(router *mux.Router, apiDeps dependencies.Dep
 // Handler makes it possible to use a RouteHandler where a http.Handler is required
 func Handler(e *Endpoint, apiDeps dependencies.Dependencies) http.Handler {
 	HTTPHandler := func(resWriter http.ResponseWriter, req *http.Request) {
-		// storageErr will be checked later on. Since the storage is not
-		// needed to throw an error, we first init the request, then we will use
-		// that request to return (and log) the error
+		// the following errors will be checked later on. we first init
+		// the request, then we will use that request to return (and log) the error
 		fileStorage, storageErr := apiDeps.FileStorage(req.Context())
+		reporter, reporterErr := apiDeps.Reporter().New()
 
 		handlerDeps := &Dependencies{
 			DB:      apiDeps.DB(),
@@ -38,15 +40,26 @@ func Handler(e *Endpoint, apiDeps dependencies.Dependencies) http.Handler {
 			Mailer:  apiDeps.Mailer(),
 		}
 		request := &Request{
-			id:     uuid.NewV4().String()[:8],
-			http:   req,
-			res:    NewResponse(resWriter, handlerDeps),
-			logger: apiDeps.Logger(),
+			id:       uuid.NewV4().String()[:8],
+			http:     req,
+			res:      NewResponse(resWriter, handlerDeps),
+			logger:   apiDeps.Logger(),
+			reporter: reporter,
 		}
 		defer request.handlePanic()
 
 		// We set some response data
 		request.res.Header().Set("X-Request-Id", request.id)
+
+		// if the reporter failed to be created we return an error
+		if reporterErr != nil {
+			request.res.Error(storageErr, request)
+			return
+		}
+
+		// We setup all the basic tag in the reporter
+		request.Reporter().AddTag("Req ID", request.id)
+		request.Reporter().AddTag("Endpoint", e.Path)
 
 		// if we failed getting the dependencies, we return a 500
 		if storageErr != nil {
@@ -57,6 +70,8 @@ func Handler(e *Endpoint, apiDeps dependencies.Dependencies) http.Handler {
 		// We fetch the user session if a token is provided
 		headers, found := req.Header["Authorization"]
 		if found {
+			request.Reporter().AddTag("Req Auths", strings.Join(headers, ", "))
+
 			userID, sessionID, err := basicauth.ParseAuthHeader(headers, "basic", "")
 			if err != nil {
 				request.res.Error(apierror.NewBadRequest("Authorization", "invalid format"), request)
@@ -85,6 +100,7 @@ func Handler(e *Endpoint, apiDeps dependencies.Dependencies) http.Handler {
 				}
 			}
 		}
+		request.Reporter().SetUser(request.user)
 
 		// Make sure the user has access to the handler
 		if allowed, err := e.Guard.HasAccess(request.user); !allowed {
@@ -106,6 +122,7 @@ func Handler(e *Endpoint, apiDeps dependencies.Dependencies) http.Handler {
 				request.res.Error(err, request)
 				return
 			}
+			request.Reporter().AddTag("Endpoint Params", fmt.Sprintf("%#v", request.params))
 		}
 
 		// Execute the actual route handler

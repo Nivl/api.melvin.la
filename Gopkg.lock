@@ -16,8 +16,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
-  packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","paginator","router","router/guard","router/guard/testguard","router/mockrouter","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/models","types/models/lifecycle"]
-  revision = "30eeb19ca2dd9031d0a4d04e19120516d89d4076"
+  packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","notifiers/reporter","notifiers/reporter/mockreporter","paginator","router","router/guard","router/guard/testguard","router/mockrouter","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/models","types/models/lifecycle"]
+  revision = "f5bb5c71a3c01d2c76aa2a433e2bf294d6e306b1"
 
 [[projects]]
   branch = "master"
@@ -32,6 +32,12 @@
   revision = "7a984a84b5492ae539b79b62fb4a10afc63c7bcf"
 
 [[projects]]
+  name = "github.com/certifi/gocertifi"
+  packages = ["."]
+  revision = "3fd9e1adb12b72d2f3f82191d49be9b93c69f67c"
+  version = "2017.07.27"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -42,6 +48,12 @@
   name = "github.com/dchest/uniuri"
   packages = ["."]
   revision = "8902c56451e9b58ff940bbe5fec35d5f9c04584a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getsentry/raven-go"
+  packages = ["."]
+  revision = "1452f6376ddb15c546b6d7567e1d9518765391b5"
 
 [[projects]]
   name = "github.com/golang/mock"
@@ -137,19 +149,19 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish"]
-  revision = "847319b7fc94cab682988f93da778204da164588"
+  revision = "c84b36c635ad003a10f0c755dff5685ceef18c71"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
-  revision = "0744d001aa8470aaa53df28d32e5ceeb8af9bd70"
+  revision = "0a9397675ba34b2845f758fe3cd68828369c6517"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/oauth2"
   packages = [".","google","internal","jws","jwt"]
-  revision = "13449ad91cb26cb47661c1b080790392170385fd"
+  revision = "bb50c06baba3d0c76f9d125c0719093e315b5b44"
 
 [[projects]]
   branch = "master"
@@ -161,7 +173,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "cec5cc05d57604ba2d2eaaf5381d3248fac4814d"
+  revision = "cf8a9e7cedca7843a0fdd8adc9d019e84349768d"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -184,6 +196,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "822cc355c11c9e8d58091f0d4592eb3e7312baadce38c536fa54316b432a0b7a"
+  inputs-digest = "802bf404387fc14813a515471c11c566f5f74bdcac45397d6be11ee475a22fb5"
   solver-name = "gps-cdcl"
   solver-version = 1

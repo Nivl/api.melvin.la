@@ -4,13 +4,16 @@ import (
 	"fmt"
 )
 
+// Makes sure Noop implements Mailer
+var _ Mailer = (*Noop)(nil)
+
 // Noop is a mailer that just print emails
 type Noop struct {
 }
 
 // SendStackTrace emails the current stacktrace to the default FROM
-func (m *Noop) SendStackTrace(trace []byte, endpoint string, message string, id string) error {
-	fmt.Printf("%s\n%s\n%s", endpoint, message, trace)
+func (m *Noop) SendStackTrace(trace []byte, message string, context map[string]string) error {
+	fmt.Printf("%s,%#v\n%s", message, context, trace)
 	return nil
 }
 

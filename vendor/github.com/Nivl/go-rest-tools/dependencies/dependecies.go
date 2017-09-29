@@ -5,6 +5,7 @@ import (
 
 	"github.com/Nivl/go-rest-tools/logger"
 	"github.com/Nivl/go-rest-tools/notifiers/mailer"
+	"github.com/Nivl/go-rest-tools/notifiers/reporter"
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-rest-tools/storage/filestorage"
 )
@@ -44,4 +45,16 @@ type Dependencies interface {
 	// Cloudinary
 	// Filesystem
 	FileStorage(ctx context.Context) (filestorage.FileStorage, error)
+
+	// SetSentry creates a reporter using Sentry
+	SetSentry(con string) error
+
+	// EnableEmailReporting sets the current mailer as reporter
+	EnableEmailReporting(con string) error
+
+	// Reporter returns the default reporter creator following this order:
+	// Sentry
+	// Email
+	// Noop
+	Reporter() reporter.Creator
 }

@@ -2,11 +2,15 @@ package mailer
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	sendgrid "github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
+
+// Makes sure Sendgrid implements Mailer
+var _ Mailer = (*Sendgrid)(nil)
 
 // Sendgrid is an object used to send email through sendgrid
 type Sendgrid struct {
@@ -17,7 +21,7 @@ type Sendgrid struct {
 }
 
 // SendStackTrace emails the current stacktrace to the default FROM
-func (s *Sendgrid) SendStackTrace(trace []byte, endpoint string, message string, id string) error {
+func (s *Sendgrid) SendStackTrace(trace []byte, message string, context map[string]string) error {
 	if s.StacktraceTemplateID == "" {
 		return errors.New("StacktraceTemplateID not set")
 	}
@@ -26,9 +30,12 @@ func (s *Sendgrid) SendStackTrace(trace []byte, endpoint string, message string,
 	stacktrace := string(trace[:])
 
 	msg.Body = strings.Replace(stacktrace, "\n", "<br>", -1)
-	msg.SetVar("endpoint", endpoint)
-	msg.SetVar("message", message)
-	msg.SetVar("requestID", id)
+
+	htmlContext := fmt.Sprintf("<li><strong>Error</strong>: %s</li>\n", message)
+	for k, v := range context {
+		htmlContext += fmt.Sprintf("<li><strong>%s</strong>: %s</li>\n", k, v)
+	}
+	msg.SetVar("context", htmlContext)
 	return s.Send(msg)
 }
 

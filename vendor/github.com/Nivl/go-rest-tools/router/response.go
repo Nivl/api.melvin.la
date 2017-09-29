@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"runtime/debug"
 
 	"github.com/Nivl/go-rest-tools/types/apierror"
 )
@@ -86,16 +85,11 @@ func (res *Response) Error(e error, req HTTPRequest) {
 	}
 	req.Logger().Errorf(`code: "%d"%s, message: "%s", %s`, err.HTTPStatus(), field, err.Error(), req)
 
-	// We send an email for all server error
+	// We send a report for all server errors
 	if err.HTTPStatus() == http.StatusInternalServerError {
-		sendEmail := func(stacktrace []byte) {
-			err := res.deps.Mailer.SendStackTrace(stacktrace, req.Signature(), err.Error(), req.ID())
-			if err != nil {
-				req.Logger().Error(err.Error())
-			}
+		if req.Reporter() != nil {
+			req.Reporter().ReportError(err)
 		}
-
-		go sendEmail(debug.Stack())
 	}
 }
 
