@@ -50,6 +50,9 @@ func TestSetupHappyPath(t *testing.T) {
 	args.CloudinaryBucket = "cloudinary bucket"
 	deps.On("SetCloudinary", args.CloudinaryAPIKey, args.CloudinarySecret, args.CloudinaryBucket).Return(nil)
 
+	args.SentryDSN = "sentry dsn"
+	deps.On("SetSentry", args.SentryDSN).Return(nil)
+
 	assert.NoError(t, api.Setup(args, deps), "Setup should have worked")
 	deps.AssertExpectations(t)
 }
@@ -120,6 +123,21 @@ func TestSetupErrorCloudinary(t *testing.T) {
 	args.CloudinaryAPIKey = "token"
 	errWanted := errors.New("cloudinary error")
 	deps.On("SetCloudinary", args.CloudinaryAPIKey, stringType, stringType).Return(errWanted)
+
+	err := api.Setup(args, deps)
+	assert.Error(t, err, "Setup should have failed")
+	assert.Equal(t, errWanted, err, "Wrong error returned")
+	deps.AssertExpectations(t)
+}
+
+func TestSetupErrorSentry(t *testing.T) {
+	args := &api.Args{}
+	deps := &mockdependencies.Dependencies{}
+	deps.On("SetDB", stringType).Return(nil)
+
+	errWanted := errors.New("sentry error")
+	args.SentryDSN = "sentry dsn"
+	deps.On("SetSentry", args.SentryDSN).Return(errWanted)
 
 	err := api.Setup(args, deps)
 	assert.Error(t, err, "Setup should have failed")
