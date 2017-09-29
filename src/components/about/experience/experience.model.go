@@ -18,8 +18,8 @@ type Experience struct {
 
 	OrganizationID string     `db:"organization_id"`
 	JobTitle       string     `db:"job_title"`
-	Location       string     `db:"location"`
-	Description    string     `db:"description"`
+	Location       *string    `db:"location"`
+	Description    *string    `db:"description"`
 	StartDate      *date.Date `db:"start_date"`
 	EndDate        *date.Date `db:"end_date"`
 

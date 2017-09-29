@@ -14,8 +14,8 @@ type Payload struct {
 	DeletedAt *datetime.DateTime `json:"deleted_at,omitempty"`
 
 	JobTitle    string     `json:"job_title"`
-	Location    string     `json:"location,omitempty"`
-	Description string     `json:"description,omitempty"`
+	Location    *string    `json:"location,omitempty"`
+	Description *string    `json:"description,omitempty"`
 	StartDate   *date.Date `json:"start_date"`
 	EndDate     *date.Date `json:"end_date,omitempty"`
 

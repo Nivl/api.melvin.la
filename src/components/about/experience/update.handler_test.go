@@ -216,8 +216,8 @@ func TestUpdateHappyPath(t *testing.T) {
 		exp := args.Get(0).(*experience.Experience)
 		exp.ID = "48d0c8b8-d7a3-4855-9d90-29a06ef474b0"
 		exp.JobTitle = "old JobTitle"
-		exp.Location = "old Location"
-		exp.Description = "old Description"
+		exp.Location = ptrs.NewString("old Location")
+		exp.Description = ptrs.NewString("old Description")
 		exp.StartDate, _ = date.New("2016-01")
 	})
 	mockDB.ExpectUpdate("*experience.Experience")
@@ -228,8 +228,8 @@ func TestUpdateHappyPath(t *testing.T) {
 		exp := args.Get(0).(*experience.Payload)
 		assert.Equal(t, handlerParams.ID, exp.ID, "ID should have not changed")
 		assert.Equal(t, *handlerParams.JobTitle, exp.JobTitle, "JobTitle should have been updated")
-		assert.Equal(t, *handlerParams.Location, exp.Location, "Location should have been updated")
-		assert.Equal(t, *handlerParams.Description, exp.Description, "Description should have been updated")
+		assert.Equal(t, *handlerParams.Location, *exp.Location, "Location should have been updated")
+		assert.Equal(t, *handlerParams.Description, *exp.Description, "Description should have been updated")
 		assert.Equal(t, handlerParams.StartDate.String(), exp.StartDate.String(), "StartDate should have been updated")
 		assert.NotNil(t, exp.DeletedAt, "DeletedAt should have been set")
 		assert.Nil(t, exp.EndDate, "EndDate should have not been set")

@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
+	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-types/date"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
@@ -22,14 +23,15 @@ func New() *experience.Experience {
 		CreatedAt:      datetime.Now(),
 		UpdatedAt:      datetime.Now(),
 		JobTitle:       uniuri.New(),
-		Description:    uniuri.New(),
-		Location:       uniuri.New(),
+		Description:    ptrs.NewString(uniuri.New()),
+		Location:       ptrs.NewString(uniuri.New()),
 		StartDate:      date.Today(),
 		OrganizationID: org.ID,
 		Organization:   org,
 	}
 }
 
+// NewPersisted returns a non persisted experience
 func NewPersisted(t *testing.T, dbCon db.Queryable, exp *experience.Experience) *experience.Experience {
 	if exp == nil {
 		exp = &experience.Experience{}
@@ -39,8 +41,8 @@ func NewPersisted(t *testing.T, dbCon db.Queryable, exp *experience.Experience) 
 		exp.JobTitle = uniuri.New()
 	}
 
-	if exp.Description == "" {
-		exp.Description = uniuri.New()
+	if exp.Description == nil {
+		exp.Description = ptrs.NewString(uniuri.New())
 	}
 
 	if exp.StartDate == nil {
