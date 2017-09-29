@@ -10,10 +10,10 @@ import (
 
 	"github.com/satori/go.uuid"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -280,9 +280,9 @@ func TestUpdateHappyPath(t *testing.T) {
 		edu := args.Get(0).(*education.Payload)
 		assert.Equal(t, handlerParams.ID, edu.ID, "ID should have not changed")
 		assert.Equal(t, *handlerParams.Degree, edu.Degree, "Degree should have been updated")
-		assert.Equal(t, *handlerParams.GPA, edu.GPA, "GPA should have been updated")
-		assert.Equal(t, *handlerParams.Location, edu.Location, "Location should have been updated")
-		assert.Equal(t, *handlerParams.Description, edu.Description, "Description should have been updated")
+		assert.Equal(t, *handlerParams.GPA, *edu.GPA, "GPA should have been updated")
+		assert.Equal(t, *handlerParams.Location, *edu.Location, "Location should have been updated")
+		assert.Equal(t, *handlerParams.Description, *edu.Description, "Description should have been updated")
 		assert.Equal(t, *handlerParams.StartYear, edu.StartYear, "StartYear should have been updated")
 		assert.NotNil(t, edu.DeletedAt, "DeletedAt should have been set")
 		assert.Empty(t, edu.EndYear, "EndYear should have not been set")

@@ -15,13 +15,13 @@ type Education struct {
 	UpdatedAt *datetime.DateTime `db:"updated_at"`
 	DeletedAt *datetime.DateTime `db:"deleted_at"`
 
-	OrganizationID string `db:"organization_id"`
-	Degree         string `db:"degree"`
-	GPA            string `db:"gpa"`
-	Location       string `db:"location"`
-	Description    string `db:"description"`
-	StartYear      int    `db:"start_year"`
-	EndYear        *int   `db:"end_year"`
+	OrganizationID string  `db:"organization_id"`
+	Degree         string  `db:"degree"`
+	GPA            *string `db:"gpa"`
+	Location       *string `db:"location"`
+	Description    *string `db:"description"`
+	StartYear      int     `db:"start_year"`
+	EndYear        *int    `db:"end_year"`
 
 	// Embedded models
 	*organizations.Organization `db:"org"`

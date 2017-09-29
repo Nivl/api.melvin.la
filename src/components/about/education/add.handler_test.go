@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/dchest/uniuri"
@@ -343,8 +343,8 @@ func TestAddHappyPath(t *testing.T) {
 	res.ExpectCreated("*education.Payload", func(args mock.Arguments) {
 		edu := args.Get(0).(*education.Payload)
 		assert.Equal(t, handlerParams.Degree, edu.Degree)
-		assert.Equal(t, handlerParams.Location, edu.Location)
-		assert.Equal(t, handlerParams.Description, edu.Description)
+		assert.Equal(t, handlerParams.Location, *edu.Location)
+		assert.Equal(t, handlerParams.Description, *edu.Description)
 		assert.Equal(t, org.ID, edu.Organization.ID)
 	})
 

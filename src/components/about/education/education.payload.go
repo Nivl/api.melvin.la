@@ -13,12 +13,12 @@ type Payload struct {
 	UpdatedAt *datetime.DateTime `json:"updated_at,omitempty"`
 	DeletedAt *datetime.DateTime `json:"deleted_at,omitempty"`
 
-	Degree      string `json:"degree"`
-	GPA         string `json:"gpa,omitempty"`
-	Location    string `json:"location,omitempty"`
-	Description string `json:"description,omitempty"`
-	StartYear   int    `json:"start_year"`
-	EndYear     int    `json:"end_year,omitempty"`
+	Degree      string  `json:"degree"`
+	GPA         *string `json:"gpa,omitempty"`
+	Location    *string `json:"location,omitempty"`
+	Description *string `json:"description,omitempty"`
+	StartYear   int     `json:"start_year"`
+	EndYear     int     `json:"end_year,omitempty"`
 
 	Organization *organizations.Payload `json:"organization,omitempty"`
 }
