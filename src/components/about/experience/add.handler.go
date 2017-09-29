@@ -56,8 +56,8 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 	exp := &Experience{
 		OrganizationID: org.ID,
 		JobTitle:       params.JobTitle,
-		Location:       params.Location,
-		Description:    params.Description,
+		Location:       &params.Location,
+		Description:    &params.Description,
 		StartDate:      params.StartDate,
 		EndDate:        params.EndDate,
 

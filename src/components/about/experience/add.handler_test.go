@@ -315,8 +315,8 @@ func TestAddHappyPath(t *testing.T) {
 	res.ExpectCreated("*experience.Payload", func(args mock.Arguments) {
 		exp := args.Get(0).(*experience.Payload)
 		assert.Equal(t, handlerParams.JobTitle, exp.JobTitle)
-		assert.Equal(t, handlerParams.Location, exp.Location)
-		assert.Equal(t, handlerParams.Description, exp.Description)
+		assert.Equal(t, handlerParams.Location, *exp.Location)
+		assert.Equal(t, handlerParams.Description, *exp.Description)
 		assert.Equal(t, org.ID, exp.Organization.ID)
 	})
 

@@ -69,14 +69,14 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 	if params.Degree != nil {
 		edu.Degree = *params.Degree
 	}
-	if params.Degree != nil {
-		edu.GPA = *params.GPA
+	if params.GPA != nil {
+		edu.GPA = params.GPA
 	}
 	if params.Location != nil {
-		edu.Location = *params.Location
+		edu.Location = params.Location
 	}
 	if params.Description != nil {
-		edu.Description = *params.Description
+		edu.Description = params.Description
 	}
 	if params.StartYear != nil {
 		edu.StartYear = *params.StartYear

@@ -11,8 +11,8 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
@@ -76,8 +76,8 @@ func TestIntegrationAdd(t *testing.T) {
 				assert.NotNil(t, ext.UpdatedAt)
 				assert.Nil(t, ext.DeletedAt)
 				assert.Equal(t, tc.params.Degree, ext.Degree)
-				assert.Equal(t, tc.params.Location, ext.Location)
-				assert.Equal(t, tc.params.Description, ext.Description)
+				assert.Equal(t, tc.params.Location, *ext.Location)
+				assert.Equal(t, tc.params.Description, *ext.Description)
 				assert.Equal(t, tc.params.StartYear, ext.StartYear)
 
 				// clean the test

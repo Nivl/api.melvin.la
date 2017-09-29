@@ -12,8 +12,8 @@ import (
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education/testeducation"
@@ -93,19 +93,19 @@ func TestIntegrationUpdate(t *testing.T) {
 				}
 
 				if tc.params.GPA != nil {
-					assert.Equal(t, *tc.params.GPA, pld.GPA, "GPA should have changed")
+					assert.Equal(t, *tc.params.GPA, *pld.GPA, "GPA should have changed")
 				} else {
 					assert.Equal(t, tc.toUpdate.GPA, pld.GPA, "GPA should have not changed")
 				}
 
 				if tc.params.Location != nil {
-					assert.Equal(t, *tc.params.Location, pld.Location, "Location should have changed")
+					assert.Equal(t, *tc.params.Location, *pld.Location, "Location should have changed")
 				} else {
 					assert.Equal(t, tc.toUpdate.Location, pld.Location, "Location should have not changed")
 				}
 
 				if tc.params.Description != nil {
-					assert.Equal(t, *tc.params.Description, pld.Description, "Description should have changed")
+					assert.Equal(t, *tc.params.Description, *pld.Description, "Description should have changed")
 				} else {
 					assert.Equal(t, tc.toUpdate.Description, pld.Description, "Description should have not changed")
 				}

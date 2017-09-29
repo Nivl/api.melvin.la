@@ -47,10 +47,10 @@ func Update(req router.HTTPRequest, deps *router.Dependencies) error {
 		exp.JobTitle = *params.JobTitle
 	}
 	if params.Location != nil {
-		exp.Location = *params.Location
+		exp.Location = params.Location
 	}
 	if params.Description != nil {
-		exp.Description = *params.Description
+		exp.Description = params.Description
 	}
 	if params.StartDate != nil {
 		exp.StartDate = params.StartDate

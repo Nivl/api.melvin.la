@@ -71,9 +71,9 @@ func Add(req router.HTTPRequest, deps *router.Dependencies) error {
 	edu := &Education{
 		OrganizationID: org.ID,
 		Degree:         params.Degree,
-		GPA:            params.GPA,
-		Location:       params.Location,
-		Description:    params.Description,
+		GPA:            &params.GPA,
+		Location:       &params.Location,
+		Description:    &params.Description,
 		StartYear:      params.StartYear,
 		EndYear:        params.EndYear,
 

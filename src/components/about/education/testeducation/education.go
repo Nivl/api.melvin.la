@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-types/datetime"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
@@ -22,9 +23,9 @@ func New() *education.Education {
 		CreatedAt:      datetime.Now(),
 		UpdatedAt:      datetime.Now(),
 		Degree:         uniuri.New(),
-		GPA:            uniuri.NewLen(4),
-		Location:       uniuri.New(),
-		Description:    uniuri.New(),
+		GPA:            ptrs.NewString(uniuri.NewLen(4)),
+		Location:       ptrs.NewString(uniuri.New()),
+		Description:    ptrs.NewString(uniuri.New()),
 		StartYear:      rand.Intn(100) + 1950,
 		OrganizationID: org.ID,
 		Organization:   org,
@@ -41,16 +42,16 @@ func NewPersisted(t *testing.T, dbCon db.Queryable, edu *education.Education) *e
 		edu.Degree = uniuri.New()
 	}
 
-	if edu.GPA == "" {
-		edu.GPA = uniuri.NewLen(4)
+	if edu.GPA == nil {
+		edu.GPA = ptrs.NewString(uniuri.NewLen(4))
 	}
 
-	if edu.Description == "" {
-		edu.Description = uniuri.New()
+	if edu.Description == nil {
+		edu.Description = ptrs.NewString(uniuri.New())
 	}
 
-	if edu.Location == "" {
-		edu.Location = uniuri.New()
+	if edu.Location == nil {
+		edu.Location = ptrs.NewString(uniuri.New())
 	}
 
 	if edu.StartYear == 0 {
