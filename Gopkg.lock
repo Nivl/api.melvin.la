@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
   packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","notifiers/reporter","notifiers/reporter/mockreporter","paginator","router","router/guard","router/guard/testguard","router/mockrouter","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","types/apierror","types/models","types/models/lifecycle"]
-  revision = "f5bb5c71a3c01d2c76aa2a433e2bf294d6e306b1"
+  revision = "8bd9f3d1b66cdca4811ff3e20e9d46d45817f0fe"
 
 [[projects]]
   branch = "master"
@@ -149,7 +149,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish"]
-  revision = "c84b36c635ad003a10f0c755dff5685ceef18c71"
+  revision = "76eec36fa14229c4b25bb894c2d0e591527af429"
 
 [[projects]]
   branch = "master"
@@ -173,7 +173,7 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport","transport/grpc","transport/http"]
-  revision = "cf8a9e7cedca7843a0fdd8adc9d019e84349768d"
+  revision = "c37f2bf2819e28a3885f240b350978f3f833be30"
 
 [[projects]]
   name = "google.golang.org/appengine"
