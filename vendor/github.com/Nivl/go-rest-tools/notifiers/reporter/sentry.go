@@ -50,6 +50,9 @@ type Sentry struct {
 
 // SetUser attaches the provided user to report
 func (r *Sentry) SetUser(u *auth.User) {
+	if u == nil {
+		return
+	}
 	sentryUser := &raven.User{
 		ID:       u.ID,
 		Email:    u.Email,
