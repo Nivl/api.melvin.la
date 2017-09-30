@@ -1,12 +1,14 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/types/apierror"
+	"github.com/ttacon/libphonenumber"
 )
 
 var updateEndpoint = &router.Endpoint{
@@ -34,6 +36,21 @@ type UpdateParams struct {
 	LinkedIn         *string `from:"form" json:"linkedin_custom_url" params:"trim" maxlen:"255"`
 	FacebookUsername *string `from:"form" json:"facebook_username" params:"trim" maxlen:"255"`
 	TwitterUsername  *string `from:"form" json:"twitter_username" params:"trim" maxlen:"255"`
+}
+
+// IsValid implements the params.CustomValidation interface
+func (p *UpdateParams) IsValid() (isValid bool, fieldFailing string, err error) {
+	if p.PhoneNumber != nil {
+		num, err := libphonenumber.Parse(*p.PhoneNumber, "US")
+		if err != nil {
+			return false, "phone_number", err
+		}
+		if !libphonenumber.IsValidNumber(num) {
+			return false, "phone_number", errors.New("not a valid phone number")
+		}
+	}
+
+	return true, "", nil
 }
 
 // Update is a HTTP handler used to update a user
