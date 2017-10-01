@@ -8,18 +8,26 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience/testexperience"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationGet(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	_, userSession := testauth.NewPersistedAuth(t, dbCon)
 	_, adminSession := testauth.NewPersistedAdminAuth(t, dbCon)
@@ -74,64 +82,70 @@ func TestIntegrationGet(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callGet(t, tc.params, tc.auth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var pld experience.Payload
-				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
-					t.Fatal(err)
-				}
+				rec := callGet(t, tc.params, tc.auth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
 
-				assert.Equal(t, tc.expectedData.ID, pld.ID, "ID should not have changed")
-				assert.Equal(t, tc.expectedData.JobTitle, pld.JobTitle, "JobTitle should not have changed")
-				assert.Equal(t, tc.expectedData.Location, pld.Location, "Location should not have changed")
-				assert.Equal(t, tc.expectedData.Description, pld.Description, "Description should not have changed")
-				assert.Equal(t, tc.expectedData.StartDate.String(), pld.StartDate.String(), "StartDate should not have changed")
-				if tc.expectedData.EndDate != nil {
-					assert.Equal(t, tc.expectedData.EndDate.String(), pld.EndDate.String(), "EndDate should not have changed")
-				} else {
-					assert.Nil(t, tc.expectedData.EndDate, "EndDate should still be nil")
-				}
-
-				// we assume that if we have one field, we have all the fields
-				assert.NotNil(t, pld.Organization, "Organization should not have been nil")
-				assert.Equal(t, tc.expectedData.Organization.ID, pld.Organization.ID, "Organization.ID should not have changed")
-
-				if tc.auth != nil && tc.auth.SessionID == adminSession.ID {
-					assert.NotNil(t, pld.CreatedAt, "CreatedAt should have been set")
-					assert.NotNil(t, pld.UpdatedAt, "UpdatedAt should have been set")
-					assert.NotNil(t, pld.Organization.CreatedAt, "Organization.CreatedAt should have been set")
-					assert.NotNil(t, pld.Organization.UpdatedAt, "Organization.UpdatedAt should have been set")
-
-					if tc.expectedData.DeletedAt != nil {
-						assert.NotNil(t, pld.DeletedAt, "DeletedAt should have been set")
+				if rec.Code == http.StatusOK {
+					var pld experience.Payload
+					if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
+						t.Fatal(err)
 					}
 
-					if tc.expectedData.Organization.DeletedAt != nil {
-						assert.NotNil(t, pld.Organization.DeletedAt, "Organization.DeletedAt should have been set")
+					assert.Equal(t, tc.expectedData.ID, pld.ID, "ID should not have changed")
+					assert.Equal(t, tc.expectedData.JobTitle, pld.JobTitle, "JobTitle should not have changed")
+					assert.Equal(t, tc.expectedData.Location, pld.Location, "Location should not have changed")
+					assert.Equal(t, tc.expectedData.Description, pld.Description, "Description should not have changed")
+					assert.Equal(t, tc.expectedData.StartDate.String(), pld.StartDate.String(), "StartDate should not have changed")
+					if tc.expectedData.EndDate != nil {
+						assert.Equal(t, tc.expectedData.EndDate.String(), pld.EndDate.String(), "EndDate should not have changed")
+					} else {
+						assert.Nil(t, tc.expectedData.EndDate, "EndDate should still be nil")
 					}
-				} else {
-					assert.Nil(t, pld.CreatedAt, "CreatedAt should have not been set")
-					assert.Nil(t, pld.UpdatedAt, "UpdatedAt should have not been set")
-					assert.Nil(t, pld.DeletedAt, "DeletedAt should have not been set")
-					assert.Nil(t, pld.Organization.CreatedAt, "Organization.CreatedAt should have not been set")
-					assert.Nil(t, pld.Organization.UpdatedAt, "Organization.UpdatedAt should have not been set")
-					assert.Nil(t, pld.Organization.DeletedAt, "Organization.DeletedAt should have not been set")
+
+					// we assume that if we have one field, we have all the fields
+					assert.NotNil(t, pld.Organization, "Organization should not have been nil")
+					assert.Equal(t, tc.expectedData.Organization.ID, pld.Organization.ID, "Organization.ID should not have changed")
+
+					if tc.auth != nil && tc.auth.SessionID == adminSession.ID {
+						assert.NotNil(t, pld.CreatedAt, "CreatedAt should have been set")
+						assert.NotNil(t, pld.UpdatedAt, "UpdatedAt should have been set")
+						assert.NotNil(t, pld.Organization.CreatedAt, "Organization.CreatedAt should have been set")
+						assert.NotNil(t, pld.Organization.UpdatedAt, "Organization.UpdatedAt should have been set")
+
+						if tc.expectedData.DeletedAt != nil {
+							assert.NotNil(t, pld.DeletedAt, "DeletedAt should have been set")
+						}
+
+						if tc.expectedData.Organization.DeletedAt != nil {
+							assert.NotNil(t, pld.Organization.DeletedAt, "Organization.DeletedAt should have been set")
+						}
+					} else {
+						assert.Nil(t, pld.CreatedAt, "CreatedAt should have not been set")
+						assert.Nil(t, pld.UpdatedAt, "UpdatedAt should have not been set")
+						assert.Nil(t, pld.DeletedAt, "DeletedAt should have not been set")
+						assert.Nil(t, pld.Organization.CreatedAt, "Organization.CreatedAt should have not been set")
+						assert.Nil(t, pld.Organization.UpdatedAt, "Organization.UpdatedAt should have not been set")
+						assert.Nil(t, pld.Organization.DeletedAt, "Organization.DeletedAt should have not been set")
+					}
 				}
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callGet(t *testing.T, params *experience.GetParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callGet(t *testing.T, params *experience.GetParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: experience.Endpoints[experience.EndpointGet],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }

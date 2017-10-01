@@ -8,21 +8,29 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/date"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience/testexperience"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationListFiltering(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	totalBasicExp := 35
 	for i := 0; i < totalBasicExp; i++ {
@@ -169,25 +177,37 @@ func TestIntegrationListFiltering(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callList(t, tc.params, tc.auth)
-			assert.Equal(t, http.StatusOK, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var pld experience.ListPayload
-				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
-					t.Fatal(err)
+				rec := callList(t, tc.params, tc.auth, helper.Deps)
+				assert.Equal(t, http.StatusOK, rec.Code)
+
+				if rec.Code == http.StatusOK {
+					var pld experience.ListPayload
+					if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
+						t.Fatal(err)
+					}
+					assert.Equal(t, tc.expectedTotal, len(pld.Results), "invalid number of results")
 				}
-				assert.Equal(t, tc.expectedTotal, len(pld.Results), "invalid number of results")
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
 func TestIntegrationListPagination(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	totalExp := 35
 	for i := 0; i < totalExp; i++ {
@@ -241,25 +261,37 @@ func TestIntegrationListPagination(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callList(t, tc.params, nil)
-			assert.Equal(t, http.StatusOK, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var pld experience.ListPayload
-				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
-					t.Fatal(err)
+				rec := callList(t, tc.params, nil, helper.Deps)
+				assert.Equal(t, http.StatusOK, rec.Code)
+
+				if rec.Code == http.StatusOK {
+					var pld experience.ListPayload
+					if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
+						t.Fatal(err)
+					}
+					assert.Equal(t, tc.expectedTotal, len(pld.Results), "invalid number of results")
 				}
-				assert.Equal(t, tc.expectedTotal, len(pld.Results), "invalid number of results")
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
 func TestIntegrationListOrdering(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	dates := []struct {
 		order int
@@ -297,7 +329,7 @@ func TestIntegrationListOrdering(t *testing.T) {
 	}
 
 	// make the request
-	rec := callList(t, params, nil)
+	rec := callList(t, params, nil, helper.Deps)
 
 	// Assert everything went well
 	if assert.Equal(t, http.StatusOK, rec.Code) {
@@ -317,11 +349,12 @@ func TestIntegrationListOrdering(t *testing.T) {
 	}
 }
 
-func callList(t *testing.T, params *experience.ListParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callList(t *testing.T, params *experience.ListParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: experience.Endpoints[experience.EndpointList],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
 	return httptests.NewRequest(t, ri)
 }

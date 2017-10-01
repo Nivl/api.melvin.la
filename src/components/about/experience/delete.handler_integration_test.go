@@ -7,20 +7,28 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience"
 	"github.com/melvin-laplanche/ml-api/src/components/about/experience/testexperience"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationDeleteHappyPath(t *testing.T) {
-	dbCon := deps.DB()
+	t.Parallel()
 
-	defer lifecycle.PurgeModels(t, dbCon)
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
 	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 	basicExp := testexperience.NewPersisted(t, dbCon, nil)
@@ -45,24 +53,31 @@ func TestIntegrationDeleteHappyPath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callDelete(t, tc.params, adminAuth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusNoContent {
-				_, err := experience.GetAnyByID(dbCon, tc.params.ID)
-				assert.True(t, apierror.IsNotFound(err), "GetByID() should have failed with an IsNotFound error")
-			}
-		})
-	}
+				rec := callDelete(t, tc.params, adminAuth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
+
+				if rec.Code == http.StatusNoContent {
+					_, err := experience.GetAnyByID(dbCon, tc.params.ID)
+					assert.True(t, apierror.IsNotFound(err), "GetByID() should have failed with an IsNotFound error")
+				}
+			})
+		}
+	})
 }
 
-func callDelete(t *testing.T, params *experience.DeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callDelete(t *testing.T, params *experience.DeleteParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: experience.Endpoints[experience.EndpointDelete],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
 	return httptests.NewRequest(t, ri)
 }
