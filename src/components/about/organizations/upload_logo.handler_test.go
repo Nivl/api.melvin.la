@@ -25,6 +25,8 @@ import (
 )
 
 func TestUploadLogoAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -48,6 +50,8 @@ func TestUploadLogoAccess(t *testing.T) {
 }
 
 func TestUploadLogoInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	mockCtrl := gomock.NewController(t)
 	// defer mockCtrl.Finish()
 
@@ -122,6 +126,8 @@ func TestUploadLogoInvalidParams(t *testing.T) {
 }
 
 func TestUploadLogoValidParams(t *testing.T) {
+	t.Parallel()
+
 	cwd, _ := os.Getwd()
 
 	testCases := []struct {
@@ -168,6 +174,8 @@ func TestUploadLogoValidParams(t *testing.T) {
 }
 
 func TestUploadHappyPath(t *testing.T) {
+	t.Parallel()
+
 	cwd, _ := os.Getwd()
 	handlerParams := &organizations.UploadLogoParams{
 		ID:   "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
@@ -218,6 +226,8 @@ func TestUploadHappyPath(t *testing.T) {
 }
 
 func TestUploadNotFound(t *testing.T) {
+	t.Parallel()
+
 	cwd, _ := os.Getwd()
 	handlerParams := &organizations.UploadLogoParams{
 		ID:   "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
@@ -246,6 +256,8 @@ func TestUploadNotFound(t *testing.T) {
 }
 
 func TestUploadStorageFailed(t *testing.T) {
+	t.Parallel()
+
 	cwd, _ := os.Getwd()
 	handlerParams := &organizations.UploadLogoParams{
 		ID:   "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
@@ -283,6 +295,8 @@ func TestUploadStorageFailed(t *testing.T) {
 }
 
 func TestUploadDBNoCon(t *testing.T) {
+	t.Parallel()
+
 	cwd, _ := os.Getwd()
 	handlerParams := &organizations.UploadLogoParams{
 		ID:   "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",

@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -18,6 +18,8 @@ import (
 )
 
 func TestDeleteInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing token",
@@ -48,6 +50,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 }
 
 func TestDeleteValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -81,6 +85,8 @@ func TestDeleteValidParams(t *testing.T) {
 }
 
 func TestDeleteAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -100,6 +106,8 @@ func TestDeleteAccess(t *testing.T) {
 
 // TestDeleteHappyPath test a user loging out (removing the current session)
 func TestDeleteHappyPath(t *testing.T) {
+	t.Parallel()
+
 	user := &auth.User{ID: "3e916798-a090-4f22-b1d1-04a63fbed6ef"}
 	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
 
@@ -140,6 +148,8 @@ func TestDeleteHappyPath(t *testing.T) {
 }
 
 func TestDeleteOtherSession(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.DeleteParams{
 		Token:           "d1ba3e60-d674-47f0-9694-59fbda0fc659",
 		CurrentPassword: "valid password",
@@ -186,6 +196,8 @@ func TestDeleteOtherSession(t *testing.T) {
 }
 
 func TestDeleteOtherSessionWrongPassword(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.DeleteParams{
 		Token:           "d1ba3e60-d674-47f0-9694-59fbda0fc659",
 		CurrentPassword: "invalid password",
@@ -215,6 +227,8 @@ func TestDeleteOtherSessionWrongPassword(t *testing.T) {
 }
 
 func TestDeleteSomeonesSession(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.DeleteParams{
 		Token:           "d1ba3e60-d674-47f0-9694-59fbda0fc659",
 		CurrentPassword: "valid password",
@@ -254,6 +268,8 @@ func TestDeleteSomeonesSession(t *testing.T) {
 }
 
 func TestDeleteUnexistingSession(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.DeleteParams{
 		Token:           "d1ba3e60-d674-47f0-9694-59fbda0fc659",
 		CurrentPassword: "valid password",
@@ -288,6 +304,8 @@ func TestDeleteUnexistingSession(t *testing.T) {
 }
 
 func TestDeleteNoDBConOnDelete(t *testing.T) {
+	t.Parallel()
+
 	user := &auth.User{ID: "3e916798-a090-4f22-b1d1-04a63fbed6ef"}
 	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
 
@@ -325,6 +343,8 @@ func TestDeleteNoDBConOnDelete(t *testing.T) {
 }
 
 func TestDeleteNoDBConOnGet(t *testing.T) {
+	t.Parallel()
+
 	user := &auth.User{ID: "3e916798-a090-4f22-b1d1-04a63fbed6ef"}
 	session := &auth.Session{ID: "3642e0e6-788e-4161-92dd-6c52ea823da9", UserID: user.ID}
 

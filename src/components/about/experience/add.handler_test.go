@@ -22,6 +22,8 @@ import (
 )
 
 func TestAddInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing org ID",
@@ -222,6 +224,8 @@ func TestAddInvalidParams(t *testing.T) {
 }
 
 func TestAddValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -266,6 +270,8 @@ func TestAddValidParams(t *testing.T) {
 }
 
 func TestAddAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -289,6 +295,8 @@ func TestAddAccess(t *testing.T) {
 }
 
 func TestAddHappyPath(t *testing.T) {
+	t.Parallel()
+
 	org := &organizations.Organization{
 		ID:   "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Name: "Org name",
@@ -336,6 +344,8 @@ func TestAddHappyPath(t *testing.T) {
 }
 
 func TestAddOrgNotFound(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.AddParams{
 		OrganizationID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		JobTitle:       "Title",
@@ -365,6 +375,8 @@ func TestAddOrgNotFound(t *testing.T) {
 }
 
 func TestAddNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	org := &organizations.Organization{
 		ID:   "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Name: "Org name",

@@ -22,6 +22,8 @@ import (
 )
 
 func TestListInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail with page = 0",
@@ -60,6 +62,8 @@ func TestListInvalidParams(t *testing.T) {
 }
 
 func TestListValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -85,6 +89,8 @@ func TestListValidParams(t *testing.T) {
 }
 
 func TestListAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -108,6 +114,8 @@ func TestListAccess(t *testing.T) {
 }
 
 func TestListNoBDCon(t *testing.T) {
+	t.Parallel()
+
 	// Mock the database & add expectations
 	mockDB := &mockdb.Connection{}
 	mockDB.ExpectSelectError("*users.Profiles")
@@ -129,6 +137,8 @@ func TestListNoBDCon(t *testing.T) {
 }
 
 func TestListInvalidSort(t *testing.T) {
+	t.Parallel()
+
 	// Mock the database & add expectations
 	mockDB := &mockdb.Connection{}
 	mockDB.ExpectSelectError("*users.Profiles")
@@ -151,6 +161,8 @@ func TestListInvalidSort(t *testing.T) {
 }
 
 func TestListPrivacy(t *testing.T) {
+	t.Parallel()
+
 	totalProfiles := 5
 
 	// Mock the database & add expectations

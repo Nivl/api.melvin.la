@@ -22,6 +22,8 @@ import (
 )
 
 func TestUpdateInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -115,6 +117,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 }
 
 func TestUpdateValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -181,6 +185,8 @@ func TestUpdateValidParams(t *testing.T) {
 }
 
 func TestUpdateAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -199,6 +205,8 @@ func TestUpdateAccess(t *testing.T) {
 }
 
 func TestUpdateHappyPath(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	handlerParams := &users.UpdateParams{
@@ -248,6 +256,8 @@ func TestUpdateHappyPath(t *testing.T) {
 }
 
 func TestUpdateInvalidPassword(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 	handlerParams := &users.UpdateParams{
 		ID:              profile.UserID,
@@ -280,6 +290,8 @@ func TestUpdateInvalidPassword(t *testing.T) {
 }
 
 func TestUpdateInvalidUser(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.UpdateParams{
 		ID:              "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		CurrentPassword: "valid password",
@@ -309,6 +321,8 @@ func TestUpdateInvalidUser(t *testing.T) {
 }
 
 func TestUpdateUnexistingUser(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.UpdateParams{
 		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}
@@ -338,6 +352,8 @@ func TestUpdateUnexistingUser(t *testing.T) {
 }
 
 func TestUpdateAllTheFields(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	handlerParams := &users.UpdateParams{
@@ -399,6 +415,8 @@ func TestUpdateAllTheFields(t *testing.T) {
 }
 
 func TestUpdateUnsetAllTheFields(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	handlerParams := &users.UpdateParams{
@@ -460,6 +478,8 @@ func TestUpdateUnsetAllTheFields(t *testing.T) {
 }
 
 func TestUpdateTransactionError(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 	handlerParams := &users.UpdateParams{
 		ID:              profile.UserID,
@@ -493,6 +513,8 @@ func TestUpdateTransactionError(t *testing.T) {
 }
 
 func TestUpdateConflict(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 	handlerParams := &users.UpdateParams{
 		ID:              profile.UserID,
@@ -530,6 +552,8 @@ func TestUpdateConflict(t *testing.T) {
 }
 
 func TestUpdateProfileError(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 	handlerParams := &users.UpdateParams{
 		ID:              profile.UserID,
@@ -567,6 +591,8 @@ func TestUpdateProfileError(t *testing.T) {
 }
 
 func TestUpdateCommitError(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 	handlerParams := &users.UpdateParams{
 		ID:              profile.UserID,

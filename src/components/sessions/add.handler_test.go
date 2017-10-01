@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -18,6 +18,8 @@ import (
 )
 
 func TestInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing email",
@@ -46,6 +48,8 @@ func TestInvalidParams(t *testing.T) {
 }
 
 func TestAddValidData(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "valid password",
@@ -87,6 +91,8 @@ func TestAddValidData(t *testing.T) {
 }
 
 func TestAddUnexistingEmail(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "valid password",
@@ -113,6 +119,8 @@ func TestAddUnexistingEmail(t *testing.T) {
 }
 
 func TestAddWrongPassword(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "invalid password",
@@ -146,6 +154,8 @@ func TestAddWrongPassword(t *testing.T) {
 }
 
 func TestAddNoDbConOnGet(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "invalid password",
@@ -171,6 +181,8 @@ func TestAddNoDbConOnGet(t *testing.T) {
 }
 
 func TestAddNoDBConOnSave(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &sessions.AddParams{
 		Email:    "email@domain.tld",
 		Password: "valid password",

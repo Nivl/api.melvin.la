@@ -7,19 +7,21 @@ import (
 
 	"github.com/Nivl/go-params"
 
-	"github.com/Nivl/go-types/ptrs"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
 	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
+	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestAddInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing name",
@@ -60,6 +62,8 @@ func TestAddInvalidParams(t *testing.T) {
 }
 
 func TestAddValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -92,6 +96,8 @@ func TestAddValidParams(t *testing.T) {
 }
 
 func TestAddAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -115,6 +121,8 @@ func TestAddAccess(t *testing.T) {
 }
 
 func TestAddHappyPath(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &organizations.AddParams{
 		Name:    "Google",
 		Website: ptrs.NewString("https://google.com"),
@@ -151,6 +159,8 @@ func TestAddHappyPath(t *testing.T) {
 }
 
 func TestAddConflictName(t *testing.T) {
+	t.Parallel()
+
 	p := &testrouter.ConflictTestParams{
 		StructConflicting: "*organizations.Organization",
 		FieldConflicting:  "name",
@@ -163,6 +173,8 @@ func TestAddConflictName(t *testing.T) {
 }
 
 func TestAddConflictShortName(t *testing.T) {
+	t.Parallel()
+
 	p := &testrouter.ConflictTestParams{
 		StructConflicting: "*organizations.Organization",
 		FieldConflicting:  "short_name",

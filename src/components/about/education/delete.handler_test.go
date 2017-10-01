@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -19,6 +19,8 @@ import (
 )
 
 func TestDeleteInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -51,6 +53,8 @@ func TestDeleteInvalidParams(t *testing.T) {
 }
 
 func TestDeleteValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -83,6 +87,8 @@ func TestDeleteValidParams(t *testing.T) {
 }
 
 func TestDeleteAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -106,6 +112,8 @@ func TestDeleteAccess(t *testing.T) {
 }
 
 func TestDeleteHappyPath(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.DeleteParams{
 		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}
@@ -138,6 +146,8 @@ func TestDeleteHappyPath(t *testing.T) {
 }
 
 func TestDeleteUnexistingEducation(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.DeleteParams{
 		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}
@@ -163,6 +173,8 @@ func TestDeleteUnexistingEducation(t *testing.T) {
 }
 
 func TestDeleteNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.DeleteParams{
 		ID: "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 	}

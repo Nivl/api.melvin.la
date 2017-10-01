@@ -7,10 +7,10 @@ import (
 
 	"github.com/satori/go.uuid"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -23,6 +23,8 @@ import (
 )
 
 func TestGetInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -49,6 +51,8 @@ func TestGetInvalidParams(t *testing.T) {
 }
 
 func TestGetValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -81,6 +85,8 @@ func TestGetValidParams(t *testing.T) {
 }
 
 func TestGetHappyPath(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		requester   *auth.User
@@ -154,6 +160,8 @@ func TestGetHappyPath(t *testing.T) {
 }
 
 func TestGetUnexisting(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.GetParams{
 		ID: uuid.NewV4().String(),
 	}
@@ -181,6 +189,8 @@ func TestGetUnexisting(t *testing.T) {
 }
 
 func TestGetNoBDCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.GetParams{
 		ID: uuid.NewV4().String(),
 	}
