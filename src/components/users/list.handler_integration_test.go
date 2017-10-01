@@ -9,14 +9,16 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/security/auth"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
@@ -24,9 +26,15 @@ import (
 
 // TestIntegrationListPagination tests the pagination
 func TestIntegrationListPagination(t *testing.T) {
-	dbCon := deps.DB()
+	t.Parallel()
 
-	defer lifecycle.PurgeModels(t, dbCon)
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
 	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
@@ -77,7 +85,7 @@ func TestIntegrationListPagination(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
-			rec := callList(t, tc.params, adminAuth)
+			rec := callList(t, tc.params, adminAuth, helper.Deps)
 			assert.Equal(t, http.StatusOK, rec.Code)
 
 			if rec.Code == http.StatusOK {
@@ -93,8 +101,14 @@ func TestIntegrationListPagination(t *testing.T) {
 
 // TestIntegrationListSorting tests the sorting
 func TestIntegrationListSorting(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	// Creates the data
 	names := []string{"z", "b", "y", "r", "a", "k", "f", "v"}
@@ -130,7 +144,7 @@ func TestIntegrationListSorting(t *testing.T) {
 	}
 
 	// make the request
-	rec := callList(t, params, adminAuth)
+	rec := callList(t, params, adminAuth, helper.Deps)
 
 	// Assert everything went well
 	if assert.Equal(t, http.StatusOK, rec.Code) {
@@ -150,11 +164,12 @@ func TestIntegrationListSorting(t *testing.T) {
 	}
 }
 
-func callList(t *testing.T, params *users.ListParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callList(t *testing.T, params *users.ListParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointList],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
 	return httptests.NewRequest(t, ri)
 }

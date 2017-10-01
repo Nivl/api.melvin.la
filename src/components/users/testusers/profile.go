@@ -6,7 +6,6 @@ import (
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-types/ptrs"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -68,8 +67,6 @@ func NewPersistedProfile(t *testing.T, q db.Queryable, p *users.Profile) *users.
 	if err := p.Create(q); err != nil {
 		t.Fatalf("failed to create user: %s", err)
 	}
-
-	lifecycle.SaveModels(t, p)
 	return p
 }
 

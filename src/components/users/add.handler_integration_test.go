@@ -8,17 +8,27 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
+
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAdd(t *testing.T) {
-	dbCon := deps.DB()
-	globalT := t
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
+	existingUser := testusers.NewPersistedProfile(t, dbCon, nil)
 
 	tests := []struct {
 		description string
@@ -38,34 +48,39 @@ func TestAdd(t *testing.T) {
 		{
 			"It should fail adding a user with an email already taken",
 			http.StatusConflict,
-			&users.AddParams{Name: "Name", Email: "email+TestAdd@fake.com", Password: "password"},
+			&users.AddParams{Name: "Name", Email: existingUser.User.Email, Password: "password"},
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callHandlerAdd(t, tc.params)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusCreated {
-				var u users.ProfilePayload
-				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
-					t.Fatal(err)
+				rec := callHandlerAdd(t, tc.params, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
+
+				if rec.Code == http.StatusCreated {
+					var u users.ProfilePayload
+					if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
+						t.Fatal(err)
+					}
+
+					assert.NotEmpty(t, u.ID)
+					assert.Equal(t, tc.params.Email, u.Email)
 				}
-
-				assert.NotEmpty(t, u.ID)
-				assert.Equal(t, tc.params.Email, u.Email)
-				lifecycle.SaveModels(globalT, &auth.User{ID: u.ID})
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callHandlerAdd(t *testing.T, params *users.AddParams) *httptest.ResponseRecorder {
+func callHandlerAdd(t *testing.T, params *users.AddParams, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointAdd],
 		Params:   params,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }

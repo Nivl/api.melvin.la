@@ -8,17 +8,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/ptrs"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationGetFeatured(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	featuredProfile, _ := testusers.NewAuthProfile(t, dbCon)
 	featuredProfile.IsFeatured = ptrs.NewBool(true)
@@ -29,7 +37,7 @@ func TestIntegrationGetFeatured(t *testing.T) {
 		testusers.NewPersistedProfile(t, dbCon, nil)
 	}
 
-	rec := callGetFeatured(t)
+	rec := callGetFeatured(t, helper.Deps)
 	if assert.Equal(t, http.StatusOK, rec.Code) {
 		var profile users.ProfilePayload
 		if err := json.NewDecoder(rec.Body).Decode(&profile); err != nil {
@@ -43,10 +51,10 @@ func TestIntegrationGetFeatured(t *testing.T) {
 	}
 }
 
-func callGetFeatured(t *testing.T) *httptest.ResponseRecorder {
+func callGetFeatured(t *testing.T, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointGetFeatured],
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }
