@@ -1,7 +1,0 @@
-test:
-  driver: postgres
-  open: $POSTGRES_URI
-
-development:
-  driver: postgres
-  open: $POSTGRES_URI

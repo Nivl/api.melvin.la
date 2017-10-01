@@ -11,6 +11,11 @@ function ml-exec {
   docker-compose exec api /bin/bash -ic $CMD
 }
 
+# Execute any command in the container
+function ml-psql {
+  docker-compose exec database psql -U $POSTGRES_USER
+}
+
 # Open a bash session
 function ml-bash {
   ml-exec bash
@@ -31,22 +36,16 @@ function ml-reset {
   source config/api.env
 
   ddc-rm
-  # ddc-build
   ddc-up
 
   until docker-compose exec database psql "$API_POSTGRES_URI_STR" -c "select 1" > /dev/null 2>&1; do sleep 2; done
-  ml-make "migration"
 }
 
 # Execute a test
 function ml-test {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  # ddc-build &> /dev/null
   ddc-up &> /dev/null
-
-  echo "Update database"
-  ml-make "migration"
 
   echo "Start testings"
   ml-exec "go test -tags=integration $@"
@@ -56,11 +55,7 @@ function ml-test {
 function ml-tests {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  # ddc-build &> /dev/null
   ddc-up &> /dev/null
-
-  echo "Update database"
-  ml-make "migration"
 
   echo "Start testings"
   ml-exec "cd src && go test -tags=integration ./..."
@@ -70,11 +65,7 @@ function ml-tests {
 function ml-coverage {
   echo "Restart services..."
   ddc-stop &> /dev/null
-  # ddc-build &> /dev/null
   ddc-up &> /dev/null
-
-  echo "Update database"
-  ml-make "migration"
 
   echo "Start testings"
   ml-exec "cd src && ../go.test.sh"

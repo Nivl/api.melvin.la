@@ -27,6 +27,8 @@ import (
 )
 
 func TestUploadPictureAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -50,6 +52,8 @@ func TestUploadPictureAccess(t *testing.T) {
 }
 
 func TestUploadPictureInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	mockCtrl := gomock.NewController(t)
 	// defer mockCtrl.Finish()
 
@@ -124,6 +128,8 @@ func TestUploadPictureInvalidParams(t *testing.T) {
 }
 
 func TestUploadPictureValidParams(t *testing.T) {
+	t.Parallel()
+
 	cwd, _ := os.Getwd()
 
 	testCases := []struct {
@@ -168,6 +174,8 @@ func TestUploadPictureValidParams(t *testing.T) {
 }
 
 func TestUploadHappyPath(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	cwd, _ := os.Getwd()
@@ -218,6 +226,8 @@ func TestUploadHappyPath(t *testing.T) {
 }
 
 func TestUploadAdminNotFoundUser(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 	profile.User.IsAdmin = true
 
@@ -250,6 +260,8 @@ func TestUploadAdminNotFoundUser(t *testing.T) {
 }
 
 func TestUploadStorageFailed(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	cwd, _ := os.Getwd()
@@ -290,6 +302,8 @@ func TestUploadStorageFailed(t *testing.T) {
 }
 
 func TestUploadDBNoCon(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	cwd, _ := os.Getwd()
@@ -333,6 +347,8 @@ func TestUploadDBNoCon(t *testing.T) {
 }
 
 func TestUploadWrongUser(t *testing.T) {
+	t.Parallel()
+
 	profile := testusers.NewProfile()
 
 	cwd, _ := os.Getwd()

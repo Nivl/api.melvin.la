@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-types/date"
 	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-types/ptrs"
@@ -62,7 +61,5 @@ func NewPersisted(t *testing.T, dbCon db.Queryable, exp *experience.Experience) 
 	if err := exp.Create(dbCon); err != nil {
 		t.Fatal(err)
 	}
-
-	lifecycle.SaveModels(t, exp)
 	return exp
 }

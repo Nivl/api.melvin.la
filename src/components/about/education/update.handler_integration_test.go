@@ -10,21 +10,29 @@ import (
 
 	"github.com/dchest/uniuri"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/datetime"
 	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education"
 	"github.com/melvin-laplanche/ml-api/src/components/about/education/testeducation"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationUpdate(t *testing.T) {
-	dbCon := deps.DB()
+	t.Parallel()
 
-	defer lifecycle.PurgeModels(t, dbCon)
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
 	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
@@ -74,69 +82,81 @@ func TestIntegrationUpdate(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callUpdate(t, tc.params, adminAuth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var pld *education.Payload
-				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
-					t.Fatal(err)
-				}
+				rec := callUpdate(t, tc.params, adminAuth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
 
-				assert.Equal(t, tc.toUpdate.ID, pld.ID, "ID should have not changed")
-				if tc.params.Degree != nil {
-					assert.Equal(t, *tc.params.Degree, pld.Degree, "Degree should have changed")
-				} else {
-					assert.Equal(t, tc.toUpdate.Degree, pld.Degree, "Degree should have not changed")
-				}
-
-				if tc.params.GPA != nil {
-					assert.Equal(t, *tc.params.GPA, *pld.GPA, "GPA should have changed")
-				} else {
-					assert.Equal(t, tc.toUpdate.GPA, pld.GPA, "GPA should have not changed")
-				}
-
-				if tc.params.Location != nil {
-					assert.Equal(t, *tc.params.Location, *pld.Location, "Location should have changed")
-				} else {
-					assert.Equal(t, tc.toUpdate.Location, pld.Location, "Location should have not changed")
-				}
-
-				if tc.params.Description != nil {
-					assert.Equal(t, *tc.params.Description, *pld.Description, "Description should have changed")
-				} else {
-					assert.Equal(t, tc.toUpdate.Description, pld.Description, "Description should have not changed")
-				}
-
-				if tc.params.StartYear != nil {
-					assert.Equal(t, *tc.params.StartYear, pld.StartYear, "StartYear should have changed")
-				} else {
-					assert.Equal(t, tc.toUpdate.StartYear, pld.StartYear, "StartYear should have not changed")
-				}
-
-				if tc.params.EndYear != nil {
-					assert.Equal(t, *tc.params.EndYear, pld.EndYear, "EndYear should have changed")
-				}
-
-				if tc.params.InTrash != nil {
-					if *tc.params.InTrash {
-						assert.NotNil(t, pld.DeletedAt, "DeletedAt should have been set")
-					} else {
-						assert.Nil(t, pld.DeletedAt, "DeletedAt should have been unset")
+				if rec.Code == http.StatusOK {
+					var pld *education.Payload
+					if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
+						t.Fatal(err)
 					}
-				} else {
-					assert.Nil(t, pld.DeletedAt, "DeletedAt should have not changed")
+
+					assert.Equal(t, tc.toUpdate.ID, pld.ID, "ID should have not changed")
+					if tc.params.Degree != nil {
+						assert.Equal(t, *tc.params.Degree, pld.Degree, "Degree should have changed")
+					} else {
+						assert.Equal(t, tc.toUpdate.Degree, pld.Degree, "Degree should have not changed")
+					}
+
+					if tc.params.GPA != nil {
+						assert.Equal(t, *tc.params.GPA, *pld.GPA, "GPA should have changed")
+					} else {
+						assert.Equal(t, tc.toUpdate.GPA, pld.GPA, "GPA should have not changed")
+					}
+
+					if tc.params.Location != nil {
+						assert.Equal(t, *tc.params.Location, *pld.Location, "Location should have changed")
+					} else {
+						assert.Equal(t, tc.toUpdate.Location, pld.Location, "Location should have not changed")
+					}
+
+					if tc.params.Description != nil {
+						assert.Equal(t, *tc.params.Description, *pld.Description, "Description should have changed")
+					} else {
+						assert.Equal(t, tc.toUpdate.Description, pld.Description, "Description should have not changed")
+					}
+
+					if tc.params.StartYear != nil {
+						assert.Equal(t, *tc.params.StartYear, pld.StartYear, "StartYear should have changed")
+					} else {
+						assert.Equal(t, tc.toUpdate.StartYear, pld.StartYear, "StartYear should have not changed")
+					}
+
+					if tc.params.EndYear != nil {
+						assert.Equal(t, *tc.params.EndYear, pld.EndYear, "EndYear should have changed")
+					}
+
+					if tc.params.InTrash != nil {
+						if *tc.params.InTrash {
+							assert.NotNil(t, pld.DeletedAt, "DeletedAt should have been set")
+						} else {
+							assert.Nil(t, pld.DeletedAt, "DeletedAt should have been unset")
+						}
+					} else {
+						assert.Nil(t, pld.DeletedAt, "DeletedAt should have not changed")
+					}
 				}
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
 func TestIntegrationUpdateOrganization(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	newOrg := testorganizations.NewPersisted(t, dbCon, nil)
 	orphan := testeducation.NewPersisted(t, dbCon, nil)
@@ -149,7 +169,7 @@ func TestIntegrationUpdateOrganization(t *testing.T) {
 	}
 
 	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
-	rec := callUpdate(t, params, httptests.NewRequestAuth(admSession))
+	rec := callUpdate(t, params, httptests.NewRequestAuth(admSession), helper.Deps)
 
 	if assert.Equal(t, http.StatusOK, rec.Code) {
 		var pld *education.Payload
@@ -173,11 +193,12 @@ func TestIntegrationUpdateOrganization(t *testing.T) {
 	}
 }
 
-func callUpdate(t *testing.T, params *education.UpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callUpdate(t *testing.T, params *education.UpdateParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: education.Endpoints[education.EndpointUpdate],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
 	return httptests.NewRequest(t, ri)
 }

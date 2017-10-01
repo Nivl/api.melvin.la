@@ -8,20 +8,28 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-types/ptrs"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations/testorganizations"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationUpdate(t *testing.T) {
-	dbCon := deps.DB()
+	t.Parallel()
 
-	defer lifecycle.PurgeModels(t, dbCon)
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
 	_, admSession := testauth.NewPersistedAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 
@@ -75,55 +83,62 @@ func TestIntegrationUpdate(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callUpdate(t, tc.params, adminAuth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var pld *organizations.Payload
-				if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
-					t.Fatal(err)
-				}
+				rec := callUpdate(t, tc.params, adminAuth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
 
-				assert.Equal(t, tc.toUpdate.ID, pld.ID, "ID should have not changed")
-				if tc.params.Name != nil {
-					assert.Equal(t, *tc.params.Name, pld.Name, "Name should have changed")
-				} else {
-					assert.Equal(t, tc.toUpdate.Name, pld.Name, "Name should have not changed")
-				}
-
-				if tc.params.ShortName != nil {
-					assert.Equal(t, *tc.params.ShortName, pld.ShortName, "ShortName should have changed")
-				} else {
-					assert.Equal(t, *tc.toUpdate.ShortName, pld.ShortName, "ShortName should have not changed")
-				}
-
-				if tc.params.Website != nil {
-					assert.Equal(t, *tc.params.Website, pld.Website, "Website should have changed")
-				} else {
-					assert.Equal(t, *tc.toUpdate.Website, pld.Website, "Website should have not changed")
-				}
-
-				if tc.params.InTrash != nil {
-					if *tc.params.InTrash {
-						assert.NotNil(t, pld.DeletedAt, "DeletedAt should have been set")
-					} else {
-						assert.Nil(t, pld.DeletedAt, "DeletedAt should have been unset")
+				if rec.Code == http.StatusOK {
+					var pld *organizations.Payload
+					if err := json.NewDecoder(rec.Body).Decode(&pld); err != nil {
+						t.Fatal(err)
 					}
-				} else {
-					assert.Nil(t, pld.DeletedAt, "DeletedAt should have not changed")
+
+					assert.Equal(t, tc.toUpdate.ID, pld.ID, "ID should have not changed")
+					if tc.params.Name != nil {
+						assert.Equal(t, *tc.params.Name, pld.Name, "Name should have changed")
+					} else {
+						assert.Equal(t, tc.toUpdate.Name, pld.Name, "Name should have not changed")
+					}
+
+					if tc.params.ShortName != nil {
+						assert.Equal(t, *tc.params.ShortName, pld.ShortName, "ShortName should have changed")
+					} else {
+						assert.Equal(t, *tc.toUpdate.ShortName, pld.ShortName, "ShortName should have not changed")
+					}
+
+					if tc.params.Website != nil {
+						assert.Equal(t, *tc.params.Website, pld.Website, "Website should have changed")
+					} else {
+						assert.Equal(t, *tc.toUpdate.Website, pld.Website, "Website should have not changed")
+					}
+
+					if tc.params.InTrash != nil {
+						if *tc.params.InTrash {
+							assert.NotNil(t, pld.DeletedAt, "DeletedAt should have been set")
+						} else {
+							assert.Nil(t, pld.DeletedAt, "DeletedAt should have been unset")
+						}
+					} else {
+						assert.Nil(t, pld.DeletedAt, "DeletedAt should have not changed")
+					}
 				}
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callUpdate(t *testing.T, params *organizations.UpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callUpdate(t *testing.T, params *organizations.UpdateParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: organizations.Endpoints[organizations.EndpointUpdate],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
 	return httptests.NewRequest(t, ri)
 }

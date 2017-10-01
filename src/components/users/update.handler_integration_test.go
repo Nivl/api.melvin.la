@@ -8,18 +8,26 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/ptrs"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUpdate(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	u1, s1 := testusers.NewAuth(t, dbCon)
 	u2, s2 := testusers.NewAuth(t, dbCon)
@@ -72,58 +80,63 @@ func TestUpdate(t *testing.T) {
 			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", FacebookUsername: ptrs.NewString("fb")},
 			httptests.NewRequestAuth(s1),
 		},
-		// Keep this one last for u1 as it changes the password
 		{
 			"Updating password",
 			http.StatusOK,
-			&users.UpdateParams{ID: u1.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
-			httptests.NewRequestAuth(s1),
+			&users.UpdateParams{ID: u2.ID, CurrentPassword: "fake", NewPassword: "TestUpdateUser"},
+			httptests.NewRequestAuth(s2),
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callUpdate(t, tc.params, tc.auth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var u users.ProfilePayload
-				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
-					t.Fatal(err)
-				}
+				rec := callUpdate(t, tc.params, tc.auth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
 
-				if tc.params.Name != "" {
-					assert.Equal(t, tc.params.Name, u.Name)
-				}
-				if tc.params.Email != "" {
-					assert.Equal(t, tc.params.Email, u.Email)
-				}
-				if tc.params.FacebookUsername != nil {
-					assert.Equal(t, *tc.params.FacebookUsername, u.FacebookUsername)
-				}
-
-				if tc.params.NewPassword != "" {
-					// To check the password has been updated with need to get the
-					// encrypted version, and compare it to the raw one
-					updatedUser, err := auth.GetUserByID(dbCon, tc.params.ID)
-					if err != nil {
+				if rec.Code == http.StatusOK {
+					var u users.ProfilePayload
+					if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
 						t.Fatal(err)
 					}
 
-					hash := updatedUser.Password
-					assert.True(t, auth.IsPasswordValid(hash, tc.params.NewPassword))
+					if tc.params.Name != "" {
+						assert.Equal(t, tc.params.Name, u.Name)
+					}
+					if tc.params.Email != "" {
+						assert.Equal(t, tc.params.Email, u.Email)
+					}
+					if tc.params.FacebookUsername != nil {
+						assert.Equal(t, *tc.params.FacebookUsername, u.FacebookUsername)
+					}
+
+					if tc.params.NewPassword != "" {
+						// To check the password has been updated with need to get the
+						// encrypted version, and compare it to the raw one
+						updatedUser, err := auth.GetUserByID(dbCon, tc.params.ID)
+						if err != nil {
+							t.Fatal(err)
+						}
+
+						hash := updatedUser.Password
+						assert.True(t, auth.IsPasswordValid(hash, tc.params.NewPassword))
+					}
 				}
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callUpdate(t *testing.T, params *users.UpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callUpdate(t *testing.T, params *users.UpdateParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointUpdate],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }

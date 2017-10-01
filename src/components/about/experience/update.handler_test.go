@@ -24,6 +24,8 @@ import (
 )
 
 func TestUpdateInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -128,6 +130,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 }
 
 func TestUpdateValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -178,6 +182,8 @@ func TestUpdateValidParams(t *testing.T) {
 }
 
 func TestUpdateAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -201,6 +207,8 @@ func TestUpdateAccess(t *testing.T) {
 }
 
 func TestUpdateHappyPath(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.UpdateParams{
 		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		JobTitle:    ptrs.NewString("JobTitle"),
@@ -251,6 +259,8 @@ func TestUpdateHappyPath(t *testing.T) {
 }
 
 func TestUpdateUnsetEndDate(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.UpdateParams{
 		UnsetEndDate: true,
 	}
@@ -287,6 +297,8 @@ func TestUpdateUnsetEndDate(t *testing.T) {
 }
 
 func TestUpdateEndDateBeforeStartDate(t *testing.T) {
+	t.Parallel()
+
 	now, _ := date.New("2017-08")
 	future, _ := date.New("2018-08")
 
@@ -319,6 +331,8 @@ func TestUpdateEndDateBeforeStartDate(t *testing.T) {
 }
 
 func TestUpdateNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.UpdateParams{
 		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		JobTitle:    ptrs.NewString("JobTitle"),
@@ -353,6 +367,8 @@ func TestUpdateNoDBCon(t *testing.T) {
 }
 
 func TestUpdateUnexisting(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.UpdateParams{
 		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		JobTitle:    ptrs.NewString("JobTitle"),
@@ -383,6 +399,8 @@ func TestUpdateUnexisting(t *testing.T) {
 }
 
 func TestUpdateUnexistingOrg(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.UpdateParams{
 		ID:             uuid.NewV4().String(),
 		OrganizationID: ptrs.NewString(uuid.NewV4().String()),
@@ -414,6 +432,8 @@ func TestUpdateUnexistingOrg(t *testing.T) {
 }
 
 func TestUpdateGetOrgNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &experience.UpdateParams{
 		ID:             uuid.NewV4().String(),
 		OrganizationID: ptrs.NewString(uuid.NewV4().String()),

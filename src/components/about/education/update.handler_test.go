@@ -24,6 +24,8 @@ import (
 )
 
 func TestUpdateInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -181,6 +183,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 }
 
 func TestUpdateValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -231,6 +235,8 @@ func TestUpdateValidParams(t *testing.T) {
 }
 
 func TestUpdateAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -254,6 +260,8 @@ func TestUpdateAccess(t *testing.T) {
 }
 
 func TestUpdateHappyPath(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.UpdateParams{
 		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Degree:      ptrs.NewString("CS"),
@@ -304,6 +312,8 @@ func TestUpdateHappyPath(t *testing.T) {
 }
 
 func TestUpdateUnsetEndYear(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.UpdateParams{
 		UnsetEndYear: true,
 	}
@@ -340,6 +350,8 @@ func TestUpdateUnsetEndYear(t *testing.T) {
 }
 
 func TestUpdateEndYearBeforeStartYear(t *testing.T) {
+	t.Parallel()
+
 	now := rand.Intn(100) + 1950
 	future := now + 1
 
@@ -372,6 +384,8 @@ func TestUpdateEndYearBeforeStartYear(t *testing.T) {
 }
 
 func TestUpdateNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.UpdateParams{
 		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Degree:      ptrs.NewString("CS"),
@@ -407,6 +421,8 @@ func TestUpdateNoDBCon(t *testing.T) {
 }
 
 func TestUpdateUnexisting(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.UpdateParams{
 		ID:          "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Degree:      ptrs.NewString("CS"),
@@ -438,6 +454,8 @@ func TestUpdateUnexisting(t *testing.T) {
 }
 
 func TestUpdateUnexistingOrg(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.UpdateParams{
 		ID:             uuid.NewV4().String(),
 		OrganizationID: ptrs.NewString(uuid.NewV4().String()),
@@ -469,6 +487,8 @@ func TestUpdateUnexistingOrg(t *testing.T) {
 }
 
 func TestUpdateGetOrgNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &education.UpdateParams{
 		ID:             uuid.NewV4().String(),
 		OrganizationID: ptrs.NewString(uuid.NewV4().String()),

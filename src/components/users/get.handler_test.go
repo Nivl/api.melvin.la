@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -19,6 +19,8 @@ import (
 )
 
 func TestGetInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -45,6 +47,8 @@ func TestGetInvalidParams(t *testing.T) {
 }
 
 func TestGetValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -77,6 +81,8 @@ func TestGetValidParams(t *testing.T) {
 }
 
 func TestGetOthersData(t *testing.T) {
+	t.Parallel()
+
 	userToGet := testusers.NewProfile()
 
 	handlerParams := &users.GetParams{
@@ -121,6 +127,8 @@ func TestGetOthersData(t *testing.T) {
 }
 
 func TestGetOwnData(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.GetParams{
 		ID: "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
 	}
@@ -166,6 +174,8 @@ func TestGetOwnData(t *testing.T) {
 }
 
 func TestGetUnexistingUser(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.GetParams{
 		ID: "0c2f0713-3f9b-4657-9cdd-2b4ed1f214e9",
 	}

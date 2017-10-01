@@ -9,20 +9,28 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-params/formfile/testformfile"
+	"github.com/Nivl/go-rest-tools/dependencies"
+	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/storage/fs"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationUploadHappyPath(t *testing.T) {
-	cwd, _ := os.Getwd()
-	dbCon := deps.DB()
+	t.Parallel()
 
-	defer lifecycle.PurgeModels(t, dbCon)
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
+	cwd, _ := os.Getwd()
 	_, admSession := testusers.NewAdminAuth(t, dbCon)
 	adminAuth := httptests.NewRequestAuth(admSession)
 	userProfile := testusers.NewPersistedProfile(t, dbCon, nil)
@@ -40,35 +48,42 @@ func TestIntegrationUploadHappyPath(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			defer tc.params.Picture.File.Close()
-			rec := callUploadPicture(t, tc.params, adminAuth)
-			assert.Equal(t, http.StatusOK, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
+				defer tc.params.Picture.File.Close()
 
-			if rec.Code == http.StatusOK {
-				pld := &users.ProfilePayload{}
-				if err := json.NewDecoder(rec.Body).Decode(pld); err != nil {
+				rec := callUploadPicture(t, tc.params, adminAuth, helper.Deps)
+				assert.Equal(t, http.StatusOK, rec.Code)
+
+				if rec.Code == http.StatusOK {
+					pld := &users.ProfilePayload{}
+					if err := json.NewDecoder(rec.Body).Decode(pld); err != nil {
+						assert.NoError(t, err)
+						return
+					}
+
+					assert.Equal(t, userProfile.User.ID, pld.ID, "ID should have not changed")
+					assert.NotEmpty(t, userProfile.Picture, "Picture should not be empty")
+					assert.Equal(t, "/", string(pld.Picture[0]), "Picture should start by a \"/\" as the storage provider should have fallback to the FS one. Got %s", pld.Picture)
+					exists, err := fs.FileExists(pld.Picture)
 					assert.NoError(t, err)
-					return
+					assert.True(t, exists, "The file should exist on the filesystem")
 				}
-
-				assert.Equal(t, userProfile.User.ID, pld.ID, "ID should have not changed")
-				assert.NotEmpty(t, userProfile.Picture, "Picture should not be empty")
-				assert.Equal(t, "/", string(pld.Picture[0]), "Picture should start by a \"/\" as the storage provider should have fallback to the FS one. Got %s", pld.Picture)
-				exists, err := fs.FileExists(pld.Picture)
-				assert.NoError(t, err)
-				assert.True(t, exists, "The file should exist on the filesystem")
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callUploadPicture(t *testing.T, params *users.UploadPictureParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callUploadPicture(t *testing.T, params *users.UploadPictureParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointUploadPicture],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
 	return httptests.NewRequest(t, ri)
 }

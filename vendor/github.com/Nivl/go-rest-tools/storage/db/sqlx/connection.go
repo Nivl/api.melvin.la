@@ -1,6 +1,8 @@
 package sqlx
 
 import (
+	"database/sql"
+
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/jmoiron/sqlx"
 )
@@ -8,8 +10,8 @@ import (
 var _ db.Connection = (*Connection)(nil)
 
 // New returns a new SQLX connection
-func New(uri string) (*Connection, error) {
-	con, err := sqlx.Connect("postgres", uri)
+func New(dsn string) (*Connection, error) {
+	con, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -21,6 +23,7 @@ func New(uri string) (*Connection, error) {
 	return &Connection{
 		Queryable: NewQueryable(con),
 		con:       con,
+		dsn:       dsn,
 	}, nil
 }
 
@@ -28,6 +31,7 @@ func New(uri string) (*Connection, error) {
 type Connection struct {
 	*Queryable
 	con *sqlx.DB
+	dsn string
 }
 
 // Beginx is an Exec that accepts named params (ex where id=:user_id)
@@ -38,4 +42,14 @@ func (db *Connection) Beginx() (db.Tx, error) {
 // Close closes the database connection
 func (db *Connection) Close() error {
 	return db.con.Close()
+}
+
+// SQL returns the sql.DB object
+func (db *Connection) SQL() *sql.DB {
+	return db.con.DB
+}
+
+// SQL returns the sql.DB object
+func (db *Connection) DSN() string {
+	return db.dsn
 }

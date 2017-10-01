@@ -8,20 +8,30 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDelete(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	u1, s1 := testauth.NewPersistedAuth(t, dbCon)
 	_, s2 := testauth.NewPersistedAuth(t, dbCon)
+
+	userToDelete, sessionToDelete := testauth.NewPersistedAuth(t, dbCon)
 
 	tests := []struct {
 		description string
@@ -47,37 +57,42 @@ func TestDelete(t *testing.T) {
 			&users.DeleteParams{ID: u1.ID, CurrentPassword: "psw"},
 			httptests.NewRequestAuth(s1),
 		},
-		// Keep this one last for u1 as it deletes the user
 		{
 			"Deleting user",
 			http.StatusNoContent,
-			&users.DeleteParams{ID: u1.ID, CurrentPassword: "fake"},
-			httptests.NewRequestAuth(s1),
+			&users.DeleteParams{ID: userToDelete.ID, CurrentPassword: "fake"},
+			httptests.NewRequestAuth(sessionToDelete),
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callDelete(t, tc.params, tc.auth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusNoContent {
-				// We check that the user has been deleted
-				var user auth.User
-				stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"
-				err := dbCon.Get(&user, stmt, tc.params.ID)
-				assert.Equal(t, sql.ErrNoRows, err, "User not deleted")
-			}
-		})
-	}
+				rec := callDelete(t, tc.params, tc.auth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
+
+				if rec.Code == http.StatusNoContent {
+					// We check that the user has been deleted
+					var user auth.User
+					stmt := "SELECT * FROM users WHERE id=$1 LIMIT 1"
+					err := dbCon.Get(&user, stmt, tc.params.ID)
+					assert.Equal(t, sql.ErrNoRows, err, "User not deleted")
+				}
+			})
+		}
+	})
 }
 
-func callDelete(t *testing.T, params *users.DeleteParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callDelete(t *testing.T, params *users.DeleteParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointDelete],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }

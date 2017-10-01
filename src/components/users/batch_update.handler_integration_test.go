@@ -8,21 +8,29 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
 	"github.com/Nivl/go-types/ptrs"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestbatchUpdateIsFeatured(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	a1, as1 := testusers.NewAdminAuth(t, dbCon)
 	params := &users.BatchUpdateParams{FeaturedUser: ptrs.NewString(a1.ID)}
-	rec := callBatchUpdate(t, params, httptests.NewRequestAuth(as1))
+	rec := callBatchUpdate(t, params, httptests.NewRequestAuth(as1), helper.Deps)
 
 	if assert.Equal(t, http.StatusOK, rec.Code) {
 		var pld users.ProfilesPayload
@@ -37,8 +45,14 @@ func TestbatchUpdateIsFeatured(t *testing.T) {
 }
 
 func TestbatchUpdateReplaceFeatured(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	a1, as1 := testusers.NewAdminAuth(t, dbCon)
 	p1, _ := testusers.NewAuthProfile(t, dbCon)
@@ -46,7 +60,7 @@ func TestbatchUpdateReplaceFeatured(t *testing.T) {
 	assert.NoError(t, p1.Update(dbCon), "Update failed")
 
 	params := &users.BatchUpdateParams{FeaturedUser: ptrs.NewString(a1.ID)}
-	rec := callBatchUpdate(t, params, httptests.NewRequestAuth(as1))
+	rec := callBatchUpdate(t, params, httptests.NewRequestAuth(as1), helper.Deps)
 
 	if assert.Equal(t, http.StatusOK, rec.Code) {
 		var pld users.ProfilesPayload
@@ -69,12 +83,12 @@ func TestbatchUpdateReplaceFeatured(t *testing.T) {
 	}
 }
 
-func callBatchUpdate(t *testing.T, params *users.BatchUpdateParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callBatchUpdate(t *testing.T, params *users.BatchUpdateParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointBatchUpdate],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }

@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/paginator"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -22,6 +22,8 @@ import (
 )
 
 func TestListInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on invalid delete value",
@@ -90,6 +92,8 @@ func TestListInvalidParams(t *testing.T) {
 }
 
 func TestListValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -182,6 +186,8 @@ func TestListValidParams(t *testing.T) {
 }
 
 func TestListAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should work for anonymous users",
@@ -205,6 +211,8 @@ func TestListAccess(t *testing.T) {
 }
 
 func TestListNoBDCon(t *testing.T) {
+	t.Parallel()
+
 	requester := testauth.NewUser()
 
 	// Mock the database & add expectations
@@ -229,6 +237,8 @@ func TestListNoBDCon(t *testing.T) {
 }
 
 func TestListPublic(t *testing.T) {
+	t.Parallel()
+
 	requester := testauth.NewUser()
 
 	expList := experience.ListExperience{
@@ -280,6 +290,8 @@ func TestListPublic(t *testing.T) {
 }
 
 func TestListPrivate(t *testing.T) {
+	t.Parallel()
+
 	requester := testauth.NewAdmin()
 
 	expList := experience.ListExperience{

@@ -9,7 +9,7 @@ install:
 	go install $(LDFLAGS) .
 
 migration:
-	goose up
+	goose postgres "${POSTGRES_URI}" up
 
 generate:
 	go install $(LDFLAGS) github.com/Nivl/api-cli

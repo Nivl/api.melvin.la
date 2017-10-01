@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
@@ -17,6 +17,8 @@ import (
 )
 
 func TestInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing name",
@@ -58,6 +60,8 @@ func TestInvalidParams(t *testing.T) {
 }
 
 func TestAddHappyPath(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",
@@ -99,6 +103,8 @@ func TestAddHappyPath(t *testing.T) {
 }
 
 func TestAddConflict(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",
@@ -130,6 +136,8 @@ func TestAddConflict(t *testing.T) {
 }
 
 func TestAddProfileError(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",
@@ -161,6 +169,8 @@ func TestAddProfileError(t *testing.T) {
 }
 
 func TestAddCommitError(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",
@@ -193,6 +203,8 @@ func TestAddCommitError(t *testing.T) {
 }
 
 func TestAddTransactionError(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &users.AddParams{
 		Name:     "username",
 		Email:    "email@domain.tld",

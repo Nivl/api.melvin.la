@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router/testrouter"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
@@ -21,6 +21,8 @@ import (
 )
 
 func TestUpdateInvalidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.InvalidParamsTestCase{
 		{
 			Description: "Should fail on missing ID",
@@ -87,6 +89,8 @@ func TestUpdateInvalidParams(t *testing.T) {
 }
 
 func TestUpdateValidParams(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		description string
 		sources     map[string]url.Values
@@ -137,6 +141,8 @@ func TestUpdateValidParams(t *testing.T) {
 }
 
 func TestUpdateAccess(t *testing.T) {
+	t.Parallel()
+
 	testCases := []testguard.AccessTestCase{
 		{
 			Description: "Should fail for anonymous users",
@@ -160,6 +166,8 @@ func TestUpdateAccess(t *testing.T) {
 }
 
 func TestUpdateHappyPath(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &organizations.UpdateParams{
 		ID:        "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Name:      ptrs.NewString("Google"),
@@ -204,6 +212,8 @@ func TestUpdateHappyPath(t *testing.T) {
 }
 
 func TestUpdateConflictName(t *testing.T) {
+	t.Parallel()
+
 	p := &testrouter.ConflictTestParams{
 		StructConflicting: "*organizations.Organization",
 		FieldConflicting:  "name",
@@ -216,6 +226,8 @@ func TestUpdateConflictName(t *testing.T) {
 }
 
 func TestUpdateConflictShortName(t *testing.T) {
+	t.Parallel()
+
 	p := &testrouter.ConflictTestParams{
 		StructConflicting: "*organizations.Organization",
 		FieldConflicting:  "short_name",
@@ -228,6 +240,8 @@ func TestUpdateConflictShortName(t *testing.T) {
 }
 
 func TestUpdateNoDBCon(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &organizations.UpdateParams{
 		ID:        "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Name:      ptrs.NewString("Google"),
@@ -261,6 +275,8 @@ func TestUpdateNoDBCon(t *testing.T) {
 }
 
 func TestUpdateUnexisting(t *testing.T) {
+	t.Parallel()
+
 	handlerParams := &organizations.UpdateParams{
 		ID:        "48d0c8b8-d7a3-4855-9d90-29a06ef474b0",
 		Name:      ptrs.NewString("Google"),

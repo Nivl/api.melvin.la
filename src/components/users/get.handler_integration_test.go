@@ -8,16 +8,24 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/users"
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGet(t *testing.T) {
-	dbCon := deps.DB()
-	defer lifecycle.PurgeModels(t, dbCon)
+	t.Parallel()
+
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
 
 	u1, s1 := testusers.NewAuth(t, dbCon)
 	_, s2 := testusers.NewAuth(t, dbCon)
@@ -60,36 +68,42 @@ func TestGet(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callGet(t, tc.params, tc.auth)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusOK {
-				var u users.ProfilePayload
-				if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
-					t.Fatal(err)
-				}
+				rec := callGet(t, tc.params, tc.auth, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
 
-				if assert.Equal(t, tc.params.ID, u.ID, "Not the same user") {
-					// User access their own data
-					if tc.auth != nil && u.ID == tc.auth.UserID {
-						assert.NotEmpty(t, u.Email, "Same user needs their private data")
-					} else { // user access an other user data
-						assert.Empty(t, u.Email, "Should not return private data")
+				if rec.Code == http.StatusOK {
+					var u users.ProfilePayload
+					if err := json.NewDecoder(rec.Body).Decode(&u); err != nil {
+						t.Fatal(err)
+					}
+
+					if assert.Equal(t, tc.params.ID, u.ID, "Not the same user") {
+						// User access their own data
+						if tc.auth != nil && u.ID == tc.auth.UserID {
+							assert.NotEmpty(t, u.Email, "Same user needs their private data")
+						} else { // user access an other user data
+							assert.Empty(t, u.Email, "Should not return private data")
+						}
 					}
 				}
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callGet(t *testing.T, params *users.GetParams, auth *httptests.RequestAuth) *httptest.ResponseRecorder {
+func callGet(t *testing.T, params *users.GetParams, auth *httptests.RequestAuth, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: users.Endpoints[users.EndpointGet],
 		Params:   params,
 		Auth:     auth,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }
