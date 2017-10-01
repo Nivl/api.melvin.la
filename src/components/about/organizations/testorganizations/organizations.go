@@ -5,7 +5,6 @@ import (
 
 	"github.com/Nivl/go-rest-tools/storage/db"
 	"github.com/Nivl/go-types/datetime"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 	"github.com/Nivl/go-types/ptrs"
 	"github.com/dchest/uniuri"
 	"github.com/melvin-laplanche/ml-api/src/components/about/organizations"
@@ -48,6 +47,5 @@ func NewPersisted(t *testing.T, dbCon db.Queryable, org *organizations.Organizat
 		t.Fatal(err)
 	}
 
-	lifecycle.SaveModels(t, org)
 	return org
 }
