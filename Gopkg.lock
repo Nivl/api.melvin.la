@@ -159,6 +159,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/ttacon/builder"
+  packages = ["."]
+  revision = "c099f663e1c235176c175644792c5eb282017ad7"
+
+[[projects]]
+  name = "github.com/ttacon/libphonenumber"
+  packages = ["."]
+  revision = "f9c5ddf85ffa9cc802cb511f9ab4733d7d8fbb0e"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = ["bcrypt","blowfish"]
   revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"

@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/melvin-laplanche/ml-api/src/components/users/testusers"
+	"github.com/ttacon/libphonenumber"
 
+	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/router"
 	"github.com/Nivl/go-rest-tools/router/guard/testguard"
 	"github.com/Nivl/go-rest-tools/router/mockrouter"
-	"github.com/Nivl/go-params"
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db/mockdb"
 	"github.com/Nivl/go-rest-tools/types/apierror"
@@ -68,6 +69,45 @@ func TestUpdateInvalidParams(t *testing.T) {
 				},
 			},
 		},
+		{
+			Description: "Should fail on invalid Email",
+			MsgMatch:    params.ErrMsgInvalidEmail,
+			FieldName:   "email",
+			Sources: map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"email": []string{"not-an-email"},
+				},
+			},
+		},
+		{
+			Description: "Should fail on invalid Phone number",
+			MsgMatch:    libphonenumber.ErrNotANumber.Error(),
+			FieldName:   "phone_number",
+			Sources: map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"phone_number": []string{"not-an-phone-number"},
+				},
+			},
+		},
+		{
+			Description: "Should fail on invalid Phone number",
+			MsgMatch:    "not a valid phone number",
+			FieldName:   "phone_number",
+			Sources: map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"phone_number": []string{"(999) 123 4567"},
+				},
+			},
+		},
 	}
 
 	g := users.Endpoints[users.EndpointUpdate].Guard
@@ -86,6 +126,39 @@ func TestUpdateValidParams(t *testing.T) {
 					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
 				},
 				"form": url.Values{},
+			},
+		},
+		{
+			"Should work with a valid phone number",
+			map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"phone_number": []string{"866-246-6453"},
+				},
+			},
+		},
+		{
+			"Should work with a valid phone number with parenthesis",
+			map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"phone_number": []string{"(866) 246 6453"},
+				},
+			},
+		},
+		{
+			"Should work with a valid phone number with country code",
+			map[string]url.Values{
+				"url": url.Values{
+					"id": []string{"48d0c8b8-d7a3-4855-9d90-29a06ef474b0"},
+				},
+				"form": url.Values{
+					"phone_number": []string{"+1 (866) 246 6453"},
+				},
 			},
 		},
 	}
