@@ -3,6 +3,7 @@ package dependencies
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"github.com/Nivl/go-rest-tools/dependencies/gcp"
 	"github.com/Nivl/go-rest-tools/logger"
@@ -18,6 +19,8 @@ var _ Dependencies = (*APIDependencies)(nil)
 
 // APIDependencies is a structure implementing the Dependencies interface
 type APIDependencies struct {
+	sync.Mutex
+
 	postgres   *sqlx.Connection
 	logentries *le_go.Logger
 	sendgrid   mailer.Mailer
@@ -31,6 +34,9 @@ type APIDependencies struct {
 
 // SetDB creates a connection to a SQL database
 func (deps *APIDependencies) SetDB(uri string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	var err error
 	deps.postgres, err = sqlx.New(uri)
 	return err
@@ -43,6 +49,9 @@ func (deps *APIDependencies) DB() db.Connection {
 
 // SetLogentries creates a connection to logentries
 func (deps *APIDependencies) SetLogentries(token string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	var err error
 	deps.logentries, err = le_go.Connect(token)
 	return err
@@ -52,6 +61,9 @@ func (deps *APIDependencies) SetLogentries(token string) error {
 // Logentries
 // BasicLogger
 func (deps *APIDependencies) Logger() logger.Logger {
+	deps.Lock()
+	defer deps.Unlock()
+
 	if deps.logger == nil {
 		if deps.logentries != nil {
 			deps.logger = logger.NewLogEntries(deps.logentries)
@@ -64,6 +76,9 @@ func (deps *APIDependencies) Logger() logger.Logger {
 
 // SetSendgrid creates a mailer using sendgrid
 func (deps *APIDependencies) SetSendgrid(apiKey, from, to, stacktraceUUID string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	deps.sendgrid = mailer.NewSendgrid(apiKey, from, to, stacktraceUUID)
 	return nil
 }
@@ -72,6 +87,9 @@ func (deps *APIDependencies) SetSendgrid(apiKey, from, to, stacktraceUUID string
 // Sendgrid
 // Noop
 func (deps *APIDependencies) Mailer() mailer.Mailer {
+	deps.Lock()
+	defer deps.Unlock()
+
 	if deps.mailer == nil {
 		if deps.sendgrid != nil {
 			deps.mailer = deps.sendgrid
@@ -84,12 +102,18 @@ func (deps *APIDependencies) Mailer() mailer.Mailer {
 
 // SetGCP sets up Google Cloud Platform
 func (deps *APIDependencies) SetGCP(apiKey, projectName, bucket string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	deps.gcp = gcp.New(apiKey, projectName, bucket)
 	return nil
 }
 
 // SetCloudinary setups Cloudinary as Storage provider
 func (deps *APIDependencies) SetCloudinary(apiKey, secret, bucket string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	deps.cloudinary = filestorage.NewCloudinary(apiKey, secret)
 	deps.cloudinary.SetBucket(bucket)
 	return nil
@@ -100,6 +124,9 @@ func (deps *APIDependencies) SetCloudinary(apiKey, secret, bucket string) error 
 // Cloudinary
 // Filesystem
 func (deps *APIDependencies) FileStorage(ctx context.Context) (filestorage.FileStorage, error) {
+	deps.Lock()
+	defer deps.Unlock()
+
 	if deps.gcp != nil {
 		return deps.gcp.Storage(ctx)
 	}
@@ -111,6 +138,9 @@ func (deps *APIDependencies) FileStorage(ctx context.Context) (filestorage.FileS
 
 // SetSentry creates a reporter using Sentry
 func (deps *APIDependencies) SetSentry(con string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	var err error
 	deps.reporter, err = reporter.NewSentryCreator(con)
 	return err
@@ -118,10 +148,12 @@ func (deps *APIDependencies) SetSentry(con string) error {
 
 // EnableEmailReporting sets the current mailer as reporter
 func (deps *APIDependencies) EnableEmailReporting(con string) error {
+	deps.Lock()
+	defer deps.Unlock()
+
 	if deps.mailer == nil {
 		return errors.New("no mailer set")
 	}
-
 	var err error
 	deps.reporter, err = reporter.NewMailerCreator(deps.mailer)
 	return err
@@ -132,9 +164,11 @@ func (deps *APIDependencies) EnableEmailReporting(con string) error {
 // Email
 // Noop
 func (deps *APIDependencies) Reporter() reporter.Creator {
+	deps.Lock()
+	defer deps.Unlock()
+
 	if deps.reporter == nil {
 		deps.reporter, _ = reporter.NewNoopCreator()
 	}
-
 	return deps.reporter
 }
