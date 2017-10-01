@@ -5,7 +5,6 @@ import (
 
 	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/storage/db"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
 )
 
 // NewAuth creates a non-persisted user and their session
@@ -48,11 +47,8 @@ func NewPersistedSession(t *testing.T, q db.Queryable, user *auth.User) *auth.Se
 	session := &auth.Session{
 		UserID: user.ID,
 	}
-
 	if err := session.Create(q); err != nil {
 		t.Fatal(err)
 	}
-
-	lifecycle.SaveModels(t, session)
 	return session
 }

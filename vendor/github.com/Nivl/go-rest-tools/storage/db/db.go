@@ -1,8 +1,16 @@
 package db
 
+import "database/sql"
+
 // Connection is an interface representing a database connection
 type Connection interface {
 	Queryable
+
+	// SQL returns the sql.DB object
+	SQL() *sql.DB
+
+	// DSN returns the DNS used to connect to the database
+	DSN() string
 
 	// Close closes the database connection
 	Close() error
