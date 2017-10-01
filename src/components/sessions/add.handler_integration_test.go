@@ -8,18 +8,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Nivl/go-rest-tools/dependencies"
 	"github.com/Nivl/go-rest-tools/network/http/httptests"
-	"github.com/Nivl/go-rest-tools/security/auth"
 	"github.com/Nivl/go-rest-tools/security/auth/testauth"
-	"github.com/Nivl/go-rest-tools/types/models/lifecycle"
+	"github.com/Nivl/go-rest-tools/testing/integration"
+	"github.com/melvin-laplanche/ml-api/src/components/api"
 	"github.com/melvin-laplanche/ml-api/src/components/sessions"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAdd(t *testing.T) {
-	dbCon := deps.DB()
+	t.Parallel()
 
-	defer lifecycle.PurgeModels(t, dbCon)
+	helper, err := integration.New(NewDeps(), migrationFolder)
+	if err != nil {
+		panic(err)
+	}
+	defer helper.Close()
+	dbCon := helper.Deps.DB()
+
 	u1 := testauth.NewPersistedUser(t, dbCon, nil)
 
 	tests := []struct {
@@ -44,32 +51,35 @@ func TestAdd(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.description, func(t *testing.T) {
-			rec := callAdd(t, tc.params)
-			assert.Equal(t, tc.code, rec.Code)
+	t.Run("parallel", func(t *testing.T) {
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.description, func(t *testing.T) {
+				t.Parallel()
+				defer helper.RecoverPanic()
 
-			if rec.Code == http.StatusCreated {
-				var session sessions.Payload
-				if err := json.NewDecoder(rec.Body).Decode(&session); err != nil {
-					t.Fatal(err)
+				rec := callAdd(t, tc.params, helper.Deps)
+				assert.Equal(t, tc.code, rec.Code)
+
+				if rec.Code == http.StatusCreated {
+					var session sessions.Payload
+					if err := json.NewDecoder(rec.Body).Decode(&session); err != nil {
+						t.Fatal(err)
+					}
+
+					assert.NotEmpty(t, session.Token)
+					assert.Equal(t, u1.ID, session.UserID)
 				}
-
-				assert.NotEmpty(t, session.Token)
-				assert.Equal(t, u1.ID, session.UserID)
-
-				// clean the test
-				(&auth.Session{ID: session.Token}).Delete(dbCon)
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
-func callAdd(t *testing.T, params *sessions.AddParams) *httptest.ResponseRecorder {
+func callAdd(t *testing.T, params *sessions.AddParams, deps dependencies.Dependencies) *httptest.ResponseRecorder {
 	ri := &httptests.RequestInfo{
 		Endpoint: sessions.Endpoints[sessions.EndpointAdd],
 		Params:   params,
+		Router:   api.GetRouter(deps),
 	}
-
 	return httptests.NewRequest(t, ri)
 }
