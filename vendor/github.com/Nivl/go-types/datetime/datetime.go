@@ -14,37 +14,46 @@ type DateTime struct {
 	time.Time
 }
 
-// Now returns the current local time.
+// Now returns the current UTC time.
 func Now() *DateTime {
-	return &DateTime{Time: time.Now()}
+	return &DateTime{Time: time.Now().UTC()}
 }
 
-// Value - Implementation of valuer for database/sql
+// Value returns a value that the database can handle
+// https://golang.org/pkg/database/sql/driver/#Valuer
 func (t *DateTime) Value() (driver.Value, error) {
 	if t == nil {
 		return nil, nil
 	}
-
-	return t.Format(ISO8601), nil
+	return t.UTC().Format(ISO8601), nil
 }
 
-// Scan - Implement the database/sql scanner interface
+// Scan assigns a value from a database driver
+// https://golang.org/pkg/database/sql/#Scanner
 func (t *DateTime) Scan(value interface{}) error {
 	if value != nil {
 		t.Time = value.(time.Time)
+		t.Time = t.Time.UTC()
 	}
 	return nil
 }
 
-// MarshalJSON implements the json.Marshaler interface
+// MarshalJSON returns a valid json representation of the struct
+// https://golang.org/pkg/encoding/json/#Marshaler
 func (t DateTime) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + t.Format(ISO8601) + `"`), nil
+	return []byte(`"` + t.UTC().Format(ISO8601) + `"`), nil
 }
 
-// UnmarshalJSON implements the json.Unmarshaler interface
-func (t *DateTime) UnmarshalJSON(data []byte) (err error) {
+// UnmarshalJSON tries to parse a json data into a valid struct
+// https://golang.org/pkg/encoding/json/#Unmarshaler
+func (t *DateTime) UnmarshalJSON(data []byte) error {
+	var err error
 	t.Time, err = time.Parse(`"`+ISO8601+`"`, string(data))
-	return
+	if err != nil {
+		return err
+	}
+	t.Time = t.Time.UTC()
+	return nil
 }
 
 // Equal check if the given date is equal to the current one
