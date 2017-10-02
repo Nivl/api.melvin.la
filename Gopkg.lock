@@ -17,13 +17,13 @@
   branch = "master"
   name = "github.com/Nivl/go-rest-tools"
   packages = ["dependencies","dependencies/gcp","dependencies/mockdependencies","logger","logger/mocklogger","network/http/basicauth","network/http/httptests","notifiers/mailer","notifiers/mailer/mockmailer","notifiers/reporter","notifiers/reporter/mockreporter","paginator","router","router/guard","router/guard/testguard","router/mockrouter","router/testrouter","security/auth","security/auth/testauth","storage/db","storage/db/mockdb","storage/db/sqlx","storage/filestorage","storage/filestorage/mockfilestorage","storage/fs","testing/integration","types/apierror"]
-  revision = "befca9f340f78c343633f4b18651497058f60dc1"
+  revision = "851422f8f6a3e38515093cb9602814fb12a9cdeb"
 
 [[projects]]
   branch = "master"
   name = "github.com/Nivl/go-types"
   packages = ["date","datetime","filetype","ptrs","slices","strngs"]
-  revision = "d7885e3ee74696687bb44c738b2a117604b298e9"
+  revision = "62b6de9222662d94e0706c917eeab5178cc72b99"
 
 [[projects]]
   branch = "master"
